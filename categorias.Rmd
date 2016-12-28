@@ -3,9 +3,9 @@ title: "categorias"
 author: "Ricardo Mayer"
 date: "December 27, 2016"
 output:
-  word_document: default
   pdf_document: default
   html_document: default
+  word_document: default
 ---
 
 
@@ -56,56 +56,154 @@ Una lista tentativa podría ser la siguiente:
 ### En situaciones que precisen primeros auxilios
 
 
-tabla:
+-  Riesgo de insolvencia del sector publico
+     +  Variable: Monto de deuda publica y monto del servicio
+        *  Gob Central (esta disponible)
+        *  Gob General (algunos paises)
+        *  Empresas relacionadas (muy poco. hay que buscar en Bloomberg)
+        *  Corto versus mediano plazo: poca informacion
+        *  Moneda local versus USD (hay innfo sobre el total)
+        *  Tasa fija versus variable
+     +  Choque: Terminos de intercambio, en tanto afecten recaudacion
+     +  Choque: precios de productos de empresas relacionadas
+     +  Choque: Tasas de interes y premio por riesgo
+  
+  
+    
+-  Riesgo de insolvencia de (parte de) el sector financiero
+     +  Variable: pasivos/capital 
+     +  Activos ajustados por riesgo? Quizas Capital Nivel 1/ Total (Basilea III)
+     +  Variable: prestamos
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precio de los bienes raices
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven efctado su margen de explotacion o familias que caen en desempleo o subempleo)
+         
+         
+    
+-  Riesgo de quiebras masivas en el sector real
+     +  Variable: utilidades sectoriales 
+     +  Variable: delinquent loans, morosidad mayor a noventa dias (non performing loans)
+     +  Variable: apalancamiento
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precios de las viviendas
+     +  Variable: ventas al por mayor
+     +  Variable: Indices de prod industrial 
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+       
+                
+-  Hiperinflacion 
+    +  Variable: IPC
+    +  Variable: Base Monetaria
+    +  Variable: deficit fiscal
+    +  Variable: autonomia de la autoridad monetaria
+    +  Choque: tasa de interes o riesgo pais, incentivos a deflactar valor de deuda publica
+    +  Choque: terminos de intercambio, si afectan recaudacion o actividad
+    
+    
+-  Desempleo muy alto (~ 20%)
+    +  Tasa de desocupacion
+    +  Empleo por cuenta propia
+    +  Subempleo
+    
+    
+-  Riesgo de una corrida importante contra la moneda local
+    +  Variable: reservas internacionales
+    +  Variable: deficit en cuenta corriente
+    +  Variable: crecimiento de importaciones y de exportaciones
+    +  Choque: terminos de intercambio
+    +  Choque: tasas de interes, premio por riesgo
+    
+    
+    
+    
+### En situaciones de 'tratamiento curativo'
+
+
+-  Carga financiera pesada pero sostenible en el sector publico
+    +  Variable: servicio de la deuda sobre ingresos
+        * Denominacion, madurez y tasa de interes
+    +  Apalancamiento de empresas relacionadas
+    +  Choque: Terminos de intercambio, en tanto afecten recaudacion
+    +  Choque: precios de productos de empresas relacionadas
+    +  Choque: Tasas de interes y premio por riesgo
+    
+        
+-  Sector financiero con bajas provisiones de capital y composicion riesgosa de cartera, tasa de morosidad en aumento
+     +  Variable: pasivos/capital 
+     +  Activos ajustados por riesgo? Quizas Capital Nivel 1/ Total (Basilea III)
+     +  Variable: prestamos
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+
+
+-  Sector real en contraccion moderada o estancamiento
+     +  Variable: utilidades sectoriales 
+     +  Variable: delinquent loans, morosidad mayor a noventa dias (non performing loans)
+     +  Variable: apalancamiento
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precios de las viviendas
+     +  Variable: ventas al por mayor
+     +  Variable: Indices de prod industrial 
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+
+
+-  Desempleo alto a moderado (8 a 19)
+    +  Tasa de desocupacion
+    +  Empleo por cuenta propia
+    +  Subempleo
+    
+    
+-  Inflacion muy fuera de meta o de dos digitos
+    +  Variable: IPC
+    +  Variable: Base Monetaria
+    +  Variable: deficit fiscal
+    +  Variable: autonomia de la autoridad monetaria
+    +  Choque: tasa de interes o riesgo pais, incentivos a deflactar valor de deuda publica
+    +  Choque: terminos de intercambio, si afectan recaudacion o actividad
+
+
+### En situaciones de tratamientos preventivos o de fortalecimiento
 
 
 
-```{css}
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-yw4l{vertical-align:top}
-</style>
-<table class="tg">
-  <tr>
-    <th class="tg-yw4l">Situacion</th>
-    <th class="tg-yw4l">Variable</th>
-    <th class="tg-yw4l">Umbral(es)</th>
-    <th class="tg-yw4l">Choques relacionados</th>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Riesgo de insolvencia del <br>sector publico</td>
-    <td class="tg-yw4l">monto y servicio de la deuda<br> <br>Niveles<br>- Central (está)<br>- General (algunos países)<br>- Empresas relacionadas (poco, <br>buscar en Bloomberg)<br><br><br>Sub variables:<br>- Composición corto plazo <br>   y largo plazo<br><br><br>- Denominada en moneda local<br>versus USD<br>- Tasa fija versus tasa variable</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">- Precios de transables, <br>si ingresos publicos por <br>ComEx son importantes<br><br>- Precios de productos de<br>empresas relacionadas<br><br>- Tasas de interés, <br>risk premium <br><br>- </td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Riesgo de insolvencia<br>de parte importante del <br>sector financiero</td>
-    <td class="tg-yw4l">Hojas de Balance <br>del sector financiero<br><br>- pasivos/capital<br><br><br>- delinquent loans<br><br>- term imbalances<br><br>- currency imbalances<br></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">- credit shocks (como en<br> sudden stops)<br>- interest rate shocks<br>- tipo de cambio<br>- Términos de <br>  intercambio<br></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Hiper inflación</td>
-    <td class="tg-yw4l">- IPC, Deflactor<br>- base monetaria, deficit fiscal</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"><br></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Desempleo muy alto <br>(e.g. 20%)</td>
-    <td class="tg-yw4l">Tasa de desocupación<br><br>tasa de sub empleo<br><br><br>empleo por cuenta propia</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Crisis de Balanza <br>de Pagos (?)</td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-    <td class="tg-yw4l"></td>
-  </tr>
-</table>
-```
+
+
+    
+    
+    
+    
 
 
 
