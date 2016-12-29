@@ -3,8 +3,8 @@ title: "categorias"
 author: "Ricardo Mayer"
 date: "December 27, 2016"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
 ---
 
@@ -145,7 +145,7 @@ Una lista tentativa podría ser la siguiente:
     
         
 -  Sector financiero con bajas provisiones de capital y composicion riesgosa de cartera, tasa de morosidad en aumento
-     +  Variable: pasivos/capital 
+     +  Variable: pasivos/capital, provisiones de capital en caso de emergencia (Basilea I y II)
      +  Activos ajustados por riesgo? Quizas Capital Nivel 1/ Total (Basilea III)
      +  Variable: prestamos
         *  corto versus largo plazo
@@ -172,11 +172,22 @@ Una lista tentativa podría ser la siguiente:
      +  Variable: precios de las viviendas
      +  Variable: ventas al por mayor
      +  Variable: Indices de prod industrial 
+     +  Variable: Exportaciones
+         * Monto y cantidad por destino
      +  Choque: Cese de financiamiento externo (como un sudden stop)
      +  Choque: alza en tasa de interes externa
      +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
      +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
          ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+     +  Choque: crecimiento de los destinos de exportacion (China, USA, EU, etc)
+
+
+-  Deficit importantes y prolongados en la cuenta corriente:
+     +  Variable: crecimiento exportaciones e importaciones, total y por socios
+     +  Variable: transferencias y remesas
+     +  Variable: grado de concentracion de la canasta de productos exportados
+     +  Variable: grado de concentracion de los destinos de exportacion
+
 
 
 -  Desempleo alto a moderado (8 a 19)
@@ -185,7 +196,7 @@ Una lista tentativa podría ser la siguiente:
     +  Subempleo
     
     
--  Inflacion muy fuera de meta o de dos digitos
+-  Inflacion de dos digitos o muy fuera de rango-meta 
     +  Variable: IPC
     +  Variable: Base Monetaria
     +  Variable: deficit fiscal
@@ -196,21 +207,80 @@ Una lista tentativa podría ser la siguiente:
 
 ### En situaciones de tratamientos preventivos o de fortalecimiento
 
+-  Fragilidad: Alta participacion del subempleo y del empleo por cuenta propia
+    + Variable: Porcentaje de subempleados y cuenta propia. Porcentaje de ultimos empleos creados que pertenecen a esas categorias
+    + Choques: terminos de intercambio, de productividad
+    
+    
+-  Fragilidad y limitacion: Expansiones con baja inversion previa y concurrente
+    + Variable: tasas de inversion total, publica y privada
+    + Variable: inversion y capital en areas estrategicas (transporte, telecomunicaciones, energia, tecnologia)
 
 
+-  Fragilidad: politicas macroprudenciales insuficientes o ausentes
+    + Variable: grado de implementacion de estadares de Basilea III
+    + Variable: coordinaciones macro interinstitucioens (e.g. consejo para la estabilidad financiera)
+    + Choque: tasas de interes, premio por riesgo, sudden stops, recesiones en socios comerciales
+    + Choque: terminos de intercambio (incrementen morosidad via disminucion del empleo o de los salarios)
+    
+    
+-  Fragilidad: excesiva concentracion de canasta exportadora o de destinos de exportacion
+    + Variable: Canasta exportadora y destinos
+    + Choque: shock de demanda externa (cantidad) y shock de precios de productos
 
-
+-  Fragilidad y limitacion: insuficiente monitoreo del pasivo ambiental y subdesarrollo de areas 
+   de produccion sostenibles
+    + Variable: indice de actividad de sectores limpios o de menor huella
+    + Variable: 
+   
+   
+-  Fragilidad y limitacion: encademamientos productivos debiles
+    + Variable: matrices de insumo producto
+    + Variable: indice de valor agregado sectorial
+    + Choque: terminos de intercambio
+    + Choque: retiro de empresas transnacionales
     
     
     
+
+
+## Determinantes de espacio para las politicas
+
+-  Politica Fiscal: 
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) el gasto corriente? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) la inversion real? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Existencia de reglas de balances/gastos/ahorro
+    + fondos para politicas contraciclicas
+    + Deuda acumulada, bruta y neta
+    + Monto servicio de la deuda
+    + Deficit actual y proyectado
+    + Pasivos de la seguridad social, actuales y proyectados
+    + Situacion de empresas estrategicas
+    + Efectividad de la recaudacion (control de elusion y evasion)
+
+
+-  Politica Monetaria
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) la liquidez? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Categoria: Cuanto espacio hay para intervenir el tipo de cambio? Alto-moderado, Moderado-bajo, bajo-ninguno.
     
+    
+    + Variable: Existencia de metas de inflacion
+    + Variable: Nivel y tedencia de inflacion e inflacion subyacente
+    + Variable: Instrumento de poltica
+    + Variable: Profundidad financiera del sistema
+    + Variable: Regimen cambiario
+    +Variable:  Reservas internacionales
 
 
-
-mi otra tabla
-
+-  Politica Comercial
 
 
+-  Politica Micro
 
-fin
 
+-  Politica Social
+
+
+## Sintesis
+
+espacio fiscal, espacio monetario, concentracion de canasta, concentracio de destino, composicion del empleo 
