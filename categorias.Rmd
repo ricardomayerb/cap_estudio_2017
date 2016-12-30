@@ -3,9 +3,9 @@ title: "categorias"
 author: "Ricardo Mayer"
 date: "December 27, 2016"
 output:
-  html_document: default
-  pdf_document: default
   word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 
@@ -269,7 +269,7 @@ Una lista tentativa podría ser la siguiente:
     + Variable: Instrumento de poltica
     + Variable: Profundidad financiera del sistema
     + Variable: Regimen cambiario
-    +Variable:  Reservas internacionales
+    + Variable:  Reservas internacionales
 
 
 -  Politica Comercial
@@ -284,3 +284,43 @@ Una lista tentativa podría ser la siguiente:
 ## Sintesis
 
 espacio fiscal, espacio monetario, concentracion de canasta, concentracio de destino, composicion del empleo 
+
+
+1. Dimension de politicas: 
+    - Plena capacidad para responder
+    - Libertad en una dimension (e.g. monetaria) y restriccion en la otra (fiscal)
+    - Restriccion en ambas dimensiones
+    
+    
+2. Dimension estructural: (agrupar en 3 )
+    - Desequilibrio grave, alta vulnerabilidad, crisis en curso
+    - Desequilibrio grave, alta vulnerabilidad, crisis en ciernes
+    - Desequilibrio grave, media vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, alta vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, media vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, media vulnerabilidad, crisis probable
+    - Desequilibrio medio, baja vulnerabilidad, crisis improbable
+    - Desequilibrio bajo, alta vulnerabilidad, crisis probable
+    - Desequilibrio bajo, media vulnerabilidad, crisis improbable
+    - Desequilibrio bajo, baja vulnerabilidad, crisis improbable
+    
+3. Choques:
+    - de precios externos
+    - de salida de capitales 
+    - de demanda externa
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
