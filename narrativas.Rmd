@@ -1,0 +1,11 @@
+---
+title: "narrativas"
+author: "Ricardo Mayer"
+date: "January 3, 2017"
+output: html_document
+---
+
+
+## Un choque de tasas de interes externas 
+
+
