@@ -8,4 +8,17 @@ output: html_document
 
 ## Un choque de tasas de interes externas 
 
+1. Inicio: la FED o el ECB suben sus tasas de interes de politica de 0.75 a 1.50
+
+2. Aumenta el spread de tasas (domestica vs extranjera), se convierte en un presion a la devaluacion de la 
+moneda local o al aumento de la tasa de interes domestica o una combinacion de ambas
+
+3. Vulnerabilidades:
+
+   - Descalce en 
+
+
+Abstract
+Using a theoretical dynamic stochastic general equilibrium model and an empirical panel vector autoregression, we assess the transmission of foreign real interest rate shocks on the volatility of various key macroeconomic variables in nine small open economies in East Asia taking into account the role of exchange rate regimes. Both the theoretical and empirical findings confirm the hypothesis that flexible exchange rate may work as a shock absorber when the economy is hit by foreign real interest rate shocks. The findings suggest a clear trade-off between the volatility of real exchange rate and real output to foreign interest rate shocks, both the US and G7 real interest rates, where the responses of real output are mitigated in countries that have more flexible exchange rate regime
+
 
