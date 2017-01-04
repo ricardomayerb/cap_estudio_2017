@@ -13,12 +13,65 @@ output: html_document
 2. Aumenta el spread de tasas (domestica vs extranjera), se convierte en un presion a la devaluacion de la 
 moneda local o al aumento de la tasa de interes domestica o una combinacion de ambas
 
-3. Vulnerabilidades:
+3. Efectos inmediatos:
 
-   - Descalce en 
+   - (if aumento de tasas) Aumento del costo de financiamiento domestico y externo:
+      + Impacto: encarecimiento de nueva deuda, de deuda anterior con tasa variable y de refinanciamiento
+      + Dato: deuda corporativa, corto versus largo plazo, tasa fija versus variable.
+      + Dato: deuda de hogares, consumo, hipotecaria y otros de largo plazo (p.e. estudios)
+      + Efecto macro: menor consumo financiado con deuda
+      + Efecto macro: aumento de morosidad, defaults corporativos o personales, cae valor de activos del sector financiero
+      + Efecto macro: presion a la baja en el nivel de precios agregados
+
+   - (if depreciacion) Descalce cambiario en las hojas de balance: 
+      + Impacto: Devaluacion del colateral, aumento del costo de la deuda en divisas, necesidad de desapalancar
+      + Impacto: Aumento del costo domestico de pagar deuda extranjera, disminucion de liquidez publica y privada
+      + Dato: Requiere mirar composicion en moneda nacional y extranjera de hojas de balance. 
+      + Dato: Si no es posible contar con hojas de balance, al menos ver composicion de la deuda
+      + Efecto macro: caida de la inversion privada
+      + Efecto macro: menor espacio para la politica fiscal
+      + Efecto macro: aumento del riesgo comparativo o pais, si la perdida de liquidez es muy grande y amenaza solvencia corporativa o fiscal
+      
+   - (if depreciacion) Aumento del valor en moneda local de las exportaciones 
+      + Aumento de utilidades en moneda local, posible efecto en el mediano plazo en el empleo y en el producto
+      
+   - (if depreciacion) Aumento del valor en moneda local de las importaciones
+      + Caida de utilidades en moneda local
+      + Traspaso parcial o gradual a precios domesticos (pass through)
+   
+      
+4. Respuestas de politica     
+
+   - Si el tipo de cambio no es flexible (pegged or fixed), hay perdida de reservas
+   - Si hay depreciacion (via devaluacion o porque hay tipo de cambio flexible), hay presiones al alza en los precios, eso puede limitar estimulos via gasto
+   - El BC podria optar por subir la tasa de politica o disminuir la base monetaria, para evitar un aumento del diferencial de tasas, pero esto es dificil si la economia se encuentra al borde o en franca recesion
+   - Incluso en casos sin pegging podria querer administrar las reservas internacionales pare evitar un excesos de volatilidad.
 
 
-Abstract
-Using a theoretical dynamic stochastic general equilibrium model and an empirical panel vector autoregression, we assess the transmission of foreign real interest rate shocks on the volatility of various key macroeconomic variables in nine small open economies in East Asia taking into account the role of exchange rate regimes. Both the theoretical and empirical findings confirm the hypothesis that flexible exchange rate may work as a shock absorber when the economy is hit by foreign real interest rate shocks. The findings suggest a clear trade-off between the volatility of real exchange rate and real output to foreign interest rate shocks, both the US and G7 real interest rates, where the responses of real output are mitigated in countries that have more flexible exchange rate regime
+
+
+
+## Un choque de terminos de intercambio (commodities (food, ), energy?)
+
+1. Inicio: 
+    a. Caida del precio de un bien de exportacion (metales, hidrocarburos, cafe, soya) (commodity-market specific shock), no esta fuertemente relacionado con un cambio en el crecimiento mundial
+    b. World demand shock (a positive shock increases prices of both exports and imports)
+    c. Globalization shock
+
+2. Efectos inmediatos:
+
+   - Empeoramiento de la balanza comercial y cuenta corriente, presion a la depreciacion de la moneda local
+   - Empeoramiento de la hoja de balance de empresas exportadores y en el caso de empresas relacionadas con el 
+   Estado, empeoramiento de la hoja de balance del sector publico
+   - Caida del empleo directo o indirecto asociado del empleo en sector productor
+   - Caida del ahorro domestico y presion al alza de la tasa de interes
+   - Efectos sectoriales sobre el empleo y la inversion y su contagio a otros sectores depende del precio especifico que cambia y de la persistencia del choque
+
+   
+   
+   
+
+<!-- Abstract -->
+<!-- Using a theoretical dynamic stochastic general equilibrium model and an empirical panel vector autoregression, we assess the transmission of foreign real interest rate shocks on the volatility of various key macroeconomic variables in nine small open economies in East Asia taking into account the role of exchange rate regimes. Both the theoretical and empirical findings confirm the hypothesis that flexible exchange rate may work as a shock absorber when the economy is hit by foreign real interest rate shocks. The findings suggest a clear trade-off between the volatility of real exchange rate and real output to foreign interest rate shocks, both the US and G7 real interest rates, where the responses of real output are mitigated in countries that have more flexible exchange rate regime -->
 
 
