@@ -67,7 +67,23 @@ moneda local o al aumento de la tasa de interes domestica o una combinacion de a
    - Caida del ahorro domestico y presion al alza de la tasa de interes
    - Efectos sectoriales sobre el empleo y la inversion y su contagio a otros sectores depende del precio especifico que cambia y de la persistencia del choque
 
-   
+
+
+### Un choque de precios de metales y mineria, exportacion.
+
+1. Inicio: Cae el precio del cobre
+
+2. Efectos inmediatos:
+
+   - Caen ingresos de mineras, publica y privada.
+   - Disminuye la oferta de dolares, presion a la depreciacion de la moneda local
+       + Bajo tipo de cambio flexible, al depreciacion ocurre (mejorando en algo su rentabilidad en moneda local)
+       + Bajo peg, o fijo, hay perdida de reservas internacioales. Dependiendo del tamano  y persistencia del shock, puede haber una devaluacion (de no haber devaluacion, no hay mejora parcial de )
+   - Empeoran hojas de balance de esas empresas, por efecto en el valor presente de sus ventas futuras. Este efecto es peor si no se deprecia la moneda local.
+   - Cae inversion de empresas mineras
+   - Se reduce la actividad de empresas o independientes relacionadas a las mineras
+   - Cae recaudacion por menores ventas de empresas privadas y menores aportes de empresas estatales
+
    
    
 
