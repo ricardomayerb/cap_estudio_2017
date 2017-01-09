@@ -2,7 +2,9 @@
 title: "narrativas"
 author: "Ricardo Mayer"
 date: "January 3, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 
@@ -51,7 +53,7 @@ moneda local o al aumento de la tasa de interes domestica o una combinacion de a
 
 
 
-## Un choque de terminos de intercambio (commodities (food, ), energy?)
+## Un choque de terminos de intercambio 
 
 1. Inicio: 
     a. Caida del precio de un bien de exportacion (metales, hidrocarburos, cafe, soya) (commodity-market specific shock), no esta fuertemente relacionado con un cambio en el crecimiento mundial
@@ -68,26 +70,97 @@ moneda local o al aumento de la tasa de interes domestica o una combinacion de a
    - Efectos sectoriales sobre el empleo y la inversion y su contagio a otros sectores depende del precio especifico que cambia y de la persistencia del choque
 
 
+### Que diferencias existen en los efectos de una caida del precio de minerales, hidrocarburos y alimentos?
 
-### Un choque de precios de metales y mineria, exportacion.
+### Choque de precios de metales y mineria, pais exportador (chile, peru).
 
 1. Inicio: Cae el precio del cobre
 
 2. Efectos inmediatos:
 
-   - Caen ingresos de mineras, publica y privada.
+   - Caen ingresos corporativos de mineras, publicas y privadas.
+   - Empeora balanza comercial, a menos que el efecto ingreso sea muy fuerte sobre las importaciones. 
    - Disminuye la oferta de dolares, presion a la depreciacion de la moneda local
        + Bajo tipo de cambio flexible, al depreciacion ocurre (mejorando en algo su rentabilidad en moneda local)
        + Bajo peg, o fijo, hay perdida de reservas internacioales. Dependiendo del tamano  y persistencia del shock, puede haber una devaluacion (de no haber devaluacion, no hay mejora parcial de )
    - Empeoran hojas de balance de esas empresas, por efecto en el valor presente de sus ventas futuras. Este efecto es peor si no se deprecia la moneda local.
    - Cae inversion de empresas mineras
-   - Se reduce la actividad de empresas o independientes relacionadas a las mineras
-   - Cae recaudacion por menores ventas de empresas privadas y menores aportes de empresas estatales
+   - Cae la produccion de cobre, suvizando en algo la caida del precio (chile+peru tienen algo de poder de mercado)
+   - Se reduce la actividad de empresas o independientes relacionadas a las mineras: disminucion de ingresos y del empleo
+   - Cae recaudacion fiscal por menores ventas de empresas privadas y menores aportes de empresas estatales
+     + Si la perdida de rentabilidad de la empresa estatal es importante y suficientemente transitoria, es posible que el Gobierno Central decida inyectar capital para evitar un aumento sustantivo de los costos financieros y asegurar su liqudez. Si el gobierno central no tiene el espacio suficiente para hacer dicha capitalizacion, se avecina una crisis de la minera estatal 
+     
+   - Efecto sobre el empleo nacional: depende de cuan externalizados esten sus servicios no escenciales y de cuanto comercio se haya instalado alrededor de las mineras, pero la actividad minera al no estar muy encadenada a otras industrias productivas, genera un impacto mas acotado en el empleo total del pais.
+
+
+3. Efectos indirectos
+
+   - 
+
+
+
+
+### Choque de precios de petroleo, pais exportador (ecuador, venezuela, colombia ... y mexico?) y gas natural (Bolivia).
+
+1. Inicio: Cae el precio del petroleo (y/o gas natural)
+
+2. Efectos inmediatos:
+
+   - Caen ingresos corporativos de petroleras, publicas y privadas.
+   - Empeora balanza comercial, a menos que el efecto ingreso sea muy fuerte sobre las importaciones. 
+   - Disminuye la oferta de dolares, presion a la depreciacion de la moneda local
+       + Bajo tipo de cambio flexible, al depreciacion ocurre (mejorando en algo su rentabilidad en moneda local)
+       + Bajo peg, o fijo, hay perdida de reservas internacioales. Dependiendo del tamano  y persistencia del shock, puede haber una devaluacion (de no haber devaluacion, no hay mejora parcial de )
+   - Empeoran hojas de balance de esas empresas, por efecto en el valor presente de sus ventas futuras. Este efecto es peor si no se deprecia la moneda local.
+   - Cae inversion de empresas petroleras
+   - Cae la produccion de petroleo (puede venezuela moverse idnependiente de opep?), suvizando en algo la caida del precio (venezuela+mexico tienen algo de poder de mercado)
+   - Se reduce la actividad de empresas o independientes relacionadas a las mineras: disminucion de ingresos y del empleo
+   - Cae recaudacion fiscal por menores ventas de empresas privadas y menores aportes de empresas estatales
+     + Esto es probablemente mas importante que en el caso del cobre, porque en ALC el petroleo aun esta mas concentrado en el sector publico que el petroleo o el gas natural
+     + Si la perdida de rentabilidad de la empresa estatal es importante y suficientemente transitoria, es posible que el Gobierno Central decida inyectar capital para evitar un aumento sustantivo de los costos financieros y asegurar su liqudez. Si el gobierno central no tiene el espacio suficiente para hacer dicha capitalizacion, se avecina una crisis de la petrolera estatal 
+   - Efecto sobre el empleo nacional: el efecto directo es probablemente pequenho. En el caso de que genere una caida masiva del ingresos fiscales, afecta al empleo publico y a los proveedores del estado.
+
+
+
+3. Efectos indirectos
+
+   - 
+
 
    
+     
+
+### Choque de precios de comida, pais exportador (argentina, uruguay, guatemala, paraguay).
+
+1. Inicio: Cae el precio de carne, soya, cafe, harinas
+
+2. Efectos inmediatos:
+
+   - Caen ingresos de productores.
+     + Mercado exportador concentrado con pocos y grandes empresas productoras? Mayor posibilidad de suavizar el shock via instrumentos fiancieros
+     + Mercado con presencia importante de pequenhos productores? Mayor caida del consumo y del empleo.
+   - Empeora balanza comercial, a menos que el efecto ingreso sea muy fuerte sobre las importaciones. 
+   - Disminuye la oferta de dolares, presion a la depreciacion de la moneda local
+       + Bajo tipo de cambio flexible, al depreciacion ocurre (mejorando en algo su rentabilidad en moneda local)
+       + Bajo peg, o fijo, hay perdida de reservas internacioales. Dependiendo del tamano  y persistencia del shock, puede haber una devaluacion (de no haber devaluacion, no hay mejora parcial de )
+   - Empeoran hojas de balance de esas empresas, por efecto en el valor presente de sus ventas futuras. Este efecto es peor si no se deprecia la moneda local. 
+   - Cae inversion de empresas productoras de alimentos. Si es un sector que se caracteriza por baja participacion en el stock de capital, su impacto sobre la inversion total sera menos pronuciada que en el caso minero o hidrocarburos
+   - Cae la produccion de soya, cafe, carne, etc.
+   - Cae recaudacion fiscal por menores ventas de empresas privadas y menores aportes de empresas estatales
+     + Esto es probablemente menos importante en el caso del cobre y el petroleo, porque en ALC los productores y exportadores de alimentos son mayoritariamente privados.
+
+   - Efecto sobre el empleo nacional: son sectores productivos mas trabajo-intensivo que el petroleo y cobre, su efecto directo sobre el empleo total es importante y sobre el consumo de los hogares tambien, con un impacto probable sobre la capacidad de edaudamiento y pago de los hogares.
    
+   
+ 
 
-<!-- Abstract -->
-<!-- Using a theoretical dynamic stochastic general equilibrium model and an empirical panel vector autoregression, we assess the transmission of foreign real interest rate shocks on the volatility of various key macroeconomic variables in nine small open economies in East Asia taking into account the role of exchange rate regimes. Both the theoretical and empirical findings confirm the hypothesis that flexible exchange rate may work as a shock absorber when the economy is hit by foreign real interest rate shocks. The findings suggest a clear trade-off between the volatility of real exchange rate and real output to foreign interest rate shocks, both the US and G7 real interest rates, where the responses of real output are mitigated in countries that have more flexible exchange rate regime -->
+3. Efectos indirectos
+
+   - Canal financiero:
+     + Hogares:
+     + Empresas:
+     
 
 
+  
+   
