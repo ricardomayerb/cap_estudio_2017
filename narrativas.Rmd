@@ -7,8 +7,16 @@ output:
   html_document: default
 ---
 
+## Choques financieros externos
 
-## Un choque de tasas de interes externas 
+Los choques financieros globales
+
+### Un choque de TPM externas
+
+### Un choque de 
+
+
+### Un choque de tasas de interes externas 
 
 1. Inicio: la FED o el ECB suben sus tasas de interes de politica de 0.75 a 1.50
 
@@ -22,7 +30,7 @@ moneda local o al aumento de la tasa de interes domestica o una combinacion de a
       + Dato: deuda corporativa, corto versus largo plazo, tasa fija versus variable.
       + Dato: deuda de hogares, consumo, hipotecaria y otros de largo plazo (p.e. estudios)
       + Efecto macro: menor consumo financiado con deuda
-      + Efecto macro: aumento de morosidad, defaults corporativos o personales, cae valor de activos del sector financiero
+      + Efecto macro: aumento de morosidad, defaults corporativos o personal es, cae valor de activos del sector financiero
       + Efecto macro: presion a la baja en el nivel de precios agregados
 
    - (if depreciacion) Descalce cambiario en las hojas de balance: 
