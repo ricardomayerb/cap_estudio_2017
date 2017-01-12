@@ -1,0 +1,40 @@
+---
+title: "clasificando"
+author: "Ricardo Mayer"
+output: pdf_document
+pdf_document:
+    citation_package: natbib
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+    template: svm.latex.ms.tex
+abstract: "This document blah"
+keywords: "pandoc, r markdown, knitr"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 11pt
+# spacing: double
+#bibliography: ~/Dropbox/master.bib
+biblio-style: apsr
+---
+
+Consideremos los siguientes categorías de choques externos que pueden golpear a ALC en su conjunto: choques de demanda, de oferta y financieros. Cada uno de estos tipos de choques generan impactos en los hogares, empresas productivas, empresas financieras y sobre las autoridades monetarias y fiscales. La pregunta que nos hacemos es *¿cuándo dos paises son suficientemente similares respecto a uno de estos choques, de forma que puedan compartir las mismas preocupaciones generales cuando el choque aún no llega o es incipiente y los mismos énfasis de política post-choque?* 
+
+Los factores 
+
+
+
+Cosas a tomar from Flow-of-funds: 
+
+ -  Indicador: reservas comparadas no solo contra importaciones, si no contra importaciones+deuda de corto plazo en dolares.
+ -  Cuanta deuda externa es volátil y explosiva: bancos privados extranjeros a bancos privados domesticos. Cuanta inversion y consumo se ha financiado con apalancamiento. ¿Está la inversión o el consumo financiados con un boom de credito, en parte importante de crédito externo y de plazo breve?
+
+
+Cosas a tomar from Ffrench-Davis y Díaz:
+
+ -  Inversión es el factor clave en el crecimiento
+ -  En la actual situación, para mantenerse depende de la innovación y de un ambiente macro estable, que cuide los equilibrios
+ -  Importa si el choque de demanda se produce en un sector cuya rentas se han ido agotando, porque requieren de alta inversion para mantener el margen de operaciones
+
+
