@@ -19,22 +19,44 @@ fontsize: 11pt
 biblio-style: apsr
 ---
 
+## Similares
+
 Consideremos los siguientes categorías de choques externos que pueden golpear a ALC en su conjunto: choques de demanda, de oferta y financieros. Cada uno de estos tipos de choques generan impactos en los hogares, empresas productivas, empresas financieras y sobre las autoridades monetarias y fiscales. La pregunta que nos hacemos es *¿cuándo dos paises son suficientemente similares respecto a uno de estos choques, de forma que puedan compartir las mismas preocupaciones generales cuando el choque aún no llega o es incipiente y los mismos énfasis de política post-choque?* 
 
-Los factores 
+Proponemos una solución en varias etapas: dos países son similares y pertenecen al mismo grupo si exhiben un grado similar de fragilidad financiera y real frente al choque en consideración. Dentro de cada grupo, podemos hacer una distinción sobre el espacio disponible para la política fiscal y la política monetaria, tanto para hacer frente al choque como para la etapa posterior cambio en la oferta, demanda o turbulecia fianciera.
+
+Como medimos la fragilidad financiera y la económica? Cada una con un indicador compuesto de variables relevantes para cada choque en consideración.
+
+## Fragilidad financiera
+
+### Disminución de la liquidez internacional, se necesitan elsewhere
+
+Ante una crisis financiera en otra región, supongamos que hay un retiro importante de liquidez desde la región. Que variables miden la exposición de un país ante esta salida de divisas?
+
+1.  El nivel de deuda de corto plazo. En general, toda deuda de corto plazo es relevante porque influye de distintos modos en la fragildad financiera, ya seadeuda domestica o extranjera, en divisas o en moneda local, de hogares, corporaciones o el sector público. Pero es necesario distinguir entre estos tipos, porque su importancia y los mecanismos que entallan, difieren:
+
+    +  *Deuda extranjera de corto plazo de privados a privados* .  Es factible de obtener usando alguna forma de Sistema de Cuentas Financieras Nacionales (o Flow-of-Funds), via IFS y BIS. Algunos fondos necesarios para un roll-over de este tipo de deuda no estarán disponibles desde la fuente extranjera usual o lo estarán a un precio mayor que en el pasado. El servicio de esta deuda causa serios problemas de liquidez y de costo del servicio de la deuda, que deben recurrir al mercado financiero local y al mercado cambiario local, poniendo mayor presión a la moneda local y tensionando al mercado de crédito doméstico, ya sea al pedir nuevos creditos domésticos o al usar parte de los ahorros para el engrosado servicio de la deuda.
+    
+    +  *Deuda extranjera de corto plazo al sector publico, central o no*
 
 
+
+
+
+
+
+## varios
 
 Cosas a tomar from Flow-of-funds: 
 
  -  Indicador: reservas comparadas no solo contra importaciones, si no contra importaciones+deuda de corto plazo en dolares.
- -  Cuanta deuda externa es volátil y explosiva: bancos privados extranjeros a bancos privados domesticos. Cuanta inversion y consumo se ha financiado con apalancamiento. ¿Está la inversión o el consumo financiados con un boom de credito, en parte importante de crédito externo y de plazo breve?
+ -  Cuanta deuda externa es volátil y explosiva: bancos privados extranjeros a bancos privados domésticos. Cuanta inversión y consumo se ha financiado con apalancamiento. ¿Está la inversión o el consumo financiados con un boom de crédito, en parte importante de crédito externo y de plazo breve?
 
 
 Cosas a tomar from Ffrench-Davis y Díaz:
 
  -  Inversión es el factor clave en el crecimiento
  -  En la actual situación, para mantenerse depende de la innovación y de un ambiente macro estable, que cuide los equilibrios
- -  Importa si el choque de demanda se produce en un sector cuya rentas se han ido agotando, porque requieren de alta inversion para mantener el margen de operaciones
+ -  Importa si el choque de demanda se produce en un sector cuya rentas se han ido agotando, porque requieren de alta inversión para mantener el margen de operaciones
 
 
