@@ -29,16 +29,18 @@ Como medimos la fragilidad financiera y la económica? Cada una con un indicador
 
 ## Fragilidad financiera
 
-### Disminución de la liquidez internacional, se necesitan elsewhere
+### Disminución de la liquidez internacional, se necesitan los fondos elsewhere
 
 Ante una crisis financiera en otra región, supongamos que hay un retiro importante de liquidez desde la región. Que variables miden la exposición de un país ante esta salida de divisas?
 
-1.  El nivel de deuda de corto plazo. En general, toda deuda de corto plazo es relevante porque influye de distintos modos en la fragildad financiera, ya seadeuda domestica o extranjera, en divisas o en moneda local, de hogares, corporaciones o el sector público. Pero es necesario distinguir entre estos tipos, porque su importancia y los mecanismos que entallan, difieren:
+1.  El nivel de deuda de corto plazo. En general, toda deuda de corto plazo es relevante porque influye de distintos modos en la fragildad financiera, ya sea deuda domestica o extranjera, en divisas o en moneda local, de hogares, corporaciones o el sector público. Pero es necesario distinguir entre estos tipos, porque su importancia y los mecanismos que entallan, difieren:
 
-    +  *Deuda extranjera de corto plazo de privados a privados* .  Es factible de obtener usando alguna forma de Sistema de Cuentas Financieras Nacionales (o Flow-of-Funds), via IFS y BIS. Algunos fondos necesarios para un roll-over de este tipo de deuda no estarán disponibles desde la fuente extranjera usual o lo estarán a un precio mayor que en el pasado. El servicio de esta deuda causa serios problemas de liquidez y de costo del servicio de la deuda, que deben recurrir al mercado financiero local y al mercado cambiario local, poniendo mayor presión a la moneda local y tensionando al mercado de crédito doméstico, ya sea al pedir nuevos creditos domésticos o al usar parte de los ahorros para el engrosado servicio de la deuda.
+    +  *Deuda extranjera de corto plazo de privados a privados* .  Este dato factible de obtener usando alguna forma de Sistema de Cuentas Financieras Nacionales (o Flow-of-Funds), via IFS del IMF y/o con datos del BIS. Algunos fondos necesarios para un roll-over de este tipo de deuda no estarán disponibles desde la fuente extranjera usual o lo estarán a un precio mayor que en el pasado. El servicio de esta deuda causa serios problemas de liquidez y de costo del servicio de la deuda, que deben recurrir al mercado financiero local y al mercado cambiario local, poniendo mayor presión a la moneda local y tensionando al mercado de crédito doméstico, ya sea al pedir nuevos creditos domésticos o al usar parte de los ahorros para el engrosado servicio de la deuda.
     
-    +  *Deuda extranjera de corto plazo al sector publico, central o no*
-
+    +  *Deuda extranjera de corto plazo del sector publico, central o no*. A nivel central, crea presiones en la liquidez del sector público, eliminnado espacio para gasto corriente o inversión pública, con efectos negativos para el empleo. EN el caso de empresas públicas o relacionadas.
+    
+    +  
+ 
 
 
 
