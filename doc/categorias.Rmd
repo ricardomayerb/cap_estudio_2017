@@ -1,0 +1,326 @@
+---
+title: "categorias"
+author: "Ricardo Mayer"
+date: "December 27, 2016"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+
+## Criterio ordenador: urgencia del tratamiento 
+
+Una lista tentativa podría ser la siguiente:
+
+1. Primeros Auxilios (UTI me parece muy dramático)
+  - Qué los caracteriza:
+    + Son políticas de aplicación rápida para detener una situación grave, en curso o inminente. Las consideraciones de corto plazo tienen un peso muy alto comparado con las de mediano y largo plazo.
+  - Ejemplos de política: 
+    + Ayuda financiera internacional para reconstrucción post desastre
+    + Intervención de empresas fiancieras (bailouts, toma de control estatal, fusiones forzosas, corralitos) en medio de una crisis a la chilena de 1982, Argentina 2001 o USA 2007
+    + Fin de covertibilidad
+    + Condonación de parte de la deuda, dentro de un plan de reestructuracion de la deuda
+  - Posibles casos 2016-2017
+    + Venezuela
+
+
+2. Tratamientos curativos:
+  - Qué los caracteriza:
+    + Las consideraciones de corto plazo no tienen tanto protagonismo, el riesgo de crisis o de empeoramiento se considera alejado y el centro está en superar los efectos de una crisis o de superar indicadores negativos que de empeorar conduzcan a una crisis
+  - Ejemplos de política: 
+    + Incremento gradual del gasto público para estimular la demanda
+    + Recorte de tasas para para evitar caída del consumo o la inversión
+    + Disminución gradual del déficit público para mantener bajo control el nivel de la deuda (vía moderación del gasto, eliminando exenciones, modificando tasas impositivas, mejorando la fiscalización)
+    + Devaluaciones programadas del tipo de cambio o intervenciones esporádicas para alinear las expectativas sobre valor futuro de las divisas
+  - Posibles casos 2016-2017
+    + Brasil, Argentina, Ecuador
+
+3. Manejo de riesgos y fortalecimiento:
+  - Qué los caracteriza:
+    + Se enfocan en problemas crónicos que no revisten riesgo en el corto plazo o que aumentarían la robustez o el dinamismo de la economía
+  - Ejemplos de política: 
+    + Aumento de la infraestructura productiva pública o de uso extendido (carreteras, puertos, telecomunicaciones, etc.)
+    + Disminución de brechas de información, de habilidades, de género. Mayor cohesión social cimentada en una sociedad mas igualitaria.
+    + Aumento de la capacidad productiva con miras a suavizar ciclos y alargar expansiones
+    + Reducción del pasivo ambiental, sostenibilidad.
+    + Regulación y monitoreo de la industria financiera.
+    + Políticas estructurales de ahorro
+    + Protección social (seguros de desempleo, pensiones, seguros de salud)
+  - Posibles casos 2016-2017
+    + Colombia, México, Chile, Perú
+
+
+## variables, indicadores y choques
+
+### En situaciones que precisen primeros auxilios
+
+
+-  Riesgo de insolvencia del sector publico
+     +  Variable: Monto de deuda publica y monto del servicio
+        *  Gob Central (esta disponible)
+        *  Gob General (algunos paises)
+        *  Empresas relacionadas (muy poco. hay que buscar en Bloomberg)
+        *  Corto versus mediano plazo: poca informacion
+        *  Moneda local versus USD (hay innfo sobre el total)
+        *  Tasa fija versus variable
+     +  Choque: Terminos de intercambio, en tanto afecten recaudacion
+     +  Choque: precios de productos de empresas relacionadas
+     +  Choque: Tasas de interes y premio por riesgo
+  
+  
+    
+-  Riesgo de insolvencia de (parte de) el sector financiero
+     +  Variable: pasivos/capital 
+     +  Activos ajustados por riesgo? Quizas Capital Nivel 1/ Total (Basilea III)
+     +  Variable: prestamos
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precio de los bienes raices
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven efctado su margen de explotacion o familias que caen en desempleo o subempleo)
+         
+         
+    
+-  Riesgo de quiebras masivas en el sector real
+     +  Variable: utilidades sectoriales 
+     +  Variable: delinquent loans, morosidad mayor a noventa dias (non performing loans)
+     +  Variable: apalancamiento
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precios de las viviendas
+     +  Variable: ventas al por mayor
+     +  Variable: Indices de prod industrial 
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+       
+                
+-  Hiperinflacion 
+    +  Variable: IPC
+    +  Variable: Base Monetaria
+    +  Variable: deficit fiscal
+    +  Variable: autonomia de la autoridad monetaria
+    +  Choque: tasa de interes o riesgo pais, incentivos a deflactar valor de deuda publica
+    +  Choque: terminos de intercambio, si afectan recaudacion o actividad
+    
+    
+-  Desempleo muy alto (~ 20%)
+    +  Tasa de desocupacion
+    +  Empleo por cuenta propia
+    +  Subempleo
+    
+    
+-  Riesgo de una corrida importante contra la moneda local
+    +  Variable: reservas internacionales
+    +  Variable: deficit en cuenta corriente
+    +  Variable: crecimiento de importaciones y de exportaciones
+    +  Choque: terminos de intercambio
+    +  Choque: tasas de interes, premio por riesgo
+    
+    
+    
+    
+### En situaciones de 'tratamiento curativo'
+
+
+-  Carga financiera pesada pero sostenible en el sector publico
+    +  Variable: servicio de la deuda sobre ingresos
+        * Denominacion, madurez y tasa de interes
+    +  Apalancamiento de empresas relacionadas
+    +  Choque: Terminos de intercambio, en tanto afecten recaudacion
+    +  Choque: precios de productos de empresas relacionadas
+    +  Choque: Tasas de interes y premio por riesgo
+    
+        
+-  Sector financiero con bajas provisiones de capital y composicion riesgosa de cartera, tasa de morosidad en aumento
+     +  Variable: pasivos/capital, provisiones de capital en caso de emergencia (Basilea I y II)
+     +  Activos ajustados por riesgo? Quizas Capital Nivel 1/ Total (Basilea III)
+     +  Variable: prestamos
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+
+
+-  Sector real en contraccion moderada o estancamiento
+     +  Variable: utilidades sectoriales 
+     +  Variable: delinquent loans, morosidad mayor a noventa dias (non performing loans)
+     +  Variable: apalancamiento
+        *  corto versus largo plazo
+        *  moneda local versus divisas
+        *  tasas de morosidad y de repago
+        *  tasas promedio por tipo (consumo, hipotecario)
+     +  Variable: carga financiera de hogares y morosidad
+     +  Variable: precios de las viviendas
+     +  Variable: ventas al por mayor
+     +  Variable: Indices de prod industrial 
+     +  Variable: Exportaciones
+         * Monto y cantidad por destino
+     +  Choque: Cese de financiamiento externo (como un sudden stop)
+     +  Choque: alza en tasa de interes externa
+     +  Choque: tipo de cambio (efecto inmediato en su hoja de balance)
+     +  Choque: terminos de intercambio (efecto sobre capacidad de pago de clientes, ya sea empresas que 
+         ven afectado su margen de explotacion o familias que caen en desempleo o subempleo)
+     +  Choque: crecimiento de los destinos de exportacion (China, USA, EU, etc)
+
+
+-  Deficit importantes y prolongados en la cuenta corriente:
+     +  Variable: crecimiento exportaciones e importaciones, total y por socios
+     +  Variable: transferencias y remesas
+     +  Variable: grado de concentracion de la canasta de productos exportados
+     +  Variable: grado de concentracion de los destinos de exportacion
+
+
+
+-  Desempleo alto a moderado (8 a 19)
+    +  Tasa de desocupacion
+    +  Empleo por cuenta propia
+    +  Subempleo
+    
+    
+-  Inflacion de dos digitos o muy fuera de rango-meta 
+    +  Variable: IPC
+    +  Variable: Base Monetaria
+    +  Variable: deficit fiscal
+    +  Variable: autonomia de la autoridad monetaria
+    +  Choque: tasa de interes o riesgo pais, incentivos a deflactar valor de deuda publica
+    +  Choque: terminos de intercambio, si afectan recaudacion o actividad
+
+
+### En situaciones de tratamientos preventivos o de fortalecimiento
+
+-  Fragilidad: Alta participacion del subempleo y del empleo por cuenta propia
+    + Variable: Porcentaje de subempleados y cuenta propia. Porcentaje de ultimos empleos creados que pertenecen a esas categorias
+    + Choques: terminos de intercambio, de productividad
+    
+    
+-  Fragilidad y limitacion: Expansiones con baja inversion previa y concurrente
+    + Variable: tasas de inversion total, publica y privada
+    + Variable: inversion y capital en areas estrategicas (transporte, telecomunicaciones, energia, tecnologia)
+
+
+-  Fragilidad: politicas macroprudenciales insuficientes o ausentes
+    + Variable: grado de implementacion de estadares de Basilea III
+    + Variable: coordinaciones macro interinstitucioens (e.g. consejo para la estabilidad financiera)
+    + Choque: tasas de interes, premio por riesgo, sudden stops, recesiones en socios comerciales
+    + Choque: terminos de intercambio (incrementen morosidad via disminucion del empleo o de los salarios)
+    
+    
+-  Fragilidad: excesiva concentracion de canasta exportadora o de destinos de exportacion
+    + Variable: Canasta exportadora y destinos
+    + Choque: shock de demanda externa (cantidad) y shock de precios de productos
+
+-  Fragilidad y limitacion: insuficiente monitoreo del pasivo ambiental y subdesarrollo de areas 
+   de produccion sostenibles
+    + Variable: indice de actividad de sectores limpios o de menor huella
+    + Variable: 
+   
+   
+-  Fragilidad y limitacion: encademamientos productivos debiles
+    + Variable: matrices de insumo producto
+    + Variable: indice de valor agregado sectorial
+    + Choque: terminos de intercambio
+    + Choque: retiro de empresas transnacionales
+    
+    
+    
+
+
+## Determinantes de espacio para las politicas
+
+-  Politica Fiscal: 
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) el gasto corriente? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) la inversion real? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Existencia de reglas de balances/gastos/ahorro
+    + fondos para politicas contraciclicas
+    + Deuda acumulada, bruta y neta
+    + Monto servicio de la deuda
+    + Deficit actual y proyectado
+    + Pasivos de la seguridad social, actuales y proyectados
+    + Situacion de empresas estrategicas
+    + Efectividad de la recaudacion (control de elusion y evasion)
+
+
+-  Politica Monetaria
+    + Categoria: Cuanto espacio hay para aumentar (dismunuir) la liquidez? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    + Categoria: Cuanto espacio hay para intervenir el tipo de cambio? Alto-moderado, Moderado-bajo, bajo-ninguno.
+    
+    
+    + Variable: Existencia de metas de inflacion
+    + Variable: Nivel y tedencia de inflacion e inflacion subyacente
+    + Variable: Instrumento de poltica
+    + Variable: Profundidad financiera del sistema
+    + Variable: Regimen cambiario
+    + Variable:  Reservas internacionales
+
+
+-  Politica Comercial
+
+
+-  Politica Micro
+
+
+-  Politica Social
+
+
+## Sintesis
+
+espacio fiscal, espacio monetario, concentracion de canasta, concentracio de destino, composicion del empleo 
+
+
+1. Dimension de politicas: 
+    - Plena capacidad para responder
+    - Libertad en una dimension (e.g. monetaria) y restriccion en la otra (fiscal)
+    - Restriccion en ambas dimensiones
+    
+    
+2. Dimension estructural: (agrupar en 3 )
+    - Desequilibrio grave, alta vulnerabilidad, crisis en curso
+    - Desequilibrio grave, alta vulnerabilidad, crisis en ciernes
+    - Desequilibrio grave, media vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, alta vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, media vulnerabilidad, crisis en ciernes
+    - Desequilibrio medio, media vulnerabilidad, crisis probable
+    - Desequilibrio medio, baja vulnerabilidad, crisis improbable
+    - Desequilibrio bajo, alta vulnerabilidad, crisis probable
+    - Desequilibrio bajo, media vulnerabilidad, crisis improbable
+    - Desequilibrio bajo, baja vulnerabilidad, crisis improbable
+    
+3. Choques:
+    - de precios externos
+    - de salida de capitales 
+    - de demanda externa
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+

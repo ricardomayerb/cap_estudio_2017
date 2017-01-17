@@ -1,0 +1,146 @@
+---
+title: "Data list"
+author: "Ricardo Mayer"
+date: "January 17, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+## Fiscal
+### Unidades de análisis
+Buscar hasta donde sea posible información a nivel deÑ
+
+   +  Gobierno central
+   +  Gobierno general
+   +  Empresas públicas (listadas o no en la información del sector público)
+  
+### Variables
+-  Deuda total, corto versus largo plazo, moneda local vs. moneda extranjera, fuente local vs. externa
+
+-  Resultados (déficit, superávit, primarios y finales)
+
+-  Composición del gasto:
+    +  Gasto corriente 
+    +  Inversión
+    +  Servicio de la deuda extranjera y doméstica
+    +  Pensiones y otras transferencias 
+    +  Alternativamente, sólo gasto vs inversión
+    
+    
+    
+### Data sources and requests
+
+Michael, es posible conseguir los siguientes datos? (los voy a describir lo mejor que puedo, corrígeme si hay errores o 
+ambiguedades, and help me refine the request)
+
+#### Gobierno Central
+-  Gobierno *Central*: Deuda total. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  Gobierno *Central*: Deuda de corto plazo y deuda de largo plazo. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  Gobierno *Central*: Deuda en moneda local y deuda en moneda extranjera. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+-  Gobierno *Central*: Deuda por fuente de financiamiento: domestica y externa. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+
+-  Gobierno *Central*: Déficit, total y primario. En su defecto, déficit total y servicio de la deuda. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+-  Gobierno *Central*: Gasto corriente total, gasto en inversión total.  Rango de fechas: maximum available.  Frecuencia: annual. Países: all available. 
+
+
+
+#### Gobierno General
+-  Gobierno *General*: Deuda total. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  Gobierno *General*: Deuda de corto plazo y deuda de largo plazo. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  Gobierno *General*: Deuda en moneda local y deuda en moneda extranjera. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+-  Gobierno *General*: Deuda por fuente de financiamiento: domestica y externa. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available. 
+
+-  Gobierno *General*: Déficit, total y primario. En su defecto, déficit total y servicio de la deuda. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+-  Gobierno *General*: Gasto corriente total, gasto en inversión total.  Rango de fechas: maximum available.  Frecuencia: annual. Países: all available. 
+
+#### Empresas públicas
+-  *Empresas públicas*: Deuda total. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  *Empresas públicas*: Deuda de corto plazo y deuda de largo plazo. Rango de fechas: maximum available. Frecuencia: annual. Países: all available.
+-  *Empresas públicas*: Deuda en moneda local y deuda en moneda extranjera. Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+-  *Empresas públicas*: Deuda por fuente de financiamiento: domestica y externa.  Rango de fechas: maximum available.  Frecuencia: annual. Países: all available.
+
+   
+   
+## Monetaria
+### Unidades de análisis
+Buscar hasta donde sea posible información a nivel de 
+   +  Banco Central
+
+### Variables
+-  Reservas internacionales
+
+-  Tasa de interés de política o target relevante de política monetaria (puede ser un agregado monetario)
+
+-  Meta inflacionaria si la hay
+
+-  Inflación
+
+-  Tipo de cambio:
+    + Régimen cambiario (dolarizado, flexible, manejado, fijo)
+    + Tipos de cambio nominal
+    + Tipos de cambio real
+    
+    
+## Sistema Financiero
+### Unidades de análisis
+
+   +  Bancos e instituciones financieras  
+   
+### Variables
+-  Deuda, doméstica y externa de los bancos e instituciones similares. Corto y largo plazo. (Bank liabilities)
+
+-  Préstamos e inversiones,  domésticas y externas de los bancos e instituciones similares. Corto y largo plazo. (Bank assets)
+
+-  Non-performing loans and delinquecy rates 
+
+-  Reservas de capital
+
+-  Implementación de políticas macro prudenciales: Have they implemented Basilea I, II or III? Have gone beyond B III?
+
+
+## Hogares
+
+### Variables
+-  Empleo, desempleo, subempleo, cuenta propia (self-employed)
+
+-  Carga finaciera
+
+-  Morosidad
+
+
+## Sector externo
+
+### Variables
+-  Exportaciones totales, por producto y por destino
+
+-  Importaciones totales, por producto y por destino
+
+-  Transferencias and remittances
+
+-  Resultado cuenta corriente y cuenta financiera
+
+
+### Data sources and requests
+Cecilia, es muy pesado el (los?) archivo(s) que me mostraste con datos de sector externo y que incluía una descomposición por origen y destino?
+
+En particular, me interesa lo siguiente:
+
+-  Exportaciones totales, por producto y por destino. Rango de fechas: máximo disponible.  Frecuencia: anual. Países: todos los disponibles.
+
+-  Importaciones totales, por producto y por destino. Rango de fechas: máximo disponible.  Frecuencia: anual. Países: todos los disponibles.
+
+-  Transferencias and remisas. Rango de fechas: máximo disponible.  Frecuencia: anual. Países: todos los disponibles.
+
+-  Resultado cuenta corriente y cuenta financiera. Rango de fechas: máximo disponible.  Frecuencia: anual. Países: todos los disponibles.
+ 
+
+no se si se podrán enviar por correo, o en un pendrive o si se pueden simplemente compartir.
+
+saludos y gracias!
+Ricardo
+
+
+
+    

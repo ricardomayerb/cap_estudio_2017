@@ -1,0 +1,17 @@
+---
+title: "Intro"
+author: "Ricardo Mayer"
+date: "December 19, 2016"
+output: html_document
+---
+
+
+
+## Intro
+
+texto 
+
+### Including Plots
+
+sub textos
+
