@@ -29,12 +29,12 @@ head(pop_data_alc)
 lac_wb = new_cache$countries %>% filter(regionID=="LCN") %>% select(iso2c, iso3c, country)
 
 # in WB's LC but not in Cepal's LACs coutries:
-# c("ABW", "CUW", "CYM", "MAF", "SXM", "TCA", "VGB", "VIR")
+# c("ABW", "CUW", "CYM", "MAF", "PRI", "SXM", "TCA", "VGB", "VIR")
 
-not_cepal_member = c("ABW","BHS", "CUW", "CYM", "MAF", "SXM", "TCA", "VGB", "VIR")
+not_cepal_member = c("ABW", "CUW", "CYM", "MAF", "PRI", "SXM", "TCA", "VGB", "VIR")
 cepal_33_countries = lac_wb %>% filter(! iso3c %in% not_cepal_member)
 
-# save(cepal_33_countries, file = "cepal_33_countries")
+save(cepal_33_countries, file = "cepal_33_countries")
 
 pop_gdp_data <- wb(country = cepal_33_countries[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
                    startdate = 1971, enddate = 1973)
@@ -43,7 +43,7 @@ pop_gdp_data <- arrange(pop_gdp_data, country, date)
 head(pop_gdp_data)
 
 # Using mrv (most recent values) instead or start and end
-pop_gdp_data_latest = wb(country = cepal_33_iso3c[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
+pop_gdp_data_latest = wb(country = cepal_33_countries[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
                          mrv=4)
 head(pop_gdp_data_latest)
 
