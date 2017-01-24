@@ -3,7 +3,7 @@ library(tidyverse)
 
 str(wb_cachelist, max.level = 1)
 
-# new_cache = wbcache()
+new_cache = wbcache()
 
 
 unemploy_vars <- wbsearch(pattern = "unemployment")
@@ -25,25 +25,20 @@ head(pop_data_alc)
 
 # Population, total
 # country values: iso3c, iso2c, regionID, adminID, incomeID
-pop_data <- wb(country = c("ABW","AF", "SSF", "ECA", "NOC"),
-               indicator = "SP.POP.TOTL", startdate = 2012, enddate = 2012)
 
-head(pop_data)
-
-lac_iso3c_wb = new_cache$countries %>% filter(regionID=="LCN") %>% select(iso3c, country)
+lac_wb = new_cache$countries %>% filter(regionID=="LCN") %>% select(iso2c, iso3c, country)
 
 # in WB's LC but not in Cepal's LACs coutries:
 # c("ABW", "CUW", "CYM", "MAF", "SXM", "TCA", "VGB", "VIR")
 
 not_cepal_member = c("ABW","BHS", "CUW", "CYM", "MAF", "SXM", "TCA", "VGB", "VIR")
-cepal_33_countries = lac_iso3c_wb %>% filter(! iso3c %in% not_cepal_member)
-cepal_33_iso3c = Cepal_33_countries %>% select(iso3c)
+cepal_33_countries = lac_wb %>% filter(! iso3c %in% not_cepal_member)
 
-pop_gdp_data <- wb(country = c("US", "NO"), indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
+# save(cepal_33_countries, file = "cepal_33_countries")
+
+pop_gdp_data <- wb(country = cepal_33_countries[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
                    startdate = 1971, enddate = 1973)
 
-pop_gdp_data <- wb(country = cepal_33_iso3c[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
-                   startdate = 1971, enddate = 1973)
 pop_gdp_data <- arrange(pop_gdp_data, country, date)
 head(pop_gdp_data)
 
