@@ -16,3 +16,4 @@ load("cepal_33_countries")
 
 debt_data <- wb(country = cepal_33_countries[["iso3c"]], indicator = JEDH_vars[["indicatorID"]],
                    mrv = 10)
+
