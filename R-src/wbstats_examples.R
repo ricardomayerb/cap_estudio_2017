@@ -34,7 +34,7 @@ lac_wb = new_cache$countries %>% filter(regionID=="LCN") %>% select(iso2c, iso3c
 not_cepal_member = c("ABW", "CUW", "CYM", "MAF", "PRI", "SXM", "TCA", "VGB", "VIR")
 cepal_33_countries = lac_wb %>% filter(! iso3c %in% not_cepal_member)
 
-save(cepal_33_countries, file = "cepal_33_countries")
+save(cepal_33_countries, file = "./output/cepal_33_countries")
 
 pop_gdp_data <- wb(country = cepal_33_countries[["iso3c"]], indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD"),
                    startdate = 1971, enddate = 1973)
