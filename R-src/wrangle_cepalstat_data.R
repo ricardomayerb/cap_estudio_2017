@@ -7,7 +7,7 @@ load("./output/cepalstat_remuneraciones")
 load("./output/cepalstat_sector_financiero_monetario")
 load("./output/sector_real_dolares_anual_cepalstat")
 
-load("./output/cepal_33_countries")
+ load("./output/cepal_33_countries")
 
 
 top_16_gdp_countries = c("BRA", "MEX", "ARG", "VEN", 
@@ -21,15 +21,26 @@ carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD",
 other_to_drop = c("GUY", "SUR", "BLZ")
 
 latin_20 = cepal_33_countries %>% 
-            filter(! iso3c %in% carib_minus_dom) %>% 
-            filter(! iso3c %in% other_to_drop)
+            filter(!iso3c %in% carib_minus_dom) %>% 
+            filter(!iso3c %in% other_to_drop)
 
-spanish_to_iso3c = list("Brasil" = "BRA", "Republica Dominicana" = "DOM")
-iso3c_to_spanish = list("BRA" = "Brasil", "DOM" = "Republica Dominicana")
+spanish_to_iso3c = list("Antigua y Barbuda" = "ATG", "Argentina" = "ARG",
+                        "Bahamas" = "BHS", "Barbados" = "BRB", "Belice" = "BLZ",
+                        "Bolivia (Estado plurinacional de)" = "BOL", "Brasil" = "BRA", 
+                        "Chile" = "CHL", "Colombia" =  "COL", "República Dominicana" = "DOM",
+                        "Ecuador" = "ECU", "El Salvador" = "SLV", "Guatemala" = "GTM",
+                        "Honduras" = "HND", "Jamaica" = "JAM", "México" = "MEX", 
+                        "Nicaragua" = "NIC", "Panama" = "PAN", "Paraguay" = "PRY",
+                        "Perú" = "PER", "Suriname" = "SUR", "Trinidad y Tobago" = "TTO",
+                        "Uruguay" = "URY", "Venezuela (República Bolivariana de)")
 
-foo = c("BRA", "DOM")
+                        
+iso3c_to_spanish = list("BRA" = "Brasil", "DOM" = "República Dominicana")
+
+foo = c("BRA", "DOM", "BOL")
 spanish_to_iso3c[["Brasil"]]
-iso3c_to_spanish[["BRA"]]
+spanish_to_iso3c[["Republica Dominicana"]]
+iso3c_to_spanish[["DOM"]]
 
 
 
