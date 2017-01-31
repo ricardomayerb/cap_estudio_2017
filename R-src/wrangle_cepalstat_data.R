@@ -7,7 +7,57 @@ load("./output/cepalstat_remuneraciones")
 load("./output/cepalstat_sector_financiero_monetario")
 load("./output/sector_real_dolares_anual_cepalstat")
 
- load("./output/cepal_33_countries")
+load("./output/cepal_33_countries")
+
+# custom dictionary to convert spanish coutry names to english or iso3c or iso2c
+# Necessary because coutrycode does not support yet country.name.es as valid origin, only as destination
+cepal_names_es_en = countrycode_data %>% 
+                    filter(iso3c %in% cepal_33_countries[["iso3c"]]) %>% 
+                    select(iso2c, iso3c, country.name.en, country.name.es)
+
+# Cepal uses Trinidad y Tabago and not Trinidad y Tobago, as in countrycodes data frame
+tto_logical <- cepal_names_es_en$country.name.es == "Trinidad yTobago"
+cepal_names_es_en[tto_logical, ] <- c("TT", "TTO", "Trinidad and Tobago", "Trinidad y Tabago")
+
+# # experiment with a smaller dataframe, sampling 10% of the rows
+# smaller_real <- cepalstat_sector_real_dolares_completo %>% 
+#           sample_frac(0.1)
+# 
+# new_real = smaller_real %>% 
+#   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c"))
+# 
+# # Find our which countries has a missing observation (NA) associated to its iso3c
+# not_with_iso3c_code <- new_real %>% filter(is.na(iso3c)) %>% select(País) %>% distinct()
+# # Conclusion: it's OK, the only ones without a code are cointry aggregates
+# # (i.e. "America Latina", "El Caribe" y "America Latina y El Caribe") and a row not referring to a country
+
+# now, operateon the entire data frame, adding an iso3c column and droping observatios for country aggregates
+cs_real_dolares <- cepalstat_sector_real_dolares_completo %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+cs_financiero_monetario <- cepalstat_sector_financiero_monetario %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+cs_remuneraciones <- cepalstat_remuneraciones %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+cs_empleo <- cepalstat_empleo %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+cs_desempleo <- cepalstat_desempleo %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+
 
 
 top_16_gdp_countries = c("BRA", "MEX", "ARG", "VEN", 
@@ -23,24 +73,6 @@ other_to_drop = c("GUY", "SUR", "BLZ")
 latin_20 = cepal_33_countries %>% 
             filter(!iso3c %in% carib_minus_dom) %>% 
             filter(!iso3c %in% other_to_drop)
-
-spanish_to_iso3c = list("Antigua y Barbuda" = "ATG", "Argentina" = "ARG",
-                        "Bahamas" = "BHS", "Barbados" = "BRB", "Belice" = "BLZ",
-                        "Bolivia (Estado plurinacional de)" = "BOL", "Brasil" = "BRA", 
-                        "Chile" = "CHL", "Colombia" =  "COL", "República Dominicana" = "DOM",
-                        "Ecuador" = "ECU", "El Salvador" = "SLV", "Guatemala" = "GTM",
-                        "Honduras" = "HND", "Jamaica" = "JAM", "México" = "MEX", 
-                        "Nicaragua" = "NIC", "Panama" = "PAN", "Paraguay" = "PRY",
-                        "Perú" = "PER", "Suriname" = "SUR", "Trinidad y Tobago" = "TTO",
-                        "Uruguay" = "URY", "Venezuela (República Bolivariana de)")
-
-                        
-iso3c_to_spanish = list("BRA" = "Brasil", "DOM" = "República Dominicana")
-
-foo = c("BRA", "DOM", "BOL")
-moo = c("Brasil",   "República Dominicana", "Bolivia (Estado plurinacional de)")
-
-spanish_to_iso3c[moo]
 
 
 
