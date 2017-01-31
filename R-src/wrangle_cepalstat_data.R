@@ -38,8 +38,9 @@ spanish_to_iso3c = list("Antigua y Barbuda" = "ATG", "Argentina" = "ARG",
 iso3c_to_spanish = list("BRA" = "Brasil", "DOM" = "República Dominicana")
 
 foo = c("BRA", "DOM", "BOL")
+moo = c("Brasil",   "República Dominicana", "Bolivia (Estado plurinacional de)")
 spanish_to_iso3c[["Brasil"]]
-spanish_to_iso3c[["Republica Dominicana"]]
+spanish_to_iso3c[["República Dominicana"]]
 iso3c_to_spanish[["DOM"]]
 
 
