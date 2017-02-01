@@ -1,14 +1,14 @@
 library(tidyverse)
  
-
-
-cepalstat_sector_real_dolares_completo <- read_delim("./data/cepalstat_sector_real_dolares_anual_completo.csv", 
-                                            ";", escape_double = FALSE, 
-                                            trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
-new_cols = ncol(cepalstat_sector_real_dolares_completo) - 1
-cepalstat_sector_real_dolares_completo = select(cepalstat_sector_real_dolares_completo, 1:new_cols)
-save(cepalstat_sector_real_dolares_completo, file="./output/sector_real_dolares_anual_cepalstat")
-
+# 
+# 
+# cepalstat_sector_real_dolares_completo <- read_delim("./data/cepalstat_sector_real_dolares_anual_completo.csv", 
+#                                             ";", escape_double = FALSE, 
+#                                             trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+# new_cols = ncol(cepalstat_sector_real_dolares_completo) - 1
+# cepalstat_sector_real_dolares_completo = select(cepalstat_sector_real_dolares_completo, 1:new_cols)
+# save(cepalstat_sector_real_dolares_completo, file="./output/cepalstat_sector_real_dolares_anual")
+# 
 
 cepalstat_desempleo <- read_delim("./data/cepalstat_desempleo.csv", 
                               ";", escape_double = FALSE, 

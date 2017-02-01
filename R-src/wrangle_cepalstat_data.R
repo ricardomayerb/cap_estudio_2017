@@ -5,7 +5,13 @@ load("./output/cepalstat_desempleo")
 load("./output/cepalstat_empleo")
 load("./output/cepalstat_remuneraciones")
 load("./output/cepalstat_sector_financiero_monetario")
+# load("./output/cepalstat_sector_real_dolares_anual")
 load("./output/sector_real_dolares_anual_cepalstat")
+load("./output/cepalstat_BP_anual")
+load("./output/cepalstat_BP_trimestral")
+load("./output/cepalstat_deuda_externa")
+load("./output/cepalstat_indicadores_derivador_de_la_BP")
+
 
 load("./output/cepal_33_countries")
 
@@ -57,8 +63,25 @@ cs_desempleo <- cepalstat_desempleo %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
 
+cs_bp_anual <- cepalstat_BP_anual %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
 
+cs_bp_trimestral <- cepalstat_BP_trimestral %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
 
+cs_deuda_externa <- cepalstat_deuda_externa %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
+
+cs_indicadores_bp <- cepalstat_indicadores_derivador_de_la_BP %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) 
 
 top_16_gdp_countries = c("BRA", "MEX", "ARG", "VEN", 
                          "COL", "CHL", "PER", "ECU",
