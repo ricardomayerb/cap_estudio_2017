@@ -100,7 +100,7 @@ cepalstat_remuneraciones = select(cepalstat_remuneraciones, 1:new_cols)
 new_cols = ncol(cepalstat_sector_financiero_monetario) - 1
 cepalstat_sector_financiero_monetario = select(cepalstat_sector_financiero_monetario, 1:new_cols)
 
-new_cols = ncol(cepalstat_sector_publico2) - 1
+new_cols = ncol(cepalstat_sector_publico) - 1
 cepalstat_sector_publico = select(cepalstat_sector_publico, 1:new_cols)
 
 new_cols = ncol(cepalstat_BP_anual) - 1
@@ -143,8 +143,7 @@ new_cols = ncol(cepalstat_tipo_de_cambio) - 1
 cepalstat_tipo_de_cambio = select(cepalstat_tipo_de_cambio, 1:new_cols)
 
 
-
-save(cepalstat_sector_real_dolares_completo, file="./produced_data/cepalstat_sector_real_dolares_anual")
+save(cepalstat_sector_real_dolares_completo, file = "./produced_data/cepalstat_sector_real_dolares_anual")
 
 save(cepalstat_desempleo , file = "./produced_data/cepalstat_desempleo")
 

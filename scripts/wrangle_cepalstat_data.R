@@ -1,19 +1,45 @@
 library(tidyverse)
 library(countrycode)
 
-load("./output/cepalstat_desempleo")
-load("./output/cepalstat_empleo")
-load("./output/cepalstat_remuneraciones")
-load("./output/cepalstat_sector_financiero_monetario")
-load("./output/cepalstat_sector_real_dolares_anual")
-load("./output/sector_real_dolares_anual_cepalstat")
-load("./output/cepalstat_BP_anual")
-load("./output/cepalstat_BP_trimestral")
-load("./output/cepalstat_deuda_externa")
-load("./output/cepalstat_indicadores_derivador_de_la_BP")
+load("./produced_data/cepal_33_countries")
+
+load("./produced_data/cepalstat_desempleo")
+load("./produced_data/cepalstat_empleo")
+load("./produced_data/cepalstat_remuneraciones")
+load("./produced_data/cepalstat_sector_publico")
+load("./produced_data/cepalstat_sector_financiero_monetario")
+load("./produced_data/cepalstat_sector_real_dolares_anual")
+load("./produced_data/cepalstat_BP_anual")
+load("./produced_data/cepalstat_BP_trimestral")
+load("./produced_data/cepalstat_deuda_externa")
+load("./produced_data/cepalstat_indicadores_derivados_de_la_BP")
+load("./produced_data/cepalstat_comercio_intrarregional")
+load("./produced_data/cepalstat_exp_imp_grandes_cat")
+load("./produced_data/cepalstat_exp_imp_servicios")
+load("./produced_data/cepalstat_exp_imp_totales_mensuales")
+load("./produced_data/cepalstat_exp_prim_manuf")
+load("./produced_data/cepalstat_indic_vol_precios_imp_exp")
+load("./produced_data/cepalstat_tipo_de_cambio")
+
+load("./produced_data/cepalstat_exp_imp_pro_ppal_part_1_of_2")
+load("./produced_data/cepalstat_exp_imp_pro_ppal_part_2_of_2")
+
+cepalstat_exp_imp_pro_ppal_part_1_of_2 <- cepalstat_exp_imp_pro_ppal_part_1_of_2 %>% 
+  rename(indicador_old = indicador) %>% 
+  separate(indicador_old, c("País", "indicador"), ":")
+
+cepalstat_exp_imp_pro_ppal_part_2_of_2 <- cepalstat_exp_imp_pro_ppal_part_2_of_2 %>% 
+  rename(indicador_old = indicador) %>% 
+  separate(indicador_old, c("País", "indicador"), ":")
+
+cepalstat_exp_imp_pro_ppal <- bind_rows(cepalstat_exp_imp_pro_ppal_part_1_of_2,
+                                        cepalstat_exp_imp_pro_ppal_part_2_of_2)
+
+rm(cepalstat_exp_imp_pro_ppal_part_2_of_2)
+rm(cepalstat_exp_imp_pro_ppal_part_1_of_2)
 
 
-load("./output/cepal_33_countries")
+
 
 # custom dictionary to convert spanish coutry names to english or iso3c or iso2c
 # Necessary because coutrycode does not support yet country.name.es as valid origin, only as destination
@@ -78,12 +104,12 @@ cs_deuda_externa <- cepalstat_deuda_externa %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
 
-cs_indicadores_bp <- cepalstat_indicadores_derivador_de_la_BP %>% 
+cs_indicadores_bp <- cepalstat_indicadores_derivados_de_la_BP %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
 
-cs_sector_publico <- cepalstat_sector_publico2 %>% 
+cs_sector_publico <- cepalstat_sector_publico %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
@@ -98,12 +124,7 @@ cs_x_m_gran_cat <- cepalstat_exp_imp_grandes_cat %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
 
-cs_x_m_10_ppales_1_of_2 <- cepalstat_exp_imp_pro_ppal_part_1_of_2 %>% 
-  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
-  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
-
-cs_x_m_10_ppales_2_of_2 <- cepalstat_exp_imp_pro_ppal_part_2_of_2 %>% 
+cs_x_m_10_ppales <- cepalstat_exp_imp_pro_ppal %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
@@ -133,12 +154,6 @@ cs_x_m_vol_precios <- cepalstat_indic_vol_precios_imp_exp %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) 
 
-cs_x_m_10_ppales_1_of_2 <- cepalstat_ %>% 
-  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
-  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
-
-
 
 carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD", 
                     "HTI", "KNA", "LCA", "TTO", "VCT")
@@ -154,8 +169,8 @@ cepal_20 = cepal_33_countries %>%
 cs_real_dolares_20 <- cs_real_dolares %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_financiero_monetario_20 <- cs_financiero_monetario %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_remuneraciones_20 <- cs_remuneraciones %>% filter(iso3c %in% cepal_20[["iso3c"]])
-cs_empleo_20 <- cs_empleo_20 %>% filter(iso3c %in% cepal_20[["iso3c"]])
-cs_desempleo_20 <- cs_desempleo_20 %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_empleo_20 <- cs_empleo %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_desempleo_20 <- cs_desempleo %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_bp_anual_20 <- cs_bp_anual %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_bp_trimestral_20 <- cs_bp_trimestral %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_deuda_externa_20 <- cs_deuda_externa %>% filter(iso3c %in% cepal_20[["iso3c"]])
@@ -163,11 +178,11 @@ cs_indicadores_bp_20 <- cs_indicadores_bp %>% filter(iso3c %in% cepal_20[["iso3c
 cs_sector_publico <- cs_sector_publico %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_comercio_intrarregional_20 <- cs_comercio_intrarregional %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_m_gran_cat_20 <- cs_x_m_gran_cat %>% filter(iso3c %in% cepal_20[["iso3c"]])
-cs_x_m_10_ppales_1_of_2_20 <- cs_x_m_10_ppales_1_of_2 %>% filter(iso3c %in% cepal_20[["iso3c"]])
-cs_x_m_10_ppales_2_of_2_20 <- cs_x_m_10_ppales_2_of_2 %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_x_m_10_ppales <- cs_x_m_10_ppales %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_m_servicios_20 <- cs_x_m_servicios %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_m_total_mensual_20 <- cs_x_m_total_mensual %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_prim_manuf_20 <- cs_x_prim_manuf %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_tipo_cambio_20 <- cs_tipo_cambio %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_m_vol_precios_20 <- cs_x_m_vol_precios %>% filter(iso3c %in% cepal_20[["iso3c"]])
+
 
