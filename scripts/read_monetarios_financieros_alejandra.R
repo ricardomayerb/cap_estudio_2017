@@ -34,3 +34,11 @@ rend <-  23
 meta_inf_liminf <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
                                  endRow = rend, startCol = cstart, endCol = cend, header = FALSE)
 
+
+sheet_name = "Cartera Vencida"
+rstart <-  3
+rend <-  280
+cstart <-  1
+cend <- 34
+cartera_vencida <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                                 endRow = rend, startCol = cstart, endCol = cend)
