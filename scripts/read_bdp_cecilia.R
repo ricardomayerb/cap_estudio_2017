@@ -3,9 +3,49 @@ library(XLConnect)
 
 bdpwb = loadWorkbook("./raw_data/BdpAnualSICValores10enero2017.xlsx")
 
-nameSheet =  "BP-Caribe"
-nameRegion = "Argentina"
-createName(bdpwb, name = nameRegion, formula = paste(nameSheet, "$A$6", sep = "!") )
+cstart <- 1
+cend <-  43
+cstarts <- rep(cstart, 43)
+cends <- rep(cend, 43)
+
+rstartARG = 6
+rendARG = 61
+rdiffARG = rendARG - rstartARG
+
+rstartBOL = 65
+rendBOL = 120
+rdiffBOL = rendBOL - rstartBOL
+
+diffBOLARG = rstartBOL - rstartARG
+
+rstarts = seq(from = 6, by = diffBOLARG, length.out = 21)
+rstarts
+
+rends <- rstarts + rdiffARG
+rends
+
+dfs <- list_along(rstarts)
+
+data = readWorksheet(bdpwb, sheet = 1, startRow = rstartARG, endRow = rendARG,
+                     startCol = cstart, endCol = cend)
+
+data2 = readWorksheet(bdpwb, sheet = "BP-América Latina", startRow = rstartARG, endRow = rendARG,
+                     startCol = cstart, endCol = cend)
+
+
+for (i in seq_along(rstarts) ) {
+  print(rstarts[[i]])
+  print(rends[[i]])
+  print(cstarts[[i]])
+  print(cends[[i]])
+  dfs[[i]] <- readWorksheet(bdpwb, sheet = "BP-América Latina",
+                              startRow = rstarts[[i]], endRow = rends[[i]],
+                              startCol = cstarts[[i]], endCol = cends[[i]]) 
+}
+
+# nameSheet =  "BP-Caribe"
+# nameRegion = "Argentina"
+# createName(bdpwb, name = nameRegion, formula = paste(nameSheet, "$A$6", sep = "!") )
 
 
 # wb = loadWorkbook("XLConnectExample1.xlsx", create = TRUE)
