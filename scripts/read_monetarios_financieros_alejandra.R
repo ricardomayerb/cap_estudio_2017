@@ -1,6 +1,5 @@
 library(tidyverse)
 library(XLConnect)
-# library(openxlsx)
 library(stringr)
 
 
@@ -50,20 +49,15 @@ cartera_vencida <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
 
 
 sheet_name = "Crédito interno"
-country_names_mess <- readWorksheet(wb, sheet = sheet_name,
+country_names_mess_ci <- readWorksheet(wb, sheet = sheet_name,
                                startRow = 1, endRow = 1,
                                startCol = 2, endCol = 199, header = FALSE) 
-country_names_units <- country_names_mess[!is.na(country_names_mess)]
-country_n_list <- str_split(country_names_units, "\\(")
-country_names <- vector(mode = "character", 
-                        length = length(country_names_units))
 
-j = 1
-for( i in country_n_list ) {
-  country_names[[j]] = i[[1]]
-  j <- j + 1
-}
-
+country_names_credito_interno <- country_names_mess_ci %>% 
+                                 select_if(! is.na(country_names_mess_ci)) %>% 
+                                 str_split( "\\(") %>% 
+                                 map_chr( .f = c(1,1)) %>% 
+                                 str_trim()
 
 rstart <-  2
 rend <-  323
@@ -83,6 +77,16 @@ for (i in seq_along(cstarts) ) {
 
 
 sheet_name = "Préstamos bancarios"
+country_names_mess_pb <- readWorksheet(wb, sheet = sheet_name,
+                                    startRow = 4, endRow = 4,
+                                    startCol = 2, endCol = 240, header = FALSE) 
+country_names_prestamos_bancarios <- country_names_mess_pb %>% 
+                                      select_if(! is.na(country_names_mess_pb)) %>% 
+                                      str_split( "\\(") %>% 
+                                      map_chr( .f = c(1,1)) %>% 
+                                      str_trim()
+
+
 rstart <-  5
 rend <-  349
 cstarts <- seq(from = 2, by = 7, length.out = 33)
