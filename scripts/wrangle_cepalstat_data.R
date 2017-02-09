@@ -51,6 +51,8 @@ cepal_names_es_en = countrycode_data %>%
 tto_logical <- cepal_names_es_en$country.name.es == "Trinidad yTobago"
 cepal_names_es_en[tto_logical, ] <- c("TT", "TTO", "Trinidad and Tobago", "Trinidad y Tabago")
 
+save(cepal_names_es_en, file = "./produced_data/cepal_names_es_en")
+
 # # experiment with a smaller dataframe, sampling 10% of the rows
 # smaller_real <- cepalstat_sector_real_dolares_completo %>% 
 #           sample_frac(0.1)
@@ -164,6 +166,12 @@ other_to_drop = c("GUY", "SUR", "BLZ")
 cepal_20 = cepal_33_countries %>% 
             filter(!iso3c %in% carib_minus_dom) %>% 
             filter(!iso3c %in% other_to_drop)
+
+cepal_names_es_en_20 <- cepal_names_es_en %>% 
+  filter(!iso3c %in% carib_minus_dom) %>% 
+  filter(!iso3c %in% other_to_drop)
+save(cepal_names_es_en_20, file="./produced_data/cepal_names_es_en_20")
+
 
 
 cs_real_dolares_20 <- cs_real_dolares %>% filter(iso3c %in% cepal_20[["iso3c"]])
