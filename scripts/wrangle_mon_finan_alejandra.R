@@ -6,6 +6,28 @@ load("./produced_data/cepal_names_es_en")
 load("./produced_data/cepal_names_es_en_20")
 
 
+## tidying tasa de politica moetaria
+country_names_tpm_mess <- names(tpm)[-1]
+tmp_dates <- seq.Date(from = as.Date("1986-01-01"), to = as.Date("2016-10-01"), by = 'month')
+tpm_tidy <-  tpm %>% 
+        mutate(Col1 = tmp_dates) %>%
+        gather(key = pais_name, value = tasa_politica_monetaria, -Col1) %>% 
+        rename(date = Col1) %>%
+        mutate( pais_name = recode(pais_name, 
+                             Antigua.y.Barbuda = "Antigua y Barbuda",
+                             Bolivia = "Bolivia (Estado Plurinacional de)",
+                             Costa.Rica = "Costa Rica",
+                             El.Salvador = "El Salvador",
+                             República.Dominicana = "República Dominicana",
+                             Saint.Kitts.y.Nevis = "Saint Kitts y Nevis",
+                             San.Vicente.y.las.Ganadinas = "San Vicente y las Granadinas",
+                             Santa.Lucía = "Santa Lucía",
+                             Trinidad.y.Tabago = "Trinidad y Tabago",
+                             Venezuela = "Venezuela (República Bolivariana de)"))
+
+tpm_tidy_20 <- tpm_tidy %>% 
+          filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+
 
 ## tidyng cartera vencida
 ### separate Col1 into year and month
@@ -84,6 +106,42 @@ country_names_prestamos_bancarios <- country_names_mess_pb %>%
   str_split( "\\(") %>% 
   map_chr( .f = c(1,1)) %>% 
   str_trim()
+
+dates_prestamos_bancarios <- seq.Date(from = as.Date("1988-01-01"), to = as.Date("2016-08-01"), by = 'month')
+
+dfs_pb_to_modify = dfs_pb
+lower_case_names_pb = str_to_lower(names(dfs_pb_to_modify[[1]]))
+lower_case_names_pb = lower_case_names_pb %>% str_replace("x.", "")
+
+for(i in 1:length(dfs_pb)){
+  
+  names(dfs_pb_to_modify[[i]]) <-  lower_case_names_pb
+  
+  print( c(country_names_prestamos_bancarios[[i]], names(dfs_pb_to_modify[[i]])))
+  
+  dfs_pb_to_modify[[i]] <- dmap(dfs_pb_to_modify[[i]], as.numeric)
+  
+  dfs_pb_to_modify[[i]]$pais_name <- country_names_prestamos_bancarios[[i]]  
+  
+  dfs_pb_to_modify[[i]]$date <- dates_prestamos_bancarios
+}
+
+prestamos_bancarios = bind_rows(dfs_pb_to_modify)
+
+prestamos_bancarios_tidy <- prestamos_bancarios %>% 
+  mutate( pais_name = recode(pais_name, 
+                             Bolivia = "Bolivia (Estado Plurinacional de)",
+                             "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
+
+prestamos_bancarios_tidy_20 = prestamos_bancarios_tidy %>% 
+  filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+
+
+## tidy
+
+
+
+
 
 
 
