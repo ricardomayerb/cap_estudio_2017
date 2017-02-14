@@ -1,0 +1,422 @@
+---
+title: "Reading data"
+author: "Ricardo Mayer"
+date: "February 13, 2017"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading data
+
+### Some criteria
+
+1.  Import directly from online sources whenever available. This implies that in the future, when I have worked out how to make direct queries and downloads from the Cepalstat API service, I will not use donwloaded excel files from cepalstat web facility.
+
+2.  Prefer cvs output over excel. Files are lighter to move around (e.g. up and down the github repository) and more robust to import.
+
+3. When importing excel files, prefer the `read_xls` package: it is simple, fast and it's boud to become standard (it's the package used by RStudio IDE for importing excel files). When the region within the sheet is not so simple (i.e. specifying how many rows to skip it's not enough), then use the `XLConnect` package. It's a great package, specially to write back to excel, that let you specify the region (even named regions) you want to import. Unfortunately, it's reliance on Java makes it less easy to install, specially without admin privileges.
+
+4. Store retrieved data in the `raw_data` directory and treat it as read-only files.
+
+5. Make no changes to the read files, with the exception --out of convenience-- of dealing with warning messages that appear during read-time (and hence probably forgotten later) and that make no sustantive changes to data. For example, when reading cepalstat csv files, a spurious column is created and you receive a woring message that notify of a newly created X8 column, added at the end of the data set. To remove this and therefore, to preserve the original data content, in the reading script  is OK to do it inside the reading script.
+
+5. Save the read raw data files, whatever its file format, inside the `produced_data` directory. Prefer `.rda` or `.rds` format to save imported data. 
+
+6. Use the `read_` prefix to name any script used to read or retrieve data. Keep those 'R' scripts in the `scripts` directory.
+
+7. Keep the reading procedure and data wragling/munging separated. At most, write necessary code to hold several sheets inside a single list, but leave any renaming, selection, filtering, joining, etc. to a separate script.  
+
+
+### Read cepalstat's data
+
+What I did here was to use the advanced query utility ("combinar indicadores/interfaz avanzada"), see [here](http://interwp.cepal.org/cepalstat/engine/index.html), to download bulkier .csv files with as many indicators as possible. Basically, all the indicators inside the Economics branch and various related to employment found in the Social branch. Since this implies to consider monthly, quaterly and topical data, the long format result in a very large number of row. This is still the best way to store data, IMHO, but later will need extensive use of filtering and grouping operations to analize the datasets. 
+
+List of file and data:
+
+- *cepalstat_sector_real_dolares_anual_completo.csv* : System of National Account annual data in US dollars. Several emasures of GDP and GDP growth, national income, gross formation of fixed capital, external gap, GDP deflator and openness.
+
+- *cepalstat_desempleo.csv*
+
+- *cepalstat_empleo.csv*
+
+- *cepalstat_remuneraciones.csv*
+
+- *cepalstat_sector_financiero_monetario.csv*: nominal interest rates, policy rate, M1, cash, deposits, M3
+
+- *cepalstat_sector_publico2.csv*: Tax revenue, income tax rates, VAT, Operations, public debt
+
+- *cepalstat_BP_anual*: Balance of Payments
+
+- *cepalstat_BP_trimestral.csv*
+
+- *cepalstat_indicadores_derivados_de_la_BP.csv*: value of X, M, transfers, rents, assests, liabilities
+
+- *cepalstat_exp_imp_servicios.csv*
+
+- *cepalstat_deuda_externa.csv*
+
+- *cepalstat_comercio_intrarregional.csv*
+
+- *cepalstat_exp_imp_pro_ppal_part_1_of_2.csv*: principal goods
+
+- *cepalstat_exp_imp_pro_ppal_part_2_of_2.csv*
+
+- *cepalstat_exp_imp_totales_mensuales.csv*
+
+- *cepalstat_exp_prim_manuf.csv*
+
+- *cepalstat_indic_vol_precios_imp_exp.csv*
+
+- *cepalstat_tipo_de_cambio.csv*
+
+- *cepalstat_ipc_ipm_mensual.csv*
+
+- *cepalstat_ipc_ipm_anual_nivel_y_var.csv*
+
+- *cepalstat_agricultura.csv*
+
+- *cepalstat_mineria_manufactura.csv*
+
+- *cepalstat_precios_combustibles.csv*
+
+- *cepalstat_turismo.csv*
+
+
+Here is the initial readings of the following data. I had to experiment a little to find the right encoding to read these files (it was `windows-1252`). For the first reading only, I'll display here the message issued by `read_delim`, that form the reason to apply the correction that you will find later in this document and supress them here on.
+
+```{r read_csv_files, cache=TRUE}
+library(tidyverse, quietly = TRUE)
+cepalstat_sector_real_dolares_completo <- 
+                    read_delim("./raw_data/cepalstat_sector_real_dolares_anual_completo.csv",
+                    ";", escape_double = FALSE,
+                    trim_ws = TRUE, 
+                    locale = locale("es", encoding="windows-1252"))
+
+```
+
+That mysterious new column called `X10` is entirely composed of NAs, it seems to be an artifact of reading and I'll proceed to remove it later. This chunk reveals the content of `X10`:
+
+```{r show_X10}
+summary(as.factor(cepalstat_sector_real_dolares_completo$X10))
+```
+
+Here are the rest of the data rweading calls:
+
+```{r read_rest, cache=TRUE, warning=FALSE, message=FALSE, tidy=FALSE}
+cepalstat_desempleo <- read_delim("./raw_data/cepalstat_desempleo.csv", 
+                                  ";", escape_double = FALSE, 
+                                  trim_ws = TRUE,
+                                  locale = locale("es", encoding="windows-1252"))
+
+cepalstat_empleo <- read_delim("./raw_data/cepalstat_empleo.csv", 
+                               ";", escape_double = FALSE, 
+                               trim_ws = TRUE,
+                               locale = locale("es", encoding="windows-1252"))
+
+cepalstat_remuneraciones <- read_delim("./raw_data/cepalstat_remuneraciones.csv", 
+                                       ";", escape_double = FALSE, 
+                                       trim_ws = TRUE,
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_sector_financiero_monetario <- read_delim(
+                                      "./raw_data/cepalstat_sector_financiero_monetario.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_sector_publico <- read_delim("./raw_data/cepalstat_sector_publico2.csv", 
+                                        ";", escape_double = FALSE, 
+                                        trim_ws = TRUE, 
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_BP_anual <- read_delim("./raw_data/cepalstat_BP_anual.csv", 
+                                 ";", escape_double = FALSE, 
+                                 trim_ws = TRUE, 
+                                 locale = locale("es", encoding="windows-1252"))
+
+cepalstat_BP_trimestral <- read_delim("./raw_data/cepalstat_BP_trimestral.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_indicadores_derivados_de_la_BP <- read_delim(
+                                  "./raw_data/cepalstat_indicadores_derivados_de_la_BP.csv", 
+                                  ";", escape_double = FALSE, 
+                                  trim_ws = TRUE, 
+                                  locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_imp_servicios <- read_delim("./raw_data/cepalstat_exp_imp_servicios.csv", 
+                                          ";", escape_double = FALSE, 
+                                          trim_ws = TRUE, 
+                                          locale = locale("es", encoding="windows-1252"))
+
+cepalstat_deuda_externa <- read_delim("./raw_data/cepalstat_deuda_externa.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_comercio_intrarregional <- read_delim(
+                                     "./raw_data/cepalstat_comercio_intrarregional.csv", 
+                                     ";", escape_double = FALSE, 
+                                     trim_ws = TRUE, 
+                                     locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_imp_grandes_cat <- read_delim("./raw_data/cepalstat_exp_imp_grandes_cat.csv", 
+                                            ";", escape_double = FALSE, 
+                                            trim_ws = TRUE, 
+                                            locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_imp_pro_ppal_part_1_of_2 <- read_delim(
+                                    "./raw_data/cepalstat_exp_imp_pro_ppal_part_1_of_2.csv", 
+                                    ";", escape_double = FALSE, 
+                                    trim_ws = TRUE, 
+                                    locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_imp_pro_ppal_part_2_of_2 <- read_delim(
+                                    "./raw_data/cepalstat_exp_imp_pro_ppal_part_2_of_2.csv", 
+                                    ";", escape_double = FALSE, 
+                                    trim_ws = TRUE, 
+                                    locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_imp_totales_mensuales <- read_delim(
+                                      "./raw_data/cepalstat_exp_imp_totales_mensuales.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_exp_prim_manuf <- read_delim("./raw_data/cepalstat_exp_prim_manuf.csv", 
+                                       ";", escape_double = FALSE, 
+                                       trim_ws = TRUE, 
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_indic_vol_precios_imp_exp <- read_delim(
+                                      "./raw_data/cepalstat_indic_vol_precios_imp_exp.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_tipo_de_cambio <- read_delim("./raw_data/cepalstat_tipo_de_cambio.csv", 
+                                       ";", escape_double = FALSE, 
+                                       trim_ws = TRUE, 
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_ipc_ipm_mensual <- read_delim("./raw_data/cepalstat_ipc_ipm_mensual.csv", 
+                                       ";", escape_double = FALSE, 
+                                       trim_ws = TRUE, 
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_ipc_ipm_anual <- read_delim("./raw_data/cepalstat_ipc_ipm_anual_nivel_y_var.csv", 
+                                       ";", escape_double = FALSE, 
+                                       trim_ws = TRUE, 
+                                       locale = locale("es", encoding="windows-1252"))
+
+cepalstat_agricultura <- read_delim("./raw_data/cepalstat_agricultura.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_mineria_manuf <- read_delim("./raw_data/cepalstat_mineria_manufactura.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_precios_combustibles <- read_delim("./raw_data/cepalstat_precios_combustibles.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+cepalstat_turismo <- read_delim("./raw_data/cepalstat_turismo.csv", 
+                                      ";", escape_double = FALSE, 
+                                      trim_ws = TRUE, 
+                                      locale = locale("es", encoding="windows-1252"))
+
+```
+
+
+Next, I'll remove the extra `X` column added to each dataset
+
+```{r removing_X_columns, warning=FALSE, message=FALSE}
+library(tidyverse, quietly = TRUE)
+new_cols = ncol(cepalstat_sector_real_dolares_completo) - 1
+cepalstat_sector_real_dolares_completo = select(cepalstat_sector_real_dolares_completo, 
+                                                1:new_cols)
+
+new_cols = ncol(cepalstat_desempleo) - 1
+cepalstat_desempleo = select(cepalstat_desempleo, 
+                             1:new_cols)
+
+new_cols = ncol(cepalstat_empleo) - 1
+cepalstat_empleo = select(cepalstat_empleo, 
+                          1:new_cols)
+
+new_cols = ncol(cepalstat_remuneraciones) - 1
+cepalstat_remuneraciones = select(cepalstat_remuneraciones, 
+                                  1:new_cols)
+
+new_cols = ncol(cepalstat_sector_financiero_monetario) - 1
+cepalstat_sector_financiero_monetario = select(cepalstat_sector_financiero_monetario, 
+                                               1:new_cols)
+
+new_cols = ncol(cepalstat_sector_publico) - 1
+cepalstat_sector_publico = select(cepalstat_sector_publico, 
+                                  1:new_cols)
+
+new_cols = ncol(cepalstat_BP_anual) - 1
+cepalstat_BP_anual = select(cepalstat_BP_anual, 
+                            1:new_cols)
+
+new_cols = ncol(cepalstat_BP_trimestral) - 1
+cepalstat_BP_trimestral = select(cepalstat_BP_trimestral, 
+                                 1:new_cols)
+
+new_cols = ncol(cepalstat_indicadores_derivados_de_la_BP) - 1
+cepalstat_indicadores_derivados_de_la_BP = select(cepalstat_indicadores_derivados_de_la_BP, 
+                                                  1:new_cols)
+
+new_cols = ncol(cepalstat_deuda_externa) - 1
+cepalstat_deuda_externa = select(cepalstat_deuda_externa, 
+                                 1:new_cols)
+
+new_cols = ncol(cepalstat_comercio_intrarregional) - 1
+cepalstat_comercio_intrarregional = select(cepalstat_comercio_intrarregional, 
+                                           1:new_cols)
+
+new_cols = ncol(cepalstat_exp_imp_grandes_cat) - 1
+cepalstat_exp_imp_grandes_cat = select(cepalstat_exp_imp_grandes_cat, 
+                                       1:new_cols)
+
+new_cols = ncol(cepalstat_exp_imp_pro_ppal_part_1_of_2) - 1
+cepalstat_exp_imp_pro_ppal_part_1_of_2 = select(cepalstat_exp_imp_pro_ppal_part_1_of_2, 
+                                                1:new_cols)
+
+new_cols = ncol(cepalstat_exp_imp_pro_ppal_part_2_of_2) - 1
+cepalstat_exp_imp_pro_ppal_part_2_of_2 = select(cepalstat_exp_imp_pro_ppal_part_2_of_2, 
+                                                1:new_cols)
+
+new_cols = ncol(cepalstat_exp_imp_servicios) - 1
+cepalstat_exp_imp_servicios = select(cepalstat_exp_imp_servicios, 
+                                     1:new_cols)
+
+new_cols = ncol(cepalstat_exp_imp_totales_mensuales) - 1
+cepalstat_exp_imp_totales_mensuales = select(cepalstat_exp_imp_totales_mensuales, 
+                                             1:new_cols)
+
+new_cols = ncol(cepalstat_exp_prim_manuf) - 1
+cepalstat_exp_prim_manuf = select(cepalstat_exp_prim_manuf, 
+                                  1:new_cols)
+
+new_cols = ncol(cepalstat_indic_vol_precios_imp_exp) - 1
+cepalstat_indic_vol_precios_imp_exp = select(cepalstat_indic_vol_precios_imp_exp, 
+                                             1:new_cols)
+
+new_cols = ncol(cepalstat_tipo_de_cambio) - 1
+cepalstat_tipo_de_cambio = select(cepalstat_tipo_de_cambio, 
+                                  1:new_cols)
+
+new_cols = ncol(cepalstat_ipc_ipm_mensual) - 1
+cepalstat_ipc_ipm_mensual = select(cepalstat_ipc_ipm_mensual, 
+                                   1:new_cols)
+
+new_cols = ncol(cepalstat_ipc_ipm_anual) - 1
+cepalstat_ipc_ipm_anual = select(cepalstat_ipc_ipm_anual, 
+                                 1:new_cols)
+
+new_cols = ncol(cepalstat_mineria_manuf) - 1
+cepalstat_mineria_manuf = select(cepalstat_mineria_manuf, 
+                                 1:new_cols)
+
+new_cols = ncol(cepalstat_turismo) - 1
+cepalstat_turismo = select(cepalstat_turismo, 
+                           1:new_cols)
+
+new_cols = ncol(cepalstat_agricultura) - 1
+cepalstat_agricultura = select(cepalstat_agricultura, 
+                               1:new_cols)
+
+new_cols = ncol(cepalstat_precios_combustibles) - 1
+cepalstat_precios_combustibles = select(cepalstat_precios_combustibles, 
+                                        1:new_cols)
+```
+
+Finally, save the files as R binary data files (.rda). I'll show the code, but disable its evaluation, just to be careful,
+because they form the base for alll the wrangling function and hence of the entire chain of analysis
+
+```{r saving_raw_data_as_r, eval=FALSE}
+save(cepalstat_sector_real_dolares_completo, 
+     file = "./produced_data/cepalstat_sector_real_dolares_anual")
+
+save(cepalstat_desempleo , file = "./produced_data/cepalstat_desempleo")
+
+save(cepalstat_empleo , file = "./produced_data/cepalstat_empleo")
+
+save(cepalstat_remuneraciones , file = "./produced_data/cepalstat_remuneraciones")
+
+save(cepalstat_sector_financiero_monetario , 
+     file = "./produced_data/cepalstat_sector_financiero_monetario")
+
+save(cepalstat_sector_publico , file = "./produced_data/cepalstat_sector_publico")
+
+save(cepalstat_BP_anual , file = "./produced_data/cepalstat_BP_anual")
+
+save(cepalstat_BP_trimestral, file = "./produced_data/cepalstat_BP_trimestral")
+
+save(cepalstat_indicadores_derivados_de_la_BP, 
+     file = "./produced_data/cepalstat_indicadores_derivados_de_la_BP")
+
+save(cepalstat_deuda_externa, file = "./produced_data/cepalstat_deuda_externa")
+
+save(cepalstat_comercio_intrarregional, 
+     file = "./produced_data/cepalstat_comercio_intrarregional")
+
+save(cepalstat_exp_imp_grandes_cat, file = "./produced_data/cepalstat_exp_imp_grandes_cat")
+
+save(cepalstat_exp_imp_pro_ppal_part_1_of_2, 
+     file = "./produced_data/cepalstat_exp_imp_pro_ppal_part_1_of_2")
+
+save(cepalstat_exp_imp_pro_ppal_part_2_of_2, 
+     file = "./produced_data/cepalstat_exp_imp_pro_ppal_part_2_of_2")
+
+save(cepalstat_exp_imp_servicios, file = "./produced_data/cepalstat_exp_imp_servicios")
+
+save(cepalstat_exp_imp_totales_mensuales, 
+     file = "./produced_data/cepalstat_exp_imp_totales_mensuales")
+
+save(cepalstat_exp_prim_manuf, file = "./produced_data/cepalstat_exp_prim_manuf")
+
+save(cepalstat_indic_vol_precios_imp_exp, 
+     file = "./produced_data/cepalstat_indic_vol_precios_imp_exp")
+
+save(cepalstat_tipo_de_cambio, file = "./produced_data/cepalstat_tipo_de_cambio")
+
+save(cepalstat_ipc_ipm_mensual, file = "./produced_data/cepalstat_ipc_ipm_mensual")
+
+save(cepalstat_ipc_ipm_anual, file = "./produced_data/cepalstat_ipc_ipm_anual")
+
+save(cepalstat_agricultura, file = "./produced_data/cepalstat_agricultura")
+
+save(cepalstat_mineria_manuf, file = "./produced_data/cepalstat_mineria_manuf")
+
+save(cepalstat_turismo, file = "./produced_data/cepalstat_turismo")
+
+save(cepalstat_precios_combustibles, file = "./produced_data/cepalstat_precios_combustibles")
+```
+
+
+### Reading data from the JEDH 
+
+
+
+### Reading data provided by colleagues at the EDD 
+
+
+
+
+
+
+
