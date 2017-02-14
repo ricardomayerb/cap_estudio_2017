@@ -20,6 +20,12 @@ load("./produced_data/cepalstat_exp_imp_totales_mensuales")
 load("./produced_data/cepalstat_exp_prim_manuf")
 load("./produced_data/cepalstat_indic_vol_precios_imp_exp")
 load("./produced_data/cepalstat_tipo_de_cambio")
+load("./produced_data/cepalstat_ipc_ipm_mensual")
+load("./produced_data/cepalstat_ipc_ipm_anual")
+load("./produced_data/cepalstat_agricultura")
+load("./produced_data/cepalstat_mineria_manuf")
+load("./produced_data/cepalstat_turismo")
+load("./produced_data/cepalstat_precios_combustibles")
 
 load("./produced_data/cepalstat_exp_imp_pro_ppal_part_1_of_2")
 load("./produced_data/cepalstat_exp_imp_pro_ppal_part_2_of_2")
@@ -69,92 +75,133 @@ save(cepal_names_es_en, file = "./produced_data/cepal_names_es_en")
 cs_real_dolares <- cepalstat_sector_real_dolares_completo %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_financiero_monetario <- cepalstat_sector_financiero_monetario %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_remuneraciones <- cepalstat_remuneraciones %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_empleo <- cepalstat_empleo %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_desempleo <- cepalstat_desempleo %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_bp_anual <- cepalstat_BP_anual %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_bp_trimestral <- cepalstat_BP_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_deuda_externa <- cepalstat_deuda_externa %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_indicadores_bp <- cepalstat_indicadores_derivados_de_la_BP %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_sector_publico <- cepalstat_sector_publico %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_comercio_intrarregional <- cepalstat_comercio_intrarregional %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_x_m_gran_cat <- cepalstat_exp_imp_grandes_cat %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_x_m_10_ppales <- cepalstat_exp_imp_pro_ppal %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_x_m_servicios <- cepalstat_exp_imp_servicios %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_x_m_total_mensual <- cepalstat_exp_imp_totales_mensuales %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_x_prim_manuf <- cepalstat_exp_prim_manuf %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
 cs_tipo_cambio <- cepalstat_tipo_de_cambio %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País) 
 
 cs_x_m_vol_precios <- cepalstat_indic_vol_precios_imp_exp %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+
+
+
+
+
+cs_ipc_mensual <- cepalstat_ipc_ipm_mensual %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+cs_ipc_anual <- cepalstat_ipc_ipm_anual %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+
+cs_agricultura <- cepalstat_agricultura %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+
+cs_mineria_manuf <- cepalstat_mineria_manuf %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+
+cs_turismo <- cepalstat_turismo %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+
+cs_precios_combustibles <- cepalstat_precios_combustibles %>% 
+  mutate(iso3c = countrycode(Países, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(Países, custom_dict = cepal_names_es_en, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = Países)
+
+
 
 
 carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD", 
@@ -192,7 +239,12 @@ cs_x_m_total_mensual_20 <- cs_x_m_total_mensual %>% filter(iso3c %in% cepal_20[[
 cs_x_prim_manuf_20 <- cs_x_prim_manuf %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_tipo_cambio_20 <- cs_tipo_cambio %>% filter(iso3c %in% cepal_20[["iso3c"]])
 cs_x_m_vol_precios_20 <- cs_x_m_vol_precios %>% filter(iso3c %in% cepal_20[["iso3c"]])
-
+cs_ipc_mensual <- cs_ipc_mensual %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_ipc_anual <- cs_ipc_anual %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_agricultura <- cs_agricultura %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_mineria_manuf <- cs_mineria_manuf %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_turismo <- cs_turismo %>% filter(iso3c %in% cepal_20[["iso3c"]])
+cs_precios_combustibles <- cs_precios_combustibles %>% filter(iso3c %in% cepal_20[["iso3c"]])
 
 save(cs_real_dolares_20, file = "./produced_data/cs_real_dolares_20")
 save(cs_financiero_monetario_20, file = "./produced_data/cs_financiero_monetario_20")
@@ -212,5 +264,11 @@ save(cs_x_m_total_mensual_20, file = "./produced_data/cs_x_m_total_mensual_20")
 save(cs_x_prim_manuf_20, file = "./produced_data/cs_x_prim_manuf_20")
 save(cs_tipo_cambio_20, file = "./produced_data/cs_tipo_cambio_20")
 save(cs_x_m_vol_precios_20, file = "./produced_data/cs_x_m_vol_precios_20")
+save(cs_ipc_mensual, file = "./produced_data/cs_ipc_mensual")
+save(cs_ipc_anual, file = "./produced_data/cs_ipc_anual")
+save(cs_agricultura, file = "./produced_data/cs_agricultura")
+save(cs_mineria_manuf, file = "./produced_data/cs_mineria_manuf")
+save(cs_turismo, file = "./produced_data/cs_turismo")
+save(cs_precios_combustibles, file = "./produced_data/cs_precios_combustibles")
 
 

@@ -1,88 +1,228 @@
 library(tidyverse)
- 
 
+cepalstat_sector_real_dolares_completo <-
+  read_delim(
+    "./raw_data/cepalstat_sector_real_dolares_anual_completo.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
+cepalstat_desempleo <-
+  read_delim(
+    "./raw_data/cepalstat_desempleo.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_sector_real_dolares_completo <- read_delim("./raw_data/cepalstat_sector_real_dolares_anual_completo.csv",
-                                              ";", escape_double = FALSE,
-                                              trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_empleo <- read_delim(
+  "./raw_data/cepalstat_empleo.csv",
+  ";",
+  escape_double = FALSE,
+  trim_ws = TRUE,
+  locale = locale("es", encoding = "windows-1252")
+)
 
-cepalstat_desempleo <- read_delim("./raw_data/cepalstat_desempleo.csv", 
-                                  ";", escape_double = FALSE, 
-                                  trim_ws = TRUE,
-                                  locale = locale("es", encoding="windows-1252"))
+cepalstat_remuneraciones <-
+  read_delim(
+    "./raw_data/cepalstat_remuneraciones.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding =
+                      "windows-1252")
+  )
 
-cepalstat_empleo <- read_delim("./raw_data/cepalstat_empleo.csv", 
-                               ";", escape_double = FALSE, 
-                               trim_ws = TRUE,
-                               locale = locale("es", encoding="windows-1252"))
+cepalstat_sector_financiero_monetario <-
+  read_delim(
+    "./raw_data/cepalstat_sector_financiero_monetario.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_remuneraciones <- read_delim("./raw_data/cepalstat_remuneraciones.csv", 
-                                       ";", escape_double = FALSE, 
-                                       trim_ws = TRUE,
-                                       locale = locale("es", encoding="windows-1252"))
+cepalstat_sector_publico <-
+  read_delim(
+    "./raw_data/cepalstat_sector_publico2.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_sector_financiero_monetario <- read_delim("./raw_data/cepalstat_sector_financiero_monetario.csv", 
-                                                    ";", escape_double = FALSE, 
-                                                    trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_BP_anual <-
+  read_delim(
+    "./raw_data/cepalstat_BP_anual.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_sector_publico <- read_delim("./raw_data/cepalstat_sector_publico2.csv", 
-                                        ";", escape_double = FALSE, 
-                                        trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_BP_trimestral <-
+  read_delim(
+    "./raw_data/cepalstat_BP_trimestral.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_BP_anual <- read_delim("./raw_data/cepalstat_BP_anual.csv", 
-                                 ";", escape_double = FALSE, 
-                                 trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_indicadores_derivados_de_la_BP <-
+  read_delim(
+    "./raw_data/cepalstat_indicadores_derivados_de_la_BP.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_BP_trimestral <- read_delim("./raw_data/cepalstat_BP_trimestral.csv", 
-                                      ";", escape_double = FALSE, 
-                                      trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_imp_servicios <-
+  read_delim(
+    "./raw_data/cepalstat_exp_imp_servicios.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_indicadores_derivados_de_la_BP <- read_delim("./raw_data/cepalstat_indicadores_derivados_de_la_BP.csv", 
-                                                       ";", escape_double = FALSE, 
-                                                       trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_deuda_externa <-
+  read_delim(
+    "./raw_data/cepalstat_deuda_externa.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_imp_servicios <- read_delim("./raw_data/cepalstat_exp_imp_servicios.csv", 
-                                          ";", escape_double = FALSE, 
-                                          trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_comercio_intrarregional <-
+  read_delim(
+    "./raw_data/cepalstat_comercio_intrarregional.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_deuda_externa <- read_delim("./raw_data/cepalstat_deuda_externa.csv", 
-                                      ";", escape_double = FALSE, 
-                                      trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_imp_grandes_cat <-
+  read_delim(
+    "./raw_data/cepalstat_exp_imp_grandes_cat.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_comercio_intrarregional <- read_delim("./raw_data/cepalstat_comercio_intrarregional.csv", 
-                                                ";", escape_double = FALSE, 
-                                                trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_imp_pro_ppal_part_1_of_2 <-
+  read_delim(
+    "./raw_data/cepalstat_exp_imp_pro_ppal_part_1_of_2.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_imp_grandes_cat <- read_delim("./raw_data/cepalstat_exp_imp_grandes_cat.csv", 
-                                            ";", escape_double = FALSE, 
-                                            trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_imp_pro_ppal_part_2_of_2 <-
+  read_delim(
+    "./raw_data/cepalstat_exp_imp_pro_ppal_part_2_of_2.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_imp_pro_ppal_part_1_of_2 <- read_delim("./raw_data/cepalstat_exp_imp_pro_ppal_part_1_of_2.csv", 
-                                                     ";", escape_double = FALSE, 
-                                                     trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_imp_totales_mensuales <-
+  read_delim(
+    "./raw_data/cepalstat_exp_imp_totales_mensuales.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_imp_pro_ppal_part_2_of_2 <- read_delim("./raw_data/cepalstat_exp_imp_pro_ppal_part_2_of_2.csv", 
-                                                     ";", escape_double = FALSE, 
-                                                     trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_exp_prim_manuf <-
+  read_delim(
+    "./raw_data/cepalstat_exp_prim_manuf.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_imp_totales_mensuales <- read_delim("./raw_data/cepalstat_exp_imp_totales_mensuales.csv", 
-                                                  ";", escape_double = FALSE, 
-                                                  trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_indic_vol_precios_imp_exp <-
+  read_delim(
+    "./raw_data/cepalstat_indic_vol_precios_imp_exp.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_exp_prim_manuf <- read_delim("./raw_data/cepalstat_exp_prim_manuf.csv", 
-                                       ";", escape_double = FALSE, 
-                                       trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_tipo_de_cambio <-
+  read_delim(
+    "./raw_data/cepalstat_tipo_de_cambio.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_indic_vol_precios_imp_exp <- read_delim("./raw_data/cepalstat_indic_vol_precios_imp_exp.csv", 
-                                                  ";", escape_double = FALSE, 
-                                                  trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_ipc_ipm_mensual <-
+  read_delim(
+    "./raw_data/cepalstat_ipc_ipm_mensual.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
-cepalstat_tipo_de_cambio <- read_delim("./raw_data/cepalstat_tipo_de_cambio.csv", 
-                                       ";", escape_double = FALSE, 
-                                       trim_ws = TRUE, locale = locale("es", encoding="windows-1252"))
+cepalstat_ipc_ipm_anual <-
+  read_delim(
+    "./raw_data/cepalstat_ipc_ipm_anual_nivel_y_var.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
+cepalstat_agricultura <-
+  read_delim(
+    "./raw_data/cepalstat_agricultura.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
 
+cepalstat_mineria_manuf <-
+  read_delim(
+    "./raw_data/cepalstat_mineria_manufactura.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
+cepalstat_precios_combustibles <-
+  read_delim(
+    "./raw_data/cepalstat_precios_combustibles.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
+cepalstat_turismo <- read_delim(
+  "./raw_data/cepalstat_turismo.csv",
+  ";",
+  escape_double = FALSE,
+  trim_ws = TRUE,
+  locale = locale("es", encoding = "windows-1252")
+)
 
 
 new_cols = ncol(cepalstat_sector_real_dolares_completo) - 1
@@ -142,6 +282,23 @@ cepalstat_indic_vol_precios_imp_exp = select(cepalstat_indic_vol_precios_imp_exp
 new_cols = ncol(cepalstat_tipo_de_cambio) - 1
 cepalstat_tipo_de_cambio = select(cepalstat_tipo_de_cambio, 1:new_cols)
 
+new_cols = ncol(cepalstat_ipc_ipm_mensual) - 1
+cepalstat_ipc_ipm_mensual = select(cepalstat_ipc_ipm_mensual, 1:new_cols)
+
+new_cols = ncol(cepalstat_ipc_ipm_anual) - 1
+cepalstat_ipc_ipm_anual = select(cepalstat_ipc_ipm_anual, 1:new_cols)
+
+new_cols = ncol(cepalstat_mineria_manuf) - 1
+cepalstat_mineria_manuf = select(cepalstat_mineria_manuf, 1:new_cols)
+
+new_cols = ncol(cepalstat_turismo) - 1
+cepalstat_turismo = select(cepalstat_turismo, 1:new_cols)
+
+new_cols = ncol(cepalstat_agricultura) - 1
+cepalstat_agricultura = select(cepalstat_agricultura, 1:new_cols)
+
+new_cols = ncol(cepalstat_precios_combustibles) - 1
+cepalstat_precios_combustibles = select(cepalstat_precios_combustibles, 1:new_cols)
 
 save(cepalstat_sector_real_dolares_completo, file = "./produced_data/cepalstat_sector_real_dolares_anual")
 
@@ -181,3 +338,14 @@ save(cepalstat_indic_vol_precios_imp_exp, file = "./produced_data/cepalstat_indi
 
 save(cepalstat_tipo_de_cambio, file = "./produced_data/cepalstat_tipo_de_cambio")
 
+save(cepalstat_ipc_ipm_mensual, file = "./produced_data/cepalstat_ipc_ipm_mensual")
+
+save(cepalstat_ipc_ipm_anual, file = "./produced_data/cepalstat_ipc_ipm_anual")
+
+save(cepalstat_agricultura, file = "./produced_data/cepalstat_agricultura")
+
+save(cepalstat_mineria_manuf, file = "./produced_data/cepalstat_mineria_manuf")
+
+save(cepalstat_turismo, file = "./produced_data/cepalstat_turismo")
+
+save(cepalstat_precios_combustibles, file = "./produced_data/cepalstat_precios_combustibles")
