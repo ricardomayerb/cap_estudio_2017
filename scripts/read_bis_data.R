@@ -1,34 +1,34 @@
 library(tidyverse)
 library(readxl)
 
-c_gaps1612_qs <- read_excel("./data/c_gaps1612.xlsx", 
+c_gaps1612_qs <- read_excel("./raw_data/c_gaps1612.xlsx", 
                             sheet = "Quarterly Series", skip = 3)
 
-c_gaps1612_documentation <- read_excel("./data/c_gaps1612.xlsx", 
+c_gaps1612_documentation <- read_excel("./raw_data/c_gaps1612.xlsx", 
                                           sheet = "Documentation") 
 
-c_gaps1612_content <- read_excel("./data/c_gaps1612.xlsx", 
+c_gaps1612_content <- read_excel("./raw_data/c_gaps1612.xlsx", 
                              sheet = "Content")
 
 
 
-totcredit_content <- read_excel("./data/totcredit.xlsx", 
+totcredit_content <- read_excel("./raw_data/totcredit.xlsx", 
                                     sheet = "Content")
 
-totcredit_documentation <- read_excel("./data/totcredit.xlsx",
+totcredit_documentation <- read_excel("./raw_data/totcredit.xlsx",
                     sheet = "Documentation")
 
-totcredit_qs <- read_excel("./data/totcredit.xlsx", 
+totcredit_qs <- read_excel("./raw_data/totcredit.xlsx", 
                                sheet = "Quarterly Series", skip = 2)
 
 
-dsr_content <- read_excel("./data/dsr.xlsx", 
+dsr_content <- read_excel("./raw_data/dsr.xlsx", 
                       sheet = "Content")
 
-dsr_documentation <- read_excel("./data/dsr.xlsx", 
+dsr_documentation <- read_excel("./raw_data/dsr.xlsx", 
                                     sheet = "Documentation")
 
-dsr_qs <- read_excel("./data/dsr.xlsx", 
+dsr_qs <- read_excel("./raw_data/dsr.xlsx", 
                        sheet = "Quarterly Series")
 
 

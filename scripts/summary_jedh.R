@@ -2,7 +2,8 @@ library(xts)
 library(tidyverse)
 library(countrycode)
 load("./produced_data/cepal_20_countries")
-load("./produced_data/debt_data_JEDH_cepal20")
+load("./produced_data/debt_data_JEDH_cepal_33")
+load("./produced_data/debt_data_JEDH_cepal_20")
 # convert current character debt 1990 Q1, to standard 2016 Q2, 2016 Q1 and 1990-01-01
 # convert to 2016 Q2, 2016 Q1, 2015 Q4, 2015 Q3, 2015 Q2 etc.
 debt_dates = as.yearqtr(debt_data$date)
