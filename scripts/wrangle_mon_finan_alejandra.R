@@ -2,8 +2,8 @@ library(tidyverse)
 library(stringr)
 
 load("./produced_data/datos_mon_finan_alej_messy")
-load("./produced_data/cepal_names_es_en")
-load("./produced_data/cepal_names_es_en_20")
+load("./produced_data/cepal_33_countries")
+load("./produced_data/cepal_20_countries")
 
 
 ## tidying tasa de politica moetaria
@@ -26,7 +26,7 @@ tpm_tidy <-  tpm %>%
                              Venezuela = "Venezuela (República Bolivariana de)"))
 
 tpm_tidy_20 <- tpm_tidy %>% 
-          filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+          filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
 ## tidyng cartera vencida
@@ -51,7 +51,7 @@ cartera_vencida_tidy <- cartera_vencida %>%
 
 
 cartera_vencida_tidy_20 <- cartera_vencida_tidy %>% 
-                          filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+                          filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
 ## tidyng credito interno
@@ -74,7 +74,7 @@ for(i in 1:length(dfs_ci)){
   
   names(dfs_ci_to_modify[[i]]) <-  lower_case_names
   
-  print( c(country_names_credito_interno[[i]], names(dfs_ci_to_modify[[i]])))
+  # print( c(country_names_credito_interno[[i]], names(dfs_ci_to_modify[[i]])))
   
   dfs_ci_to_modify[[i]] <- dmap(dfs_ci_to_modify[[i]], as.numeric)
   
@@ -95,7 +95,7 @@ credito_interno_tidy <- credito_interno %>%
                              "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
 
 credito_interno_tidy_20 = credito_interno_tidy %>% 
-  filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+  filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
 
@@ -117,7 +117,7 @@ for(i in 1:length(dfs_pb)){
   
   names(dfs_pb_to_modify[[i]]) <-  lower_case_names_pb
   
-  print( c(country_names_prestamos_bancarios[[i]], names(dfs_pb_to_modify[[i]])))
+  # print( c(country_names_prestamos_bancarios[[i]], names(dfs_pb_to_modify[[i]])))
   
   dfs_pb_to_modify[[i]] <- dmap(dfs_pb_to_modify[[i]], as.numeric)
   
@@ -134,7 +134,7 @@ prestamos_bancarios_tidy <- prestamos_bancarios %>%
                              "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
 
 prestamos_bancarios_tidy_20 = prestamos_bancarios_tidy %>% 
-  filter(pais_name %in% cepal_names_es_en_20[["country.name.es"]])
+  filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
 ## tidy
