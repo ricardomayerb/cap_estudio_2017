@@ -9,13 +9,16 @@ load("./produced_data/debt_data_JEDH_cepal_20")
 # convert to 2016 Q2, 2016 Q1, 2015 Q4, 2015 Q3, 2015 Q2 etc.
 
 # debt = debt_dates_cepal_33
-
+debt_data <- debt_data_cepal_33
 debt_dates = as.yearqtr(debt_data$date)
 debt_data$dateYQ = debt_dates
 
 debt_data <- debt_data %>% mutate(ind_short = indicator) %>% 
-             mutate(ind_short,  recode(ind_short,
-                                       "01_Cross-border loans from BIS reporting banks" = "01"))
+  mutate(new = strtrim(indicator, 2)) %>% 
+             mutate(ind_short = 
+                    recode(ind_short,
+                    "01_Cross-border loans from BIS reporting banks" = "01",
+                    "02_Cross-border loans from BIS banks to nonbanks" = "02"))
 
 # convert to standard year-month-day
 debt_dates = as.Date.yearqtr(debt_dates)
@@ -24,11 +27,11 @@ debt_data$date = as.Date(debt_dates, "%Y-%m-%d")
 ## make tables of all the individual variables that we are going to use with the
 ## number of observations and end and start date.
 indicator_first = debt_data %>%
-  group_by(nr_of_obs, country) %>%
-  summarise(count = n(),
+  group_by(indicator, country) %>%
+  summarise(nr_of_obs = n(),
             start = min(dateYQ),
             end = max(dateYQ)) %>%
-  arrange(indicator, count)
+  arrange(indicator, nr_of_obs)
 
 
 Variable1_catA <- indicator_first %>% 
