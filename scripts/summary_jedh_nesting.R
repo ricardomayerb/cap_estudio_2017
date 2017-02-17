@@ -62,7 +62,7 @@ debt_by_cat_n <- debt_data %>% group_by(ind_groups) %>%
 debt_by_cat_n <- debt_by_cat_n %>% 
   mutate(isum = map(subdata, summary))
 
-print(debt_by_cat_n$isum[[1]] )
+
 
 
 debt_by_cat_ind <- debt_data %>% group_by(ind_groups, ind_num_group)
@@ -71,11 +71,52 @@ debt_by_cat_ind_n <- debt_data %>% group_by(ind_groups, ind_num_group) %>%
                       nest(.key = subdata)
 
 debt_by_cat_ind_n <- debt_by_cat_ind_n %>% 
-                      mutate(isum = map(subdata, summary)) %>% 
-                      mutate(tidysum = isum)
-  
+                        mutate( 
+                          aksum = map(subdata, summarise, 
+                                mean = mean(value, na.rm = TRUE) / 1000000000,
+                                min_value = min(value) / 1000000000,
+                                max_value = max(value) / 1000000000,
+                                sd = sd(value) / 1000000000,
+                                count = n(),
+                                start = min(dateYQ),
+                                end = max(dateYQ))  ,
+                          what_countries = map(subdata, ~ unique(.$country))
+                        ) 
+                      
 
-print(debt_by_cat_ind_n$isum[[1]] )
+debt_by_cat_ind_un <- debt_by_cat_ind_n %>% unnest(aksum)
+
+nonest_debt_by_cat_ind =  debt_data %>% group_by(ind_groups, ind_num_group) %>% 
+              summarise(
+                mean = mean(value, na.rm = TRUE) / 1000000000,
+                min_value = min(value) / 1000000000,
+                max_value = max(value) / 1000000000,
+                sd = sd(value) / 1000000000,
+                count = n(),
+                start = min(dateYQ),
+                end = max(dateYQ),
+                num_countries = length(unique(country)),
+                is_br_cl = all(any(iso2c == "BR"),
+                                   any(iso2c == "CL")
+                                   ),
+                is_br_cl_mex = all(is_br_cl,
+                                   any(iso2c == "MX")
+                ),
+                is_arg_br_cl_mex = all(is_br_cl_mex, 
+                                       any(iso2c == "AR")
+                                       )
+                        ) 
+
+
+my_jedh_summary <- function(jedh_data){
+  country = as.factor(jedh_data$country)
+  iso2c = as.factor(jedh_data)
+  countries = unique(jedh_data$country)
+  tab_iso2c = table(as.factor(jedh_data$iso2c))
+  countries_iso2c = unique(jedh_data$iso2c)
+  n_countries = length(countries)
+  
+}
 
 
 # # alternative, droping variables and using recode
