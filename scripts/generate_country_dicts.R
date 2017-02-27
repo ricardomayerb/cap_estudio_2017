@@ -1,11 +1,6 @@
 library(countrycode)
 library(tidyverse)
 
-# lac_wb = wb_cachelist$countries  %>% filter(regionID=="LCN") %>% select(iso2c, iso3c, country)
-
-
-
-
 ca_sa_region = c("Central America", "South America")
 sa_not_cepal = c("FLK", "GUF")
 cepal_caribbean = c("ATG","BHS", "BRB", "CUB", "DMA",
