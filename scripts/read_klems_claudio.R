@@ -56,5 +56,16 @@ klems_dfs_bra_map <- path_bra %>%
 names(klems_dfs_bra_map) <- sheets_bra
 
 
+## read mexico
+path_mex = "./raw_data/mex_output_09II_menor_agregacion.xls"
+sheets_mex = quiet_sheets(path_mex)$result
+
+klems_dfs_mex_map <- path_mex %>% 
+  map2(sheets_mex, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_mex_map) <- sheets_mex
+
+save(klems_dfs_arg_map, klems_dfs_bra_map, klems_dfs_chi_map, klems_dfs_col_map, 
+     klems_dfs_mex_map, file="./produced_data/klems_ar_br_cl_co_mx")
 
 
