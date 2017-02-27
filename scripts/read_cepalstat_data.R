@@ -224,6 +224,18 @@ cepalstat_turismo <- read_delim(
   locale = locale("es", encoding = "windows-1252")
 )
 
+cepalstat_sector_real_mn_trimestral <-
+  read_delim(
+    "./raw_data/cepalstat_sector_real_mn_na_trimestral.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
+
+
+
 
 new_cols = ncol(cepalstat_sector_real_dolares_completo) - 1
 cepalstat_sector_real_dolares_completo = select(cepalstat_sector_real_dolares_completo, 1:new_cols)
@@ -300,6 +312,9 @@ cepalstat_agricultura = select(cepalstat_agricultura, 1:new_cols)
 new_cols = ncol(cepalstat_precios_combustibles) - 1
 cepalstat_precios_combustibles = select(cepalstat_precios_combustibles, 1:new_cols)
 
+new_cols = ncol(cepalstat_sector_real_mn_trimestral) - 1
+cepalstat_sector_real_mn_trimestral = select(cepalstat_sector_real_mn_trimestral, 1:new_cols)
+
 save(cepalstat_sector_real_dolares_completo, file = "./produced_data/cepalstat_sector_real_dolares_anual")
 
 save(cepalstat_desempleo , file = "./produced_data/cepalstat_desempleo")
@@ -349,3 +364,5 @@ save(cepalstat_mineria_manuf, file = "./produced_data/cepalstat_mineria_manuf")
 save(cepalstat_turismo, file = "./produced_data/cepalstat_turismo")
 
 save(cepalstat_precios_combustibles, file = "./produced_data/cepalstat_precios_combustibles")
+
+save(cepalstat_sector_real_mn_trimestral, file = "./produced_data/cepalstat_sector_real_mn_trimestral")

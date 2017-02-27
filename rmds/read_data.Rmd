@@ -2,9 +2,11 @@
 title: "Reading data"
 author: "Ricardo Mayer"
 date: "February 13, 2017"
-output: 
+output:
+  word_document:
+    toc: yes
   html_document:
-    toc: true
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -31,6 +33,58 @@ knitr::opts_chunk$set(echo = TRUE)
 6. Use the `read_` prefix to name any script used to read or retrieve data. Keep those 'R' scripts in the `scripts` directory.
 
 7. Keep the reading procedure and data wragling/munging separated. At most, write necessary code to hold several sheets inside a single list, but leave any renaming, selection, filtering, joining, etc. to a separate script.  
+
+
+### Preliminaries: country dictionaries
+With the help of the `countrycode`  package we create custom 
+dataframes to hold iso2c, iso3c, english names and spanish names for the complete list 
+of latinoamerican and caribbean members of ECLAC (33 countries) and a more restricted subset of 20 economies.
+
+The `countrycode` package let us to change easly between codes and names, which is useful to retrive information and to construct consistent ID keys to merge datasents down the road.
+
+In this shorter list we have excluded all caribbean member countries except Dominican Republic and 
+included all members from Central and South America , with the exception of Belize and Suriname.
+
+At the end of this part, we save these dataframes to call them later in subsequent scripts.
+
+The process is carried in the `generate_country_dicts.R` script and reproduced here:
+
+```{r}
+library(countrycode)
+library(tidyverse)
+
+ca_sa_region = c("Central America", "South America")
+sa_not_cepal = c("FLK", "GUF")
+cepal_caribbean = c("ATG","BHS", "BRB", "CUB", "DMA",
+                    "DOM", "GRD", "HTI", "JAM", "KNA",
+                    "LCA", "VCT", "TTO")
+
+cepal_33_countries <- countrycode_data %>% 
+                select(iso2c, iso3c, country.name.en, country.name.es, region) %>% 
+                filter(region %in% ca_sa_region | iso3c %in% cepal_caribbean) %>% 
+                filter(! iso3c  %in%  sa_not_cepal) 
+                
+
+# fix the Trinidad yTobago entry and change it to Trinidad y Tabago
+cepal_33_countries$country.name.es[cepal_33_countries$iso3c == "TTO"] <- "Trinidad y Tabago"
+
+
+carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD", 
+                    "HTI", "KNA", "LCA", "TTO", "VCT")
+
+other_to_drop = c("GUY", "SUR", "BLZ") 
+
+# without caribbean (except cuba and dom rep) and without belize, suriname and guyana
+cepal_20_countries = cepal_33_countries %>% 
+  filter(!iso3c %in% carib_minus_dom) %>% 
+  filter(!iso3c %in% other_to_drop)
+
+
+save(cepal_33_countries, file = "./produced_data/cepal_33_countries")
+save(cepal_20_countries, file = "./produced_data/cepal_20_countries")
+
+```
+
 
 
 ### Read cepalstat's data
@@ -86,6 +140,8 @@ List of file and data:
 - *cepalstat_precios_combustibles.csv*
 
 - *cepalstat_turismo.csv*
+
+- *cepalstat_sector_real_mn_na_trimestral.csv*
 
 
 Here is the initial readings of the following data. I had to experiment a little to find the right encoding to read these files (it was `windows-1252`). For the first reading only, I'll display here the message issued by `read_delim`, that form the reason to apply the correction that you will find later in this document and supress them here on.
@@ -236,6 +292,14 @@ cepalstat_turismo <- read_delim("./raw_data/cepalstat_turismo.csv",
                                       trim_ws = TRUE, 
                                       locale = locale("es", encoding="windows-1252"))
 
+cepalstat_sector_real_mn_trimestral <-
+  read_delim(
+  "./raw_data/cepalstat_sector_real_mn_na_trimestral.csv",
+  ";",
+  escape_double = FALSE,
+  trim_ws = TRUE,
+  locale = locale("es", encoding = "windows-1252")
+  )
 ```
 
 
@@ -342,6 +406,10 @@ cepalstat_agricultura = select(cepalstat_agricultura,
 new_cols = ncol(cepalstat_precios_combustibles) - 1
 cepalstat_precios_combustibles = select(cepalstat_precios_combustibles, 
                                         1:new_cols)
+
+new_cols = ncol(cepalstat_sector_real_mn_trimestral) - 1
+cepalstat_sector_real_mn_trimestral = select(
+  cepalstat_sector_real_mn_trimestral, 1:new_cols)
 ```
 
 Finally, save the files as R binary data files (.rda). I'll show the code, but disable its evaluation, just to be careful,
@@ -404,18 +472,597 @@ save(cepalstat_mineria_manuf, file = "./produced_data/cepalstat_mineria_manuf")
 
 save(cepalstat_turismo, file = "./produced_data/cepalstat_turismo")
 
-save(cepalstat_precios_combustibles, file = "./produced_data/cepalstat_precios_combustibles")
+save(cepalstat_precios_combustibles, 
+     file = "./produced_data/cepalstat_precios_combustibles")
+
+save(cepalstat_sector_real_mn_trimestral, 
+     file = "./produced_data/cepalstat_sector_real_mn_trimestral")
+
 ```
 
 
 ### Reading data from the JEDH 
+Fortunately the World Bank exposes data from the Joint External Debt Hub, of which it is a member, so we 
+can use the `wbstats` package to download all data where the source correponds to JEDH. The list of countries 
+it's give in our 33 and 20-members lists. This is implemented in  `get_joint_hub_data.R` and it's reproduced below:
+
+```{r get_jedh_from_wb, cache=TRUE}
+library(tidyverse)
+library(wbstats)
+
+load("./produced_data/cepal_33_countries")
+load("./produced_data/cepal_20_countries")
+
+
+# sources = updated_cache[[2]]$source
+# JEDH_indicators = filter(updated_cache[[2]], source=="(JEDH) Joint External Debt Hub")
+# JEDH_indicators_codes = JEDH_indicators$indicatorID
+# 
+# # shorter, using the fact we know now to look for JEDH as parte of the name of the source
+# # long description is not included
+
+JEDH_vars = wbsearch(pattern = "JEDH", cache=wb_cachelist, fields = "source")
+
+debt_data_cepal_33 <- wb(country = cepal_33_countries[["iso3c"]],
+                          indicator = JEDH_vars[["indicatorID"]],
+                          mrv = 80)
+
+debt_data_cepal_20 = debt_data_cepal_33 %>% 
+                      filter(iso2c %in% cepal_20_countries[["iso2c"]])
+
+save(debt_data_cepal_33, file = "./produced_data/debt_data_JEDH_cepal_33")
+save(debt_data_cepal_20, file = "./produced_data/debt_data_JEDH_cepal_20")
+
+```
+
+This is the list of variables we get from that call:
+
+```{r list_jedh_vars}
+list_of_vars <- unique(debt_data_cepal_33$indicator)
+print(list_of_vars)
+```
+
+To see how many countries have information on each variable and for what time span,
+you will have to wait to read the data munging Rmarkdown document
+
+
+### Monetary and banking data (EDD, Alejandra Acevedo)
+We now turn to read data provided in a excel workbook with several sheets. The location 
+of the data inside each sheet is not simple enough to use `readxl`, thus we employ the `XLConnect` 
+package that let us to specify the exact region of the sheet we wish to extract.
+
+The variable we retrive fromt his excel file, are:
+
+- Préstamos Bancarios (Bank loans)
+- Cartera vencida (Non performing loans)
+- Crédito interno (internal credit)
+- Meta de inflación, incluyendo máximos y mínimos (inflation target levels and upper-lower target bounds)
+- Tasa de política monetaria (monetary policy rate)
+
+The resulting R dataframe are stored in `datos_mon_finan_alej_messy.rda` for further manipulation.
+
+
+The work is done in `read_monetarios_financieros_alejandra.R` which I reproduce below:
+
+```{r read_monetarios, cache=TRUE}
+library(tidyverse)
+library(XLConnect)
+
+
+wb = loadWorkbook("./raw_data/Datos_monetarios_de_Alejandra.xlsx")
+
+sheet_name = "Tasa_politica"
+rstart <-  3
+rend <-  373
+cstart <-  1
+cend <- 34
+
+tpm <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                     endRow = rend, startCol = cstart, endCol = cend)
 
 
 
-### Reading data provided by colleagues at the EDD 
+sheet_name = "Meta de Inflación"
+rstart <-  5
+rend <-  9
+cstart <-  1
+cend <- 180
+meta_inf <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                          endRow = rend, startCol = cstart, endCol = cend, header = FALSE)
+
+
+rstart <-  12
+rend <-  16
+meta_inf_limsup <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                          endRow = rend, startCol = cstart, endCol = cend, header = FALSE)
+
+rstart <-  19
+rend <-  23
+meta_inf_liminf <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                                 endRow = rend, startCol = cstart, endCol = cend, header = FALSE)
+
+
+sheet_name = "Cartera Vencida"
+rstart <-  3
+rend <-  280
+cstart <-  1
+cend <- 34
+cartera_vencida <- readWorksheet(wb, sheet = sheet_name, startRow = rstart,
+                                 endRow = rend, startCol = cstart, endCol = cend)
+
+
+sheet_name = "Crédito interno"
+country_names_mess_ci <- readWorksheet(wb, sheet = sheet_name,
+                               startRow = 1, endRow = 1,
+                               startCol = 2, endCol = 199, header = FALSE) 
+
+rstart <-  2
+rend <-  323
+cstarts <- seq(from = 3, by = 6, length.out = 33)
+cends <- cstarts + 5
+
+dfs_ci <- list_along(cstarts)
+
+# autofitRow = FALSE is necessary to ensure all blocks have the same number of rows
+# irrespective of the date of hte last observation recorded. Equal number of rows is 
+# necessary for bind_rows() later
+for (i in seq_along(cstarts) ) {
+  
+  dfs_ci[[i]] <- readWorksheet(wb, sheet = sheet_name,
+                                 startRow = rstart, endRow = rend,
+                                 startCol = cstarts[[i]], endCol = cends[[i]],
+                                 autofitRow = FALSE) 
+}
 
 
 
+sheet_name = "Préstamos bancarios"
+country_names_mess_pb <- readWorksheet(wb, sheet = sheet_name,
+                                    startRow = 4, endRow = 4,
+                                    startCol = 2, endCol = 240, header = FALSE) 
+
+rstart <-  5
+rend <-  349
+cstarts <- seq(from = 2, by = 7, length.out = 33)
+cends <- cstarts + 6
+
+dfs_pb <- list_along(cstarts)
+
+for (i in seq_along(cstarts) ) {
+  dfs_pb[[i]] <- readWorksheet(wb, sheet = sheet_name,
+                               startRow = rstart, endRow = rend,
+                               startCol = cstarts[[i]], endCol = cends[[i]],
+                               autofitRow = FALSE) 
+}
+
+
+save(tpm, 
+     meta_inf, meta_inf_liminf, meta_inf_limsup,
+     cartera_vencida, 
+     dfs_pb, country_names_mess_pb, 
+     dfs_ci, country_names_mess_ci, 
+     file="./produced_data/datos_mon_finan_alej_messy")
+
+```
+
+
+
+### Reading KLEMS project data (EDD, Claudio Aravena)
+
+Data for Argentina, Brazil, Chile, Colombia and Mexico. To make data comparable, 
+data is aggregated up to 9 sectors.
+
+The structure of each country-workbook is a follows:
+
+- the fisrt sheet is called Notes, an contains a glossary of the variables present i the workbook, each of them stored in a separate sheet
+- 36 sheets of numerical data, corresponding to 36 variables defined in Notes.
+
+The reading script is called `read_klems_claudio.R` and saves its output to `klems_ar_br_cl_co_mx.rda` for further maipulation
+
+```{r read_klems, cache=TRUE}
+library(readxl)
+library(tidyverse)
+
+# workaround bc of the unwanted message DEFINEDNAME: blah blah ... blame the libxml package
+quiet_read <- purrr::quietly(readxl::read_excel)
+quiet_sheets <- purrr::quietly(readxl::excel_sheets)
+
+
+## read chile
+path_chi = "./raw_data/chi_output_09II.xls"
+sheets_chi = quiet_sheets(path_chi)$result
+
+klems_dfs_chi_map <- path_chi %>% 
+                      map2(sheets_chi, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+                      map("result") 
+names(klems_dfs_chi_map) <- sheets_chi
+
+
+## read argentina
+path_arg = "./raw_data/ar_output_09II.xls"
+sheets_arg = quiet_sheets(path_arg)$result
+
+klems_dfs_arg_map <- path_arg %>% 
+  map2(sheets_arg, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_arg_map) <- sheets_arg
+
+
+## read colombia
+path_col = "./raw_data/co_output_09II.xls"
+sheets_col = quiet_sheets(path_col)$result
+
+klems_dfs_col_map <- path_col %>% 
+  map2(sheets_col, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_col_map) <- sheets_col
+
+
+## read brazil
+path_bra = "./raw_data/br_output_09II.xls"
+sheets_bra = quiet_sheets(path_bra)$result
+
+klems_dfs_bra_map <- path_bra %>% 
+  map2(sheets_bra, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_bra_map) <- sheets_bra
+
+
+## read mexico
+path_mex = "./raw_data/mex_output_09II_menor_agregacion.xls"
+sheets_mex = quiet_sheets(path_mex)$result
+
+klems_dfs_mex_map <- path_mex %>% 
+  map2(sheets_mex, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_mex_map) <- sheets_mex
+
+save(klems_dfs_arg_map, klems_dfs_bra_map, klems_dfs_chi_map, klems_dfs_col_map, 
+     klems_dfs_mex_map, file="./produced_data/klems_ar_br_cl_co_mx")
+```
+
+### Reading Self-employment data (DDE, Jurgen Weller)
+
+Very simple file cointaining  data on self employment as share of the total emplyment, 
+for recent years, for 20 countries
+
+```{r read_tcp}
+library(tidyverse)
+library(readxl)
+
+
+TCP_2015 <- read_excel("./raw_data/TCP_2015.xlsx", skip = 1)
+save(TCP_2015, file="./produced_data/trab_cuenta_propia_jurgen")
+
+```
+
+
+### Reading Balance of Payment information (DDE, Cecilia)
+There may be substantial overlap with cepalstat data read before
+
+```{r read_bop}
+library(tidyverse)
+library(stringr)
+library(XLConnect)
+library(lubridate)
+
+bdpwb = loadWorkbook("./raw_data/BdpAnualSICValores10enero2017.xlsx")
+
+## import tables from sheet = BP-America Latina
+cstart <- 1
+cend <-  43
+cstarts <- rep(cstart, 43)
+cends <- rep(cend, 43)
+
+rstart <-  6
+rend <-  61
+row_block <-  rend - rstart
+rstart_next <-  65
+rows_to_next <-  rstart_next - rstart
+
+number_of_tables <- 21
+
+rstarts <-  seq(from = 6, by = rows_to_next, length.out = number_of_tables)
+rends <- rstarts + row_block
+
+dfs_bpal <- list_along(rstarts)
+
+sheet_name <- "BP-América Latina"
+
+for (i in seq_along(rstarts) ) {
+  
+  dfs_bpal[[i]] <- readWorksheet(bdpwb, sheet = sheet_name,
+                              startRow = rstarts[[i]], endRow = rends[[i]],
+                              startCol = cstarts[[i]], endCol = cends[[i]]) 
+}
+
+
+
+## import tables from sheet = BP-Caribe
+cstart <- 1
+cend <-  43
+cstarts <- rep(cstart, 43)
+cends <- rep(cend, 43)
+
+rstart <-  6
+rend <-  61
+row_block <-  rend - rstart
+rstart_next <-  65
+rows_to_next <-  rstart_next - rstart
+
+number_of_tables <- 14
+
+rstarts <-  seq(from = 6, by = rows_to_next, length.out = number_of_tables)
+rends <- rstarts + row_block
+
+dfs_bpcar <- list_along(rstarts)
+
+sheet_name <- "BP-Caribe"
+
+for (i in seq_along(rstarts) ) {
+  
+  dfs_bpcar[[i]] <- readWorksheet(bdpwb, sheet = sheet_name,
+                                 startRow = rstarts[[i]], endRow = rends[[i]],
+                                 startCol = cstarts[[i]], endCol = cends[[i]]) 
+}
+
+
+save(dfs_bpal, dfs_bpcar, file = "./produced_data/from_BdP_excel")
+
+```
+
+
+### Reading export ad import data by origin/destinatio and by product (DITI, SC)
+
+First by destination of exports and origin of imports (`read_expo_impo_origen_destino.R`):
+
+```{r read_x_m_ori, cache=TRUE}
+library(tidyverse)
+library(stringr)
+library(XLConnect)
+library(lubridate)
+
+x_m_oridest = loadWorkbook("./raw_data/expo_e_impo_por_destino_y_origen.xlsx")
+
+num_of_countries = 16
+
+all_dates = readWorksheet(x_m_oridest, sheet = 1, header = FALSE,
+                          startRow = 2, endRow = 2, startCol = 2,
+                          colTypes = "DATETIME")
+
+all_dates_ch <- as.character.Date(all_dates, format = "%Y-%m-%d")
+
+# all_dates <- cbind("dates", all_dates)
+
+
+## read country names
+rstart_names <- seq(from=3, by=21, length.out = num_of_countries)
+all_names <- list_along(rstart_names)
+
+for (i in seq_along(rstart_names) ) {
+  
+  this_name <- readWorksheet(x_m_oridest, sheet = 1, header = FALSE,
+                             startRow = rstart_names[[i]],
+                             endRow = rstart_names[[i]],
+                             startCol = 1, endCol = 1) 
+  
+  all_names[[i]] <- this_name[[1]]
+}
+
+
+## read exports (x) data
+rstart_x <- seq(from=5, by=21, length.out = num_of_countries)
+n_x <- 7
+rend_x <- rstart_x + n_x
+
+dfs_x <- list_along(rstart_x)
+
+for (i in seq_along(rstart_x) ) {
+  
+  this_df <- readWorksheet(x_m_oridest, sheet = 1, header = FALSE,
+                          startRow = rstart_x[[i]], endRow = rend_x[[i]],
+                          startCol = 1)
+  
+  this_df[5,1] <- "China"
+  this_df[6,1] <- "Resto_de_Asia"
+  
+  colnames(this_df) <- append(c("region"), all_dates_ch)
+  
+  this_df$nombre_pais <- rep(all_names[[i]], n_x+1)
+  
+  this_df <- gather(this_df, date, value, -c(region, nombre_pais))
+  
+  dfs_x[[i]] <- this_df
+}
+
+
+
+## read imports (m) data
+rstart_m <- seq(from=14, by=21, length.out = num_of_countries)
+n_m <- 7
+rend_m <- rstart_m + n_m
+
+dfs_m <- list_along(rstart_m)
+
+for (i in seq_along(rstart_m) ) {
+  
+  this_df <- readWorksheet(x_m_oridest, sheet = 1, header = FALSE,
+                           startRow = rstart_m[[i]], endRow = rend_m[[i]],
+                           startCol = 1)
+  
+  this_df[1,1] <- "Mundo"
+  this_df[5,1] <- "China"
+  this_df[6,1] <- "Resto_de_Asia"
+  
+  colnames(this_df) <- append(c("region"), all_dates_ch)
+  
+  this_df$nombre_pais <- rep(all_names[[i]], n_m+1)
+  
+  this_df <- gather(this_df, date, value, -c(region, nombre_pais))
+
+  dfs_m[[i]] <- this_df
+}
+
+save(dfs_m, dfs_x, file = "./produced_data/x_m_por_origen_destino")
+
+```
+
+
+Now, by product groups (`read_expo_impo_ppales_productos.R`)
+
+```{r read_x_m_prod, cache=TRUE}
+library(tidyverse)
+library(stringr)
+library(XLConnect)
+library(lubridate)
+
+x_m_prod = loadWorkbook("./raw_data/expo_e_impo_por_grupo_de_productos.xlsx")
+
+
+num_of_countries = 16
+
+all_dates = readWorksheet(x_m_prod, sheet = 1, header = FALSE,
+                          startRow = 3, endRow = 3, startCol = 2,
+                          colTypes = "DATETIME")
+
+all_dates_ch <- as.character.Date(all_dates, format = "%Y-%m-%d")
+
+# all_dates <- cbind("dates", all_dates)
+
+
+## read country names
+rstart_names <- seq(from=4, by=12, length.out = num_of_countries)
+all_names <- list_along(rstart_names)
+
+for (i in seq_along(rstart_names) ) {
+  
+  this_name <- readWorksheet(x_m_prod, sheet = 1, header = FALSE,
+                             startRow = rstart_names[[i]],
+                             endRow = rstart_names[[i]],
+                             startCol = 1, endCol = 1) 
+  
+  all_names[[i]] <- this_name[[1]]
+}
+
+
+## read exports (x) data
+rstart_x <- seq(from=5, by=12, length.out = num_of_countries)
+n_x <- 3
+rend_x <- rstart_x + n_x
+
+dfs_x_p <- list_along(rstart_x)
+
+for (i in seq_along(rstart_x) ) {
+  
+  this_df <- readWorksheet(x_m_prod, sheet = 1, header = FALSE,
+                          startRow = rstart_x[[i]], endRow = rend_x[[i]],
+                          startCol = 1)
+  
+  # print(ncol(this_df))
+  
+  this_df[1,1] <- "total"
+  
+  colnames(this_df) <- append(c("producto"), all_dates_ch[1:ncol(this_df)-1])
+  
+  this_df$nombre_pais <- rep(all_names[[i]], n_x+1)
+  
+  this_df <- gather(this_df, date, value, -c(producto, nombre_pais))
+  
+  dfs_x_p[[i]] <- this_df
+}
+
+
+
+## read imports (m) data
+rstart_m <- seq(from=10, by=12, length.out = num_of_countries)
+n_m <- 4
+rend_m <- rstart_m + n_m
+
+dfs_m_p <- list_along(rstart_m)
+
+for (i in seq_along(rstart_m) ) {
+  
+  this_df <- readWorksheet(x_m_prod, sheet = 1, header = FALSE,
+                           startRow = rstart_m[[i]], endRow = rend_m[[i]],
+                           startCol = 1)
+  
+  this_df[1,1] <- "total"
+  
+  colnames(this_df) <- append(c("producto"), all_dates_ch[1:ncol(this_df)-1])
+  
+  this_df$nombre_pais <- rep(all_names[[i]], n_m+1)
+  
+  this_df <- gather(this_df, date, value, -c(producto, nombre_pais))
+
+  dfs_m_p[[i]] <- this_df
+}
+
+save(dfs_m_p, dfs_x_p, file = "./produced_data/x_m_por_producto")
+
+```
+
+
+
+
+### Read other BIS data (not JEDH)
+
+There are three variables in this section:
+
+- Debt service ratio for the private non-financial sector (in `dsr.xlsx`)
+
+- Long series on total credit to the non-financial sectors (in `totcredit.xlsx`)
+
+- Credit-to-GDP gap and underlying input data (in `c_gaps1612.xlsx`)
+
+
+Contents of `read_bis_data.R`:
+
+```{r read_bis, cache=TRUE}
+library(tidyverse)
+library(readxl)
+
+c_gaps1612_qs <- read_excel("./raw_data/c_gaps1612.xlsx", 
+                            sheet = "Quarterly Series", skip = 3)
+
+c_gaps1612_documentation <- read_excel("./raw_data/c_gaps1612.xlsx", 
+                                          sheet = "Documentation") 
+
+c_gaps1612_content <- read_excel("./raw_data/c_gaps1612.xlsx", 
+                             sheet = "Content")
+
+totcredit_content <- read_excel("./raw_data/totcredit.xlsx", 
+                                    sheet = "Content")
+
+totcredit_documentation <- read_excel("./raw_data/totcredit.xlsx",
+                    sheet = "Documentation")
+
+totcredit_qs <- read_excel("./raw_data/totcredit.xlsx", 
+                               sheet = "Quarterly Series", skip = 2)
+
+dsr_content <- read_excel("./raw_data/dsr.xlsx", 
+                      sheet = "Content")
+
+dsr_documentation <- read_excel("./raw_data/dsr.xlsx", 
+                                    sheet = "Documentation")
+
+dsr_qs <- read_excel("./raw_data/dsr.xlsx", 
+                       sheet = "Quarterly Series")
+
+
+# after inspecting the data frames, get country names
+names(c_gaps1612_documentation)
+# backticks ` are necessary bc the variable name includes spaces 
+c_gaps1612_countries <- unique(c_gaps1612_documentation$`Borrowers' country`)
+# result: ARG, BRA, CHL and MEX
+
+names(totcredit_documentation)
+totcredit_countries <- unique(totcredit_documentation$`Borrowers' country`)
+# result: ARG, BRA, CHL and MEX
+
+names(dsr_documentation)
+dsr_countries <- unique(dsr_documentation$`Borrowers' country`)
+# result: BRA and MEX
+```
 
 
 

@@ -1,9 +1,5 @@
 library(tidyverse)
 library(XLConnect)
-# library(stringr)
-
-
-
 
 
 wb = loadWorkbook("./raw_data/Datos_monetarios_de_Alejandra.xlsx")
