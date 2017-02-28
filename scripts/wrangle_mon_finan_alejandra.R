@@ -1,5 +1,6 @@
 library(tidyverse)
 library(stringr)
+library(countrycode)
 
 load("./produced_data/datos_mon_finan_alej_messy")
 load("./produced_data/cepal_33_countries")
@@ -25,8 +26,14 @@ tpm_tidy <-  tpm %>%
                              Trinidad.y.Tabago = "Trinidad y Tabago",
                              Venezuela = "Venezuela (República Bolivariana de)"))
 
-tpm_tidy_20 <- tpm_tidy %>% 
-          filter(pais_name %in% cepal_20_countries[["country.name.es"]])
+tpm_33_tidy <- tpm_tidy %>% 
+    mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+                               custom_dict=cepal_33_countries),
+           iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+                               custom_dict=cepal_33_countries))
+
+tpm_20_tidy  <- tpm_33_tidy  %>% 
+          filter(pais_name %in% cepal_20_countries[["country.name.es"]]) 
 
 
 ## tidyng cartera vencida
@@ -49,8 +56,13 @@ cartera_vencida_tidy <- cartera_vencida %>%
                                                  Trinidad.y.Tabago = "Trinidad y Tabago",
                                                  Venezuela = "Venezuela (República Bolivariana de)"))
 
+cartera_vencida_33_tidy <- cartera_vencida_tidy %>% 
+  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+                             custom_dict=cepal_33_countries),
+         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+                             custom_dict=cepal_33_countries))
 
-cartera_vencida_tidy_20 <- cartera_vencida_tidy %>% 
+cartera_vencida_20_tidy <- cartera_vencida_33_tidy %>% 
                           filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
@@ -90,11 +102,18 @@ credito_interno_tidy <- credito_interno %>%
                              Bolivia = "Bolivia (Estado Plurinacional de)",
                              Costa.Rica = "Costa Rica",
                              "Rep. Dominicana" = "República Dominicana",
+                             "Santa Lucia" = "Santa Lucía",
                              "San Kitts y Nevis" = "Saint Kitts y Nevis",
                              Surinam = "Suriname",
                              "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
 
-credito_interno_tidy_20 = credito_interno_tidy %>% 
+credito_interno_33_tidy <- credito_interno_tidy %>% 
+  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+                             custom_dict=cepal_33_countries),
+         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+                             custom_dict=cepal_33_countries))
+
+credito_interno_20_tidy = credito_interno_33_tidy %>% 
   filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
 
@@ -131,17 +150,24 @@ prestamos_bancarios = bind_rows(dfs_pb_to_modify)
 prestamos_bancarios_tidy <- prestamos_bancarios %>% 
   mutate( pais_name = recode(pais_name, 
                              Bolivia = "Bolivia (Estado Plurinacional de)",
-                             "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
+                             Venezuela = "Venezuela (República Bolivariana de)"))
 
-prestamos_bancarios_tidy_20 = prestamos_bancarios_tidy %>% 
+prestamos_bancarios_33_tidy <- prestamos_bancarios_tidy %>% 
+  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+                             custom_dict=cepal_33_countries),
+         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+                             custom_dict=cepal_33_countries))
+
+prestamos_bancarios_20_tidy = prestamos_bancarios_33_tidy %>% 
   filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
+save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
+     cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
+     credito_interno_20_tidy, cartera_vencida_20_tidy,
+     file = "./produced_data/monetary_fin_tidy")
 
-## tidy
 
-
-
-
+# tydig inflation targets
 
 
 

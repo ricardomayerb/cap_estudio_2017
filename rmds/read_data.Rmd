@@ -3,9 +3,11 @@ title: "Reading data"
 author: "Ricardo Mayer"
 date: "February 13, 2017"
 output:
-  word_document:
-    toc: yes
   html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  word_document:
     toc: yes
 ---
 
@@ -14,9 +16,9 @@ knitr::opts_knit$set(root.dir = "./../")
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Reading data
 
-### Some criteria
+
+## Some criteria
 
 1.  Import directly from online sources whenever available. This implies that in the future, when I have worked out how to make direct queries and downloads from the Cepalstat API service, I will not use donwloaded excel files from cepalstat web facility.
 
@@ -35,7 +37,7 @@ knitr::opts_chunk$set(echo = TRUE)
 7. Keep the reading procedure and data wragling/munging separated. At most, write necessary code to hold several sheets inside a single list, but leave any renaming, selection, filtering, joining, etc. to a separate script.  
 
 
-### Preliminaries: country dictionaries
+## Preliminaries: country dictionaries
 With the help of the `countrycode`  package we create custom 
 dataframes to hold iso2c, iso3c, english names and spanish names for the complete list 
 of latinoamerican and caribbean members of ECLAC (33 countries) and a more restricted subset of 20 economies.
@@ -87,7 +89,7 @@ save(cepal_20_countries, file = "./produced_data/cepal_20_countries")
 
 
 
-### Read cepalstat's data
+## Read cepalstat's data
 
 What I did here was to use the advanced query utility ("combinar indicadores/interfaz avanzada"), see [here](http://interwp.cepal.org/cepalstat/engine/index.html), to download bulkier .csv files with as many indicators as possible. Basically, all the indicators inside the Economics branch and various related to employment found in the Social branch. Since this implies to consider monthly, quaterly and topical data, the long format result in a very large number of row. This is still the best way to store data, IMHO, but later will need extensive use of filtering and grouping operations to analize the datasets. 
 
@@ -481,7 +483,7 @@ save(cepalstat_sector_real_mn_trimestral,
 ```
 
 
-### Reading data from the JEDH 
+## Reading data from the JEDH 
 Fortunately the World Bank exposes data from the Joint External Debt Hub, of which it is a member, so we 
 can use the `wbstats` package to download all data where the source correponds to JEDH. The list of countries 
 it's give in our 33 and 20-members lists. This is implemented in  `get_joint_hub_data.R` and it's reproduced below:
@@ -526,7 +528,7 @@ To see how many countries have information on each variable and for what time sp
 you will have to wait to read the data munging Rmarkdown document
 
 
-### Monetary and banking data (EDD, Alejandra Acevedo)
+##  Monetary and banking data (EDD, Alejandra Acevedo)
 We now turn to read data provided in a excel workbook with several sheets. The location 
 of the data inside each sheet is not simple enough to use `readxl`, thus we employ the `XLConnect` 
 package that let us to specify the exact region of the sheet we wish to extract.
@@ -544,7 +546,7 @@ The resulting R dataframe are stored in `datos_mon_finan_alej_messy.rda` for fur
 
 The work is done in `read_monetarios_financieros_alejandra.R` which I reproduce below:
 
-```{r read_monetarios, cache=TRUE}
+```{r read_monetarios, cache=TRUE, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(XLConnect)
 
@@ -647,7 +649,7 @@ save(tpm,
 
 
 
-### Reading KLEMS project data (EDD, Claudio Aravena)
+## Reading KLEMS project data (EDD, Claudio Aravena)
 
 Data for Argentina, Brazil, Chile, Colombia and Mexico. To make data comparable, 
 data is aggregated up to 9 sectors.
@@ -721,7 +723,7 @@ save(klems_dfs_arg_map, klems_dfs_bra_map, klems_dfs_chi_map, klems_dfs_col_map,
      klems_dfs_mex_map, file="./produced_data/klems_ar_br_cl_co_mx")
 ```
 
-### Reading Self-employment data (DDE, Jurgen Weller)
+## Reading Self-employment data (EDD, Jurgen Weller)
 
 Very simple file cointaining  data on self employment as share of the total emplyment, 
 for recent years, for 20 countries
@@ -737,7 +739,7 @@ save(TCP_2015, file="./produced_data/trab_cuenta_propia_jurgen")
 ```
 
 
-### Reading Balance of Payment information (DDE, Cecilia)
+## Reading Balance of Payment information (DDE, Cecilia)
 There may be substantial overlap with cepalstat data read before
 
 ```{r read_bop}
@@ -812,7 +814,7 @@ save(dfs_bpal, dfs_bpcar, file = "./produced_data/from_BdP_excel")
 ```
 
 
-### Reading export ad import data by origin/destinatio and by product (DITI, SC)
+## Reading export ad import data by origin/destinatio and by product (ITID, SC)
 
 First by destination of exports and origin of imports (`read_expo_impo_origen_destino.R`):
 
@@ -1004,7 +1006,7 @@ save(dfs_m_p, dfs_x_p, file = "./produced_data/x_m_por_producto")
 
 
 
-### Read other BIS data (not JEDH)
+## Read other BIS data (not JEDH)
 
 There are three variables in this section:
 

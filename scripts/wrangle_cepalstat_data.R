@@ -1,4 +1,5 @@
 library(tidyverse)
+library(stringr)
 library(countrycode)
 
 load("./produced_data/cepal_33_countries")
@@ -189,8 +190,8 @@ cs_precios_combustibles <- cepalstat_precios_combustibles %>%
   filter(!is.na(iso3c)) %>% rename(nombre_pais = Países)
 
 cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
-  separate(col="País [Año base]", into=c("País", "Año base")) %>% 
-  select(- contains("base"))
+  separate(col="País [Año base]", into=c("País", "Año base"), sep="\\[") %>% 
+  select(-contains("base")) %>% mutate(País = str_trim(País))
 
 cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -216,13 +217,13 @@ cs_x_m_total_mensual_20 <- cs_x_m_total_mensual %>% filter(iso3c %in% cepal_20_c
 cs_x_prim_manuf_20 <- cs_x_prim_manuf %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_tipo_cambio_20 <- cs_tipo_cambio %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_x_m_vol_precios_20 <- cs_x_m_vol_precios %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_ipc_mensual <- cs_ipc_mensual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_ipc_anual <- cs_ipc_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_agricultura <- cs_agricultura %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_mineria_manuf <- cs_mineria_manuf %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_turismo <- cs_turismo %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_precios_combustibles <- cs_precios_combustibles %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_real_mn_trimestral <- cs_real_mn_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_ipc_mensual_20 <- cs_ipc_mensual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_ipc_anual_20 <- cs_ipc_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_agricultura_20 <- cs_agricultura %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_mineria_manuf_20 <- cs_mineria_manuf %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_turismo_20 <- cs_turismo %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_precios_combustibles_20 <- cs_precios_combustibles %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_real_mn_trimestral_20 <- cs_real_mn_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 
 
 save(cs_real_dolares_20, file = "./produced_data/cs_real_dolares_20")
@@ -243,12 +244,12 @@ save(cs_x_m_total_mensual_20, file = "./produced_data/cs_x_m_total_mensual_20")
 save(cs_x_prim_manuf_20, file = "./produced_data/cs_x_prim_manuf_20")
 save(cs_tipo_cambio_20, file = "./produced_data/cs_tipo_cambio_20")
 save(cs_x_m_vol_precios_20, file = "./produced_data/cs_x_m_vol_precios_20")
-save(cs_ipc_mensual, file = "./produced_data/cs_ipc_mensual")
-save(cs_ipc_anual, file = "./produced_data/cs_ipc_anual")
-save(cs_agricultura, file = "./produced_data/cs_agricultura")
-save(cs_mineria_manuf, file = "./produced_data/cs_mineria_manuf")
-save(cs_turismo, file = "./produced_data/cs_turismo")
-save(cs_precios_combustibles, file = "./produced_data/cs_precios_combustibles")
-save(cs_real_mn_trimestral, file = "./produced_data/cs_real_mn_trimestral")
+save(cs_ipc_mensual_20, file = "./produced_data/cs_ipc_mensual_20")
+save(cs_ipc_anual_20, file = "./produced_data/cs_ipc_anual_20")
+save(cs_agricultura_20, file = "./produced_data/cs_agricultura_20")
+save(cs_mineria_manuf_20, file = "./produced_data/cs_mineria_manuf_20")
+save(cs_turismo_20, file = "./produced_data/cs_turismo_20")
+save(cs_precios_combustibles_20, file = "./produced_data/cs_precios_combustibles_20")
+save(cs_real_mn_trimestral_20, file = "./produced_data/cs_real_mn_trimestral_20")
 
 
