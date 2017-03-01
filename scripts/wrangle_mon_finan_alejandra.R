@@ -161,13 +161,42 @@ prestamos_bancarios_33_tidy <- prestamos_bancarios_tidy %>%
 prestamos_bancarios_20_tidy = prestamos_bancarios_33_tidy %>% 
   filter(pais_name %in% cepal_20_countries[["country.name.es"]])
 
-save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
-     cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
-     credito_interno_20_tidy, cartera_vencida_20_tidy,
-     file = "./produced_data/monetary_fin_tidy")
+
 
 
 # tydig inflation targets
 
+inf_dates = seq.Date(from=as.Date("2004-01-01"), to=as.Date("2018-12-01"), by="month")
+inf_dates_ch <- as.character.Date(inf_dates, format = "%Y-%m-%d")
+
+
+meta_inf$Col181 <- meta_inf$Col180
+colnames(meta_inf) <- append(c("nombre_pais"), inf_dates_ch)
+meta_inf$nombre_pais <- str_to_title(meta_inf$nombre_pais)
+
+meta_inf_liminf$Col181 <- meta_inf_liminf$Col180
+colnames(meta_inf_liminf) <- append(c("nombre_pais"), inf_dates_ch)
+meta_inf_liminf$nombre_pais <- str_to_title(meta_inf_liminf$nombre_pais)
+
+meta_inf_limsup$Col181 <- meta_inf_limsup$Col180
+colnames(meta_inf_limsup) <- append(c("nombre_pais"), inf_dates_ch)
+meta_inf_limsup$nombre_pais <- str_to_title(meta_inf_limsup$nombre_pais)
+
+meta_inf_long <- gather(meta_inf, date, meta_inf, -c(nombre_pais))
+meta_inf_liminf_long <- gather(meta_inf_liminf, date, meta_inf_low,
+                               -c(nombre_pais))
+meta_inf_limsup_long <- gather(meta_inf_limsup, date, meta_inf_hi,
+                               -c(nombre_pais))
+
+meta_inf_tidy <- meta_inf_long %>% 
+    left_join(meta_inf_liminf_long, by=c("nombre_pais","date")) %>% 
+    left_join(meta_inf_limsup_long, by=c("nombre_pais","date"))
+
+
+save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
+     cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
+     credito_interno_20_tidy, cartera_vencida_20_tidy, 
+     meta_inf_tidy,
+     file = "./produced_data/monetary_fin_tidy")
 
 
