@@ -69,3 +69,16 @@ save(klems_dfs_arg_map, klems_dfs_bra_map, klems_dfs_chi_map, klems_dfs_col_map,
      klems_dfs_mex_map, file="./produced_data/klems_ar_br_cl_co_mx")
 
 
+## read mexico finer level of aggregation
+path_mex_finer = "./raw_data/mex_output_09II.xls"
+sheets_mex_finer = quiet_sheets(path_mex_finer)$result
+
+klems_dfs_mex_finer_map <- path_mex_finer %>% 
+  map2(sheets_mex_finer, function(x, y)  quiet_read(x, sheet = y) ) %>% 
+  map("result") 
+names(klems_dfs_mex_finer_map) <- sheets_mex_finer
+
+save(klems_dfs_arg_map, klems_dfs_bra_map, klems_dfs_chi_map, klems_dfs_col_map, 
+     klems_dfs_mex_map, klems_dfs_mex_finer_map,
+     file="./produced_data/klems_ar_br_cl_co_mx")
+
