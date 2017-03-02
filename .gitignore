@@ -1,0 +1,8 @@
+# ignore produced_data, prefer to locally run data-producing scripts
+*.Rproj*
+*.Rhistory*
+*.Rproj
+*cache*
+
+./produced_data/
+
