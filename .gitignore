@@ -3,5 +3,13 @@
 *.Rhistory*
 *.Rproj
 *cache*
-./produced_data/
+
 produced_data/
+
+rmds/**/*.docx
+rmds/**/*.pdf
+rmds/**/*.html
+
+rmds/*cache*/
+
+
