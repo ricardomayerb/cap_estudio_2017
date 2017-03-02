@@ -1,6 +1,7 @@
 library(tidyverse)
 library(stringr)
 library(countrycode)
+library(lubridate)
 
 load("./produced_data/datos_mon_finan_alej_messy")
 load("./produced_data/cepal_33_countries")
@@ -12,9 +13,9 @@ country_names_tpm_mess <- names(tpm)[-1]
 tmp_dates <- seq.Date(from = as.Date("1986-01-01"), to = as.Date("2016-10-01"), by = 'month')
 tpm_tidy <-  tpm %>% 
         mutate(Col1 = tmp_dates) %>%
-        gather(key = pais_name, value = tasa_politica_monetaria, -Col1) %>% 
+        gather(key = nombre_pais, value = tasa_politica_monetaria, -Col1) %>% 
         rename(date = Col1) %>%
-        mutate( pais_name = recode(pais_name, 
+        mutate( nombre_pais = recode(nombre_pais, 
                              Antigua.y.Barbuda = "Antigua y Barbuda",
                              Bolivia = "Bolivia (Estado Plurinacional de)",
                              Costa.Rica = "Costa Rica",
@@ -24,27 +25,37 @@ tpm_tidy <-  tpm %>%
                              San.Vicente.y.las.Ganadinas = "San Vicente y las Granadinas",
                              Santa.Lucía = "Santa Lucía",
                              Trinidad.y.Tabago = "Trinidad y Tabago",
-                             Venezuela = "Venezuela (República Bolivariana de)"))
+                             Venezuela = "Venezuela (República Bolivariana de)"),
+                year = year(date),
+                month = month(date)
+                )
 
 tpm_33_tidy <- tpm_tidy %>% 
-    mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+    mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                                custom_dict=cepal_33_countries),
-           iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+           iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
                                custom_dict=cepal_33_countries))
 
+tpm_33_tidy$tasa_politica_monetaria <- 
+  as.numeric(tpm_33_tidy$tasa_politica_monetaria)
+
+
 tpm_20_tidy  <- tpm_33_tidy  %>% 
-          filter(pais_name %in% cepal_20_countries[["country.name.es"]]) 
+          filter(nombre_pais %in% cepal_20_countries[["country.name.es"]]) 
 
 
 ## tidyng cartera vencida
 ### separate Col1 into year and month
 country_names_cv_mess <- names(cartera_vencida)[-1]
+cv_dates <- seq.Date(from = as.Date("1993-12-01"), to = as.Date("2016-12-01"), by = 'month')
+# del 12 del 93 al 6 del 16
 
 cartera_vencida_tidy <- cartera_vencida %>% 
+                      mutate(date = cv_dates) %>% 
                       separate(col=Col1, into=c('year', 'month'), sep='-M') %>% 
                       mutate(year = as.numeric(year), month = as.numeric(month)) %>%
-                      gather(key=pais_name, value=cartera_vencida_percent, -year, -month) %>% 
-                      mutate( pais_name = recode(pais_name, 
+                      gather(key=nombre_pais, value=cartera_vencida_percent, -year, -month, -date) %>% 
+                      mutate( nombre_pais = recode(nombre_pais, 
                                                  Antigua.y.Barbuda = "Antigua y Barbuda",
                                                  Bolivia = "Bolivia (Estado Plurinacional de)",
                                                  Costa.Rica = "Costa Rica",
@@ -57,13 +68,16 @@ cartera_vencida_tidy <- cartera_vencida %>%
                                                  Venezuela = "Venezuela (República Bolivariana de)"))
 
 cartera_vencida_33_tidy <- cartera_vencida_tidy %>% 
-  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+  mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                              custom_dict=cepal_33_countries),
-         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+         iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
                              custom_dict=cepal_33_countries))
 
+cartera_vencida_33_tidy$cartera_vencida_percent <- 
+  as.numeric(cartera_vencida_33_tidy$cartera_vencida_percent)
+
 cartera_vencida_20_tidy <- cartera_vencida_33_tidy %>% 
-                          filter(pais_name %in% cepal_20_countries[["country.name.es"]])
+                          filter(nombre_pais %in% cepal_20_countries[["country.name.es"]])
 
 
 ## tidyng credito interno
@@ -90,7 +104,7 @@ for(i in 1:length(dfs_ci)){
   
   dfs_ci_to_modify[[i]] <- dmap(dfs_ci_to_modify[[i]], as.numeric)
   
-  dfs_ci_to_modify[[i]]$pais_name <- country_names_credito_interno[[i]]  
+  dfs_ci_to_modify[[i]]$nombre_pais <- country_names_credito_interno[[i]]  
   
   dfs_ci_to_modify[[i]]$date <- dates_credito_interno
 }
@@ -98,23 +112,30 @@ for(i in 1:length(dfs_ci)){
 credito_interno = bind_rows(dfs_ci_to_modify)
 
 credito_interno_tidy <- credito_interno %>% 
-   mutate( pais_name = recode(pais_name, 
+   mutate( nombre_pais = recode(nombre_pais, 
                              Bolivia = "Bolivia (Estado Plurinacional de)",
                              Costa.Rica = "Costa Rica",
                              "Rep. Dominicana" = "República Dominicana",
                              "Santa Lucia" = "Santa Lucía",
                              "San Kitts y Nevis" = "Saint Kitts y Nevis",
                              Surinam = "Suriname",
-                             "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"))
+                             "República Bolivariana de Venezuela" = "Venezuela (República Bolivariana de)"),
+           year = year(date),
+           month = month(date)
+           )
 
 credito_interno_33_tidy <- credito_interno_tidy %>% 
-  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+  mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                              custom_dict=cepal_33_countries),
-         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+         iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
                              custom_dict=cepal_33_countries))
+         
+
+
+
 
 credito_interno_20_tidy = credito_interno_33_tidy %>% 
-  filter(pais_name %in% cepal_20_countries[["country.name.es"]])
+  filter(nombre_pais %in% cepal_20_countries[["country.name.es"]])
 
 
 
@@ -140,7 +161,7 @@ for(i in 1:length(dfs_pb)){
   
   dfs_pb_to_modify[[i]] <- dmap(dfs_pb_to_modify[[i]], as.numeric)
   
-  dfs_pb_to_modify[[i]]$pais_name <- country_names_prestamos_bancarios[[i]]  
+  dfs_pb_to_modify[[i]]$nombre_pais <- country_names_prestamos_bancarios[[i]]  
   
   dfs_pb_to_modify[[i]]$date <- dates_prestamos_bancarios
 }
@@ -148,18 +169,19 @@ for(i in 1:length(dfs_pb)){
 prestamos_bancarios = bind_rows(dfs_pb_to_modify)
 
 prestamos_bancarios_tidy <- prestamos_bancarios %>% 
-  mutate( pais_name = recode(pais_name, 
+  mutate( nombre_pais = recode(nombre_pais, 
                              Bolivia = "Bolivia (Estado Plurinacional de)",
-                             Venezuela = "Venezuela (República Bolivariana de)"))
+                             Venezuela = "Venezuela (República Bolivariana de)"),
+          year=year(date), month=month(date))
 
 prestamos_bancarios_33_tidy <- prestamos_bancarios_tidy %>% 
-  mutate(iso2c = countrycode(pais_name, "country.name.es", "iso2c", 
+  mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                              custom_dict=cepal_33_countries),
-         iso3c = countrycode(pais_name, "country.name.es", "iso3c", 
+         iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
                              custom_dict=cepal_33_countries))
 
 prestamos_bancarios_20_tidy = prestamos_bancarios_33_tidy %>% 
-  filter(pais_name %in% cepal_20_countries[["country.name.es"]])
+  filter(nombre_pais %in% cepal_20_countries[["country.name.es"]])
 
 
 
@@ -190,7 +212,8 @@ meta_inf_limsup_long <- gather(meta_inf_limsup, date, meta_inf_hi,
 
 meta_inf_tidy <- meta_inf_long %>% 
     left_join(meta_inf_liminf_long, by=c("nombre_pais","date")) %>% 
-    left_join(meta_inf_limsup_long, by=c("nombre_pais","date"))
+    left_join(meta_inf_limsup_long, by=c("nombre_pais","date")) %>% 
+    mutate(year=year(date), month=month(date))
 
 
 save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,

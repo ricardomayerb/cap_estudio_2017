@@ -1,6 +1,8 @@
 library(tidyverse)
 library(stringr)
 library(countrycode)
+library(xts)
+library(lubridate)
 
 load("./produced_data/cepal_33_countries")
 load("./produced_data/cepal_20_countries")
@@ -75,6 +77,29 @@ cs_financiero_monetario <- cepalstat_sector_financiero_monetario %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
+cs_financiero_monetario_anual <- cs_financiero_monetario %>% 
+  filter(Periodo == "Anual")
+
+cs_financiero_monetario_trimestral <- cs_financiero_monetario %>% 
+  filter( str_detect(Periodo, "Trimestre")) %>% 
+  mutate(quarter = str_replace(Periodo, "Trimestre ", "")) %>%
+  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
+         date = date(year_quarter)) %>%
+  select(- Periodo)
+
+nombres_mes <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", 
+         "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+
+cs_financiero_monetario_mensual <- cs_financiero_monetario %>% 
+  filter( Periodo != "Anual" & !str_detect(Periodo, "Trimestre")) %>% 
+  mutate(month = match(Periodo, nombres_mes)) %>% 
+  unite(year_month, Años, month, remove=FALSE, sep="-") %>%
+  mutate(year_month = as.yearmon(year_month, format="%Y-%m"),
+         date = date(year_month)) %>%
+  select(- Periodo)
+
+
 cs_remuneraciones <- cepalstat_remuneraciones %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
@@ -90,6 +115,19 @@ cs_desempleo <- cepalstat_desempleo %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
+cs_desempleo_anual <- cepalstat_desempleo %>% 
+  filter(indicador != "Tasa de desempleo trimestral" ) %>% 
+  select(-Trimestre)
+
+cs_desempleo_trimestral <- cepalstat_desempleo %>% 
+  filter(indicador == "Tasa de desempleo trimestral" ) %>% 
+  mutate(quarter = str_replace(Trimestre, "T", "")) %>%
+  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
+         date = date(year_quarter)) %>%
+  select(- Trimestre)
+
+
 cs_bp_anual <- cepalstat_BP_anual %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
@@ -98,7 +136,12 @@ cs_bp_anual <- cepalstat_BP_anual %>%
 cs_bp_trimestral <- cepalstat_BP_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
+  filter(!is.na(iso3c))  %>% rename(nombre_pais = País) %>% 
+  mutate(quarter = str_replace(Trimestres, "Trimestre ", "Q")) %>%
+  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-Q%q"),
+         date = date(year_quarter)) %>%
+  select(- Trimestres)
 
 cs_deuda_externa <- cepalstat_deuda_externa %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -189,6 +232,8 @@ cs_precios_combustibles <- cepalstat_precios_combustibles %>%
   mutate(iso2c = countrycode(Países, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) %>% rename(nombre_pais = Países)
 
+
+
 cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   separate(col="País [Año base]", into=c("País", "Año base"), sep="\\[") %>% 
   select(-contains("base")) %>% mutate(País = str_trim(País))
@@ -196,7 +241,24 @@ cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
 cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País) %>% 
+  mutate(quarter = str_replace(Trimestres, "Trimestre ", "Q")) %>%
+  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-Q%q"),
+           date = date(year_quarter)) %>%
+  select(- Trimestres)
+
+
+# 
+# gdp_currentlc_q <- cs_real_mn_trimestral_20 %>% 
+#   filter(Rubro=="Producto interno bruto (PIB)") %>% 
+#   select( -c(indicador, Rubro_1, notas, fuente)) %>% 
+#   mutate(quarter = str_replace(Trimestres, "Trimestre ", "Q")) %>% 
+#   unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>% 
+#   mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-Q%q"),
+#          date = date(year_quarter)) %>% 
+#   select(- Trimestres)
+
 
 
 cs_real_dolares_20 <- cs_real_dolares %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
