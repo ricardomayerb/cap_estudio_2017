@@ -29,7 +29,7 @@ dsr_documentation <- read_excel("./raw_data/dsr.xlsx",
                                     sheet = "Documentation")
 
 dsr_qs <- read_excel("./raw_data/dsr.xlsx", 
-                       sheet = "Quarterly Series")
+                       sheet = "Quarterly Series", skip = 2)
 
 
 # after inspecting the data frames, get country names
@@ -45,5 +45,12 @@ totcredit_countries <- unique(totcredit_documentation$`Borrowers' country`)
 names(dsr_documentation)
 dsr_countries <- unique(dsr_documentation$`Borrowers' country`)
 # result: BRA and MEX
+
+save(c_gaps1612_documentation, c_gaps1612_content, c_gaps1612_qs, 
+     dsr_documentation, dsr_content, dsr_qs,
+     totcredit_documentation, totcredit_content, totcredit_qs,
+     file = "./produced_data/bis_gap_tc_dsr")
+
+
 
 

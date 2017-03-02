@@ -17,7 +17,7 @@ all_dates_ch <- as.character.Date(all_dates, format = "%Y-%m-%d")
 
 
 ## read country names
-rstart_names <- seq(from=3, by=21, length.out = num_of_countries)
+rstart_names <- seq(from = 3, by = 21, length.out = num_of_countries)
 all_names <- list_along(rstart_names)
 
 for (i in seq_along(rstart_names) ) {

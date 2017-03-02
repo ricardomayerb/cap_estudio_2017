@@ -573,8 +573,10 @@ Quantitative data is in QS files. Metadata in Contents and Definitions files
 library(tidyverse)
 library(stringr)
 library(lubridate)
+library(countrycode)
 
 load("./produced_data/klems_ar_br_cl_co_mx")
+load("./produced_data/cepal_33_countries")
 
 arg_notes_df <- klems_dfs_arg_map$Notes
 colnames(arg_notes_df) <- c("table_name", "description", "status")
@@ -624,6 +626,13 @@ for (i in 1:length(arg_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Argentina"
+  df_long <- df_long %>% 
+    mutate(
+      iso2c = countrycode(country_name, "country.name.en",
+                          "iso2c"),
+      iso3c = countrycode(country_name, "country.name.en",
+                          "iso3c")) 
   arg_dfs_long[[i]] <- df_long
   
 }
@@ -631,7 +640,7 @@ arg_long <- bind_rows(arg_dfs_long)
 
 
 bra_dfs_long <- list_along(bra_list_sheets_ok)
-for (i in 1:length(bra_list_sheets_ok)){
+for (i in 1:length(bra_list_sheets_ok)) {
   this_df <- bra_list_sheets_ok[[i]]
   this_df <- filter(this_df, desc != is.na(desc))
   names(this_df) <- str_replace_all(names(this_df), "_", "")
@@ -640,6 +649,13 @@ for (i in 1:length(bra_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Brazil"
+  df_long <- df_long %>% 
+    mutate(
+      iso2c = countrycode(country_name, "country.name.en",
+                          "iso2c"),
+      iso3c = countrycode(country_name, "country.name.en",
+                          "iso3c")) 
   bra_dfs_long[[i]] <- df_long
   
 }
@@ -647,7 +663,7 @@ bra_long <- bind_rows(bra_dfs_long)
 
 
 chl_dfs_long <- list_along(chl_list_sheets_ok)
-for (i in 1:length(chl_list_sheets_ok)){
+for (i in 1:length(chl_list_sheets_ok)) {
   this_df <- chl_list_sheets_ok[[i]]
   this_df <- filter(this_df, desc != is.na(desc))
   names(this_df) <- str_replace_all(names(this_df), "_", "")
@@ -656,6 +672,13 @@ for (i in 1:length(chl_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Chile"
+  df_long <- df_long %>% 
+    mutate(
+      iso2c = countrycode(country_name, "country.name.en",
+                          "iso2c"),
+      iso3c = countrycode(country_name, "country.name.en",
+                          "iso3c")) 
   chl_dfs_long[[i]] <- df_long
   
 }
@@ -663,7 +686,7 @@ chl_long <- bind_rows(chl_dfs_long)
 
 
 col_dfs_long <- list_along(col_list_sheets_ok)
-for (i in 1:length(col_list_sheets_ok)){
+for (i in 1:length(col_list_sheets_ok)) {
   this_df <- col_list_sheets_ok[[i]]
   this_df <- filter(this_df, desc != is.na(desc))
   names(this_df) <- str_replace_all(names(this_df), "_", "")
@@ -672,14 +695,21 @@ for (i in 1:length(col_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Colombia"
+  df_long <- df_long %>% 
+    mutate(
+      iso2c = countrycode(country_name, "country.name.en",
+                          "iso2c"),
+      iso3c = countrycode(country_name, "country.name.en",
+                          "iso3c")) 
   col_dfs_long[[i]] <- df_long
   
 }
 col_long <- bind_rows(col_dfs_long)
 
-
+  
 mex_dfs_long <- list_along(mex_list_sheets_ok)
-for (i in 1:length(mex_list_sheets_ok)){
+for (i in 1:length(mex_list_sheets_ok)) {
   this_df <- mex_list_sheets_ok[[i]]
   this_df <- filter(this_df, desc != is.na(desc))
   names(this_df) <- str_replace_all(names(this_df), "_", "")
@@ -688,14 +718,21 @@ for (i in 1:length(mex_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Mexico"
+  df_long <- df_long %>% 
+    mutate(
+      iso2c = countrycode(country_name, "country.name.en",
+                          "iso2c"),
+      iso3c = countrycode(country_name, "country.name.en",
+                          "iso3c")) 
   mex_dfs_long[[i]] <- df_long
-  print(dim(df_long))
+  
 }
 mex_long <- bind_rows(mex_dfs_long)
 
 
 mex_finer_dfs_long <- list_along(mex_finer_list_sheets_ok)
-for (i in 1:length(mex_finer_list_sheets_ok)){
+for (i in 1:length(mex_finer_list_sheets_ok)) {
   this_df <- mex_finer_list_sheets_ok[[i]]
   this_df <- filter(this_df, desc != is.na(desc))
   names(this_df) <- str_replace_all(names(this_df), "_", "")
@@ -704,6 +741,13 @@ for (i in 1:length(mex_finer_list_sheets_ok)){
   df_long <- gather(this_df, date, value, -c(desc, code, basic_table))
   df_long$value[ df_long$value == "error" ] <- NA
   df_long$value <- as.numeric(df_long$value)
+  df_long$country_name <- "Mexico"
+  df_long <- df_long %>% 
+              mutate(
+                iso2c = countrycode(country_name, "country.name.en",
+                                    "iso2c"),
+                iso3c = countrycode(country_name, "country.name.en",
+                                    "iso3c")) 
   mex_finer_dfs_long[[i]] <- df_long
 }
 mex_finer_long <- bind_rows(mex_finer_dfs_long)
@@ -713,8 +757,178 @@ klems_9_tidy = bind_rows(arg_long, bra_long, chl_long, col_long, mex_long)
 
 save(mex_finer_long, klems_9_tidy, file = "./produced_data/klems_tidy")
 
+
 ```
 
+## BoP data from EDD
+
+```{r bop, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(stringr)
+library(lubridate)
+
+load("./produced_data/from_BdP_excel")
+load("./produced_data/cepal_33_countries")
+load("./produced_data/cepal_20_countries")
+
+dfs_joined <- bind_rows(dfs_bpal)
+new_names <- dfs_joined %>% names()  %>% str_replace("X", "") 
+names(dfs_joined) <- new_names
+
+dfs_long_form_BPAL <- dfs_joined %>% 
+  gather(Year, Value , `1980`:`2016`) %>% 
+  arrange(areaID, Grupo, Year) %>% 
+  mutate(Year = as.numeric(Year) ) %>% 
+  rename(iso3c = areaID) %>% 
+  tbl_df()
+ 
+
+
+
+dfs_joined <- bind_rows(dfs_bpcar)
+new_names <- dfs_joined %>% names()  %>% str_replace("X", "") 
+names(dfs_joined) <- new_names
+
+dfs_long_form_BPC <- dfs_joined %>% 
+  gather(Year, Value , `1980`:`2016`) %>% 
+  arrange(areaID, Grupo, Year) %>% 
+  mutate(Year = as.numeric(Year) ) %>% 
+  rename(iso3c = areaID) %>% 
+  tbl_df()
+
+rm(dfs_joined)
+
+bop_tidy_BPALC <-  bind_rows(dfs_long_form_BPAL, dfs_long_form_BPC) %>% 
+                      arrange(iso3c, Grupo, Year)
+
+bop_tidy_BPALC$iso2c <- countrycode(bop_tidy_BPALC$iso3c, "iso3c", "iso2c")
+
+names(bop_tidy_BPALC) <- str_to_lower(names(bop_tidy_BPALC))
+
+bop_tidy_20 <- filter(bop_tidy_BPALC, iso3c %in% cepal_20_countries[["iso3c"]])
+
+save(bop_tidy_BPALC, bop_tidy_20, 
+     file = "./produced_data/bop_edd_tidy")
+
+```
+
+## Self-employment data, EDD
+
+```{r tcp, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(countrycode)
+
+load("./produced_data/trab_cuenta_propia_jurgen")
+load("./produced_data/cepal_20_countries")
+
+TCP_tidy <-  TCP_2015 %>% 
+  mutate( País = recode(País, 
+                        Bolivia = "Bolivia (Estado Plurinacional de)",
+                        "Rep. Dominicana" = "República Dominicana",
+                        Venezuela = "Venezuela (República Bolivariana de)")) %>% 
+  rename(nombre_pais = País) %>% 
+  mutate(
+    iso2c = countrycode(nombre_pais, "country.name.es",
+                        "iso2c", custom_dict = cepal_20_countries),
+    iso3c = countrycode(nombre_pais, "country.name.es",
+                        "iso3c", custom_dict = cepal_20_countries))
+
+TCP_tidy_20 <- TCP_tidy %>% filter(nombre_pais %in% cepal_20_countries[["country.name.es"]]) 
+
+save(TCP_tidy_20, TCP_tidy, file = "./produced_data/TCP_tidy")
+
+
+```
+
+## Trade by countries and products
+
+By origin and destination, and by grou pf products
+
+```{r x_m_ori_prod, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(countrycode)
+library(stringr)
+
+load("./produced_data/x_m_por_origen_destino")
+load("./produced_data/x_m_por_producto")
+
+load("./produced_data/cepal_20_countries")
+load("./produced_data/cepal_33_countries")
+
+imp_by_ori <- bind_rows(dfs_m)
+names(imp_by_ori)[1] <- "origin_region"
+imp_by_ori$nombre_pais <- str_to_title(imp_by_ori$nombre_pais)
+imp_by_ori$nombre_pais <- recode(imp_by_ori$nombre_pais, 
+                            "Bolivia" = "Bolivia (Estado Plurinacional de)",
+                            "Venezuela" = "Venezuela (República Bolivariana de)"
+                                 )
+imp_by_ori$iso2c <- countrycode(imp_by_ori$nombre_pais, "country.name.es",
+                                "iso2c", custom_dict = cepal_33_countries)
+
+imp_by_ori$iso3c <- countrycode(imp_by_ori$nombre_pais, "country.name.es",
+                                "iso3c", custom_dict = cepal_33_countries)
+
+
+exp_by_dest <- bind_rows(dfs_x)
+names(exp_by_dest)[1] <- "dest_region"
+exp_by_dest$nombre_pais <- str_to_title(exp_by_dest$nombre_pais)
+exp_by_dest$nombre_pais <- recode(exp_by_dest$nombre_pais, 
+                                 "Bolivia" = "Bolivia (Estado Plurinacional de)",
+                                 "Venezuela" = "Venezuela (República Bolivariana de)"
+)
+exp_by_dest$iso2c <- countrycode(exp_by_dest$nombre_pais, "country.name.es",
+                                "iso2c", custom_dict = cepal_33_countries)
+
+exp_by_dest$iso3c <- countrycode(exp_by_dest$nombre_pais, "country.name.es",
+                                "iso3c", custom_dict = cepal_33_countries)
+
+
+
+imp_by_prod <- bind_rows(dfs_m_p)
+# names(imp_by_prod)[1] <- "origin_region"
+imp_by_prod$nombre_pais <- str_to_title(imp_by_prod$nombre_pais)
+imp_by_prod$nombre_pais <- recode(imp_by_prod$nombre_pais, 
+                                 "Bolivia" = "Bolivia (Estado Plurinacional de)",
+                                 "Venezuela" = "Venezuela (República Bolivariana de)",
+                                 "Mexico" = "México",
+                                 "Rep. Dominicana" = "República Dominicana"
+                                 )
+
+imp_by_prod$iso2c <- countrycode(imp_by_prod$nombre_pais, "country.name.es",
+                                "iso2c", custom_dict = cepal_33_countries)
+
+imp_by_prod$iso3c <- countrycode(imp_by_prod$nombre_pais, "country.name.es",
+                                 "iso3c", custom_dict = cepal_33_countries)
+
+
+exp_by_prod <- bind_rows(dfs_x_p)
+# names(exp_by_prod)[1] <- "origin_region"
+exp_by_prod$nombre_pais <- str_to_title(exp_by_prod$nombre_pais)
+exp_by_prod$nombre_pais <- recode(exp_by_prod$nombre_pais, 
+                                  "Bolivia" = "Bolivia (Estado Plurinacional de)",
+                                  "Venezuela" = "Venezuela (República Bolivariana de)",
+                                  "Mexico" = "México",
+                                  "Rep. Dominicana" = "República Dominicana"
+)
+
+exp_by_prod$iso2c <- countrycode(exp_by_prod$nombre_pais, "country.name.es",
+                                 "iso2c", custom_dict = cepal_33_countries)
+
+exp_by_prod$iso3c <- countrycode(exp_by_prod$nombre_pais, "country.name.es",
+                                 "iso3c", custom_dict = cepal_33_countries)
+
+
+exp_by_dest_tidy <- exp_by_dest
+exp_by_prod_tidy <- exp_by_prod
+imp_by_ori_tidy <- imp_by_ori
+imp_by_prod_tidy <- imp_by_prod
+
+save(exp_by_dest_tidy, exp_by_prod_tidy, imp_by_ori_tidy, imp_by_prod_tidy,
+     file = "./produced_data/x_m_locations_products_tidy")
+
+```
+
+## other bis data
 
 
 
