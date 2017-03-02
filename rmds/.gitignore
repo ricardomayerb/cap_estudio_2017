@@ -1,0 +1,6 @@
+# ignore produced_data, prefer to locally run data-producing scripts
+*.html
+*.docx
+*.pdf
+
+
