@@ -3,6 +3,5 @@
 *.Rhistory*
 *.Rproj
 *cache*
-
 ./produced_data/
-
+produced_data/
