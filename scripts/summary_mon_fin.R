@@ -1,34 +1,45 @@
 # summary of monetary and financial data
-
-library(tidyverse)
 library(broom)
 library(plotly)
 library(ggiraph)
 library(ggiraphExtra)
 library(stringr)
 library(xts)
+library(gridExtra)
+library(seasonal)
+library(tidyverse)
 
 load("./produced_data/monetary_fin_tidy")
 
 load("./produced_data/cs_real_mn_trimestral_20")
 
+cv_no_na <- cartera_vencida_20_tidy %>% 
+  filter( !is.na(cartera_vencida_percent) )
+
 gdp_currentlc_q <- cs_real_mn_trimestral_20 %>% 
     filter(Rubro=="Producto interno bruto (PIB)") %>% 
-    select( -c(indicador, Rubro_1, notas, fuente)) 
+    select( -c(indicador, Rubro_1, notas, fuente)) %>% 
+    dplyr::rename(gdp = valor) 
 
-# gdp_currentlc_q <- cs_real_mn_trimestral_20 %>% 
-#   filter(Rubro=="Producto interno bruto (PIB)") %>% 
-#   select( -c(indicador, Rubro_1, notas, fuente)) %>% 
-#   mutate(quarter = str_replace(Trimestres, "Trimestre ", "Q")) %>% 
-#   unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>% 
-#   mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-Q%q"),
-#          date = date(year_quarter)) %>% 
-#   select(- Trimestres)  
-#     
+cs_real_mn_trimestral_cl <-  cs_real_mn_trimestral_20 %>% 
+  filter(iso2c == "CL") %>% 
+  arrange(Rubro, date)
+
+gdp_date <- gdp_currentlc_q %>% 
+  filter(iso2c == "CL") %>% 
+  select(gdp, date)
+
+gdp_cl <- gdp_currentlc_q %>% 
+  filter(iso2c == "CL") 
+     
 
 
-cv_no_na <- cartera_vencida_20_tidy %>% 
-              filter( !is.na(cartera_vencida_percent) )
+cartera_vencida_qtr <- gdp_currentlc_q %>% 
+  select(-c(iso3c, nombre_pais, Rubro)) %>% 
+  left_join( cartera_vencida_20_tidy ,  by = c("iso2c", "date")) %>% 
+  filter( !is.na(cartera_vencida_percent) ) %>% 
+  select(-Años)
+
 
 tab_cv <- cv_no_na %>% group_by(iso2c, year) %>%
     summarise(nobs=n(), 
@@ -45,6 +56,36 @@ p_cv_ly
 # p_cv_ig <- ggplot(tab_cv, aes(x=year, y=avg_cv, col=iso2c)) + 
 #               geom_line_interactive()
 # ggiraph(code = print(p_cv_ig), width = 0.7)
+
+
+credito_interno_qtr <- gdp_currentlc_q %>% 
+  select(-c(iso3c, nombre_pais, Rubro)) %>% 
+  left_join( credito_interno_20_tidy ,  by = c("iso2c", "date")) %>% 
+  filter( !is.na(total) ) %>% 
+  select(-Años) %>% 
+  mutate(total_to_gdp = total/gdp,
+         al_spub_gdp = al.sector.público/gdp,
+         al_spriv_gdp = al.sector.privado/gdp,
+         al_gob_gdp = gobierno/gdp,
+         a_otros_gdp = otros/gdp)
+
+p_tot_to_gdp_qtr <- credito_interno_qtr %>% 
+  filter(iso2c %in% c("AR", "BR", "CL",  "MX", "UY")) %>% 
+  ggplot(aes(x=date, y=total_to_gdp, color=iso2c)) + 
+    geom_line()
+
+p_tot_qtr <- credito_interno_qtr %>% 
+  filter(iso2c %in% c("AR", "BR", "CL",  "MX", "UY")) %>% 
+  ggplot(aes(x=date, y=total, color=iso2c)) + 
+  geom_line()
+
+p_gdp_qtr <- credito_interno_qtr %>% 
+  filter(iso2c %in% c("AR", "BR", "CL",  "MX", "UY")) %>% 
+  ggplot(aes(x=date, y=gdp, color=iso2c)) + 
+  geom_line()
+
+grid.arrange(p_tot_to_gdp_qtr, p_tot_qtr, p_gdp_qtr, ncol=2, nrow=2)
+
 
 ci_no_na <- credito_interno_20_tidy %>% 
   filter( !is.na(al.sector.privado))

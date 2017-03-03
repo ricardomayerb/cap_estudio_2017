@@ -332,6 +332,42 @@ cs_precios_combustibles_20 <- cs_precios_combustibles %>% filter(iso3c %in% cepa
 cs_real_mn_trimestral_20 <- cs_real_mn_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 
 
+
+save(cs_real_dolares, file = "./produced_data/cs_real_dolares")
+save(cs_financiero_monetario_anual, file = "./produced_data/cs_financiero_monetario_anual")
+save(cs_financiero_monetario_trimestral, file = "./produced_data/cs_financiero_monetario_trimestral")
+save(cs_financiero_monetario_mensual, file = "./produced_data/cs_financiero_monetario_mensual")
+save(cs_remuneraciones_anual, file = "./produced_data/cs_remuneraciones_anual")
+save(cs_remuneraciones_trimestral, file = "./produced_data/cs_remuneraciones_trimestral")
+save(cs_empleo, file = "./produced_data/cs_empleo")
+save(cs_desempleo_anual, file = "./produced_data/cs_desempleo_anual")
+save(cs_desempleo_trimestral, file = "./produced_data/cs_desempleo_trimestral")
+save(cs_bp_anual, file = "./produced_data/cs_bp_anual")
+save(cs_bp_trimestral, file = "./produced_data/cs_bp_trimestral")
+save(cs_deuda_externa, file = "./produced_data/cs_deuda_externa")
+save(cs_indicadores_bp, file = "./produced_data/cs_indicadores_bp")
+save(cs_sector_publico, file = "./produced_data/cs_sector_publico")
+save(cs_comercio_intrarregional, file = "./produced_data/cs_comercio_intrarregional")
+save(cs_x_m_gran_cat, file = "./produced_data/cs_x_m_gran_cat")
+save(cs_x_m_10_ppales, file = "./produced_data/cs_x_m_10_ppales")
+save(cs_x_m_servicios, file = "./produced_data/cs_x_m_servicios")
+save(cs_x_m_total_mensual, file = "./produced_data/cs_x_m_total_mensual")
+save(cs_x_m_total_trimestral, file = "./produced_data/cs_x_m_total_trimestral")
+save(cs_x_prim_manuf, file = "./produced_data/cs_x_prim_manuf")
+save(cs_tipo_cambio, file = "./produced_data/cs_tipo_cambio")
+save(cs_x_m_vol_precios, file = "./produced_data/cs_x_m_vol_precios")
+save(cs_ipc_mensual, file = "./produced_data/cs_ipc_mensual")
+save(cs_ipc_anual, file = "./produced_data/cs_ipc_anual")
+save(cs_agricultura, file = "./produced_data/cs_agricultura")
+save(cs_mineria_manuf, file = "./produced_data/cs_mineria_manuf")
+save(cs_turismo, file = "./produced_data/cs_turismo")
+save(cs_precios_combustibles, file = "./produced_data/cs_precios_combustibles")
+save(cs_real_mn_trimestral, file = "./produced_data/cs_real_mn_trimestral")
+
+
+
+
+
 save(cs_real_dolares_20, file = "./produced_data/cs_real_dolares_20")
 save(cs_financiero_monetario_anual_20, file = "./produced_data/cs_financiero_monetario_anual_20")
 save(cs_financiero_monetario_trimestral_20, file = "./produced_data/cs_financiero_monetario_trimestral_20")
