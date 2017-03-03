@@ -67,6 +67,11 @@ rm(cepalstat_exp_imp_pro_ppal_part_1_of_2)
 # # (i.e. "America Latina", "El Caribe" y "America Latina y El Caribe") and a row not referring to a country
 
 # now, operateon the entire data frame, adding an iso3c column and droping observatios for country aggregates
+
+nombres_mes <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", 
+                 "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+
+
 cs_real_dolares <- cepalstat_sector_real_dolares_completo %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
@@ -83,27 +88,37 @@ cs_financiero_monetario_anual <- cs_financiero_monetario %>%
 cs_financiero_monetario_trimestral <- cs_financiero_monetario %>% 
   filter( str_detect(Periodo, "Trimestre")) %>% 
   mutate(quarter = str_replace(Periodo, "Trimestre ", "")) %>%
-  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
-  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
+  unite(year_quarter, Años, quarter, remove = FALSE, sep = "-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format = "%Y-%q"),
          date = date(year_quarter)) %>%
-  select(- Periodo)
+  select(-Periodo)
 
-nombres_mes <- c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", 
-         "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
 
 cs_financiero_monetario_mensual <- cs_financiero_monetario %>% 
   filter( Periodo != "Anual" & !str_detect(Periodo, "Trimestre")) %>% 
   mutate(month = match(Periodo, nombres_mes)) %>% 
-  unite(year_month, Años, month, remove=FALSE, sep="-") %>%
-  mutate(year_month = as.yearmon(year_month, format="%Y-%m"),
+  unite(year_month, Años, month, remove = FALSE, sep = "-") %>%
+  mutate(year_month = as.yearmon(year_month, format = "%Y-%m"),
          date = date(year_month)) %>%
-  select(- Periodo)
+  select(-Periodo)
 
 
 cs_remuneraciones <- cepalstat_remuneraciones %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
+
+cs_remuneraciones_anual <- cs_remuneraciones %>% 
+  filter(Trimestre == "n/a")  %>% 
+  select(-Trimestre)
+
+cs_remuneraciones_trimestral <- cs_remuneraciones %>% 
+  filter(Trimestre != "n/a")  %>% 
+  mutate(quarter = str_replace(Trimestre, "T", "")) %>%
+  unite(year_quarter, Años, quarter, remove = FALSE, sep = "-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format = "%Y-%q"),
+         date = date(year_quarter)) %>%
+  select(-Trimestre)
 
 cs_empleo <- cepalstat_empleo %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -115,11 +130,11 @@ cs_desempleo <- cepalstat_desempleo %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
-cs_desempleo_anual <- cepalstat_desempleo %>% 
+cs_desempleo_anual <- cs_desempleo %>% 
   filter(indicador != "Tasa de desempleo trimestral" ) %>% 
   select(-Trimestre)
 
-cs_desempleo_trimestral <- cepalstat_desempleo %>% 
+cs_desempleo_trimestral <- cs_desempleo %>% 
   filter(indicador == "Tasa de desempleo trimestral" ) %>% 
   mutate(quarter = str_replace(Trimestre, "T", "")) %>%
   unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
@@ -178,10 +193,29 @@ cs_x_m_servicios <- cepalstat_exp_imp_servicios %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
 
-cs_x_m_total_mensual <- cepalstat_exp_imp_totales_mensuales %>% 
+cs_x_m_total_mensual_trim <- cepalstat_exp_imp_totales_mensuales %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c))  %>% rename(nombre_pais = País)
+
+cs_x_m_total_mensual <- cs_x_m_total_mensual_trim %>% 
+  filter(! `Trimestres y meses` %in% c("I","II","III","IV")) %>% 
+  mutate(month = match(`Trimestres y meses`, nombres_mes)) %>% 
+  unite(year_month, Años, month, remove = FALSE, sep = "-") %>%
+  mutate(year_month = as.yearmon(year_month, format = "%Y-%m"),
+         date = date(year_month)) %>% 
+  select(-`Trimestres y meses`)
+
+quarters_roman_num <- c("I", "II", "III", "IV")
+
+cs_x_m_total_trimestral <- cs_x_m_total_mensual_trim %>% 
+  filter( `Trimestres y meses` %in% c("I","II","III","IV")) %>% 
+  mutate(quarter = match(`Trimestres y meses`, quarters_roman_num)) %>% 
+  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
+         date = date(year_quarter)) %>%
+  select(-`Trimestres y meses`)
+
 
 cs_x_prim_manuf <- cepalstat_exp_prim_manuf %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -196,12 +230,19 @@ cs_tipo_cambio <- cepalstat_tipo_de_cambio %>%
 cs_x_m_vol_precios <- cepalstat_indic_vol_precios_imp_exp %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País) %>% 
+  select(-Meses)
 
 cs_ipc_mensual <- cepalstat_ipc_ipm_mensual %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
-  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)  %>% 
+  mutate(month = match(Meses, nombres_mes)) %>% 
+  unite(year_month, Años, month, remove = FALSE, sep = "-") %>%
+  mutate(year_month = as.yearmon(year_month, format = "%Y-%m"),
+         date = date(year_month)) %>% 
+  select(-Meses)
+  
 
 cs_ipc_anual <- cepalstat_ipc_ipm_anual %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -233,7 +274,6 @@ cs_precios_combustibles <- cepalstat_precios_combustibles %>%
   filter(!is.na(iso3c)) %>% rename(nombre_pais = Países)
 
 
-
 cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   separate(col="País [Año base]", into=c("País", "Año base"), sep="\\[") %>% 
   select(-contains("base")) %>% mutate(País = str_trim(País))
@@ -260,12 +300,15 @@ cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
 #   select(- Trimestres)
 
 
-
 cs_real_dolares_20 <- cs_real_dolares %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_financiero_monetario_20 <- cs_financiero_monetario %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_remuneraciones_20 <- cs_remuneraciones %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_financiero_monetario_anual_20 <- cs_financiero_monetario_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_financiero_monetario_trimestral_20 <- cs_financiero_monetario_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_financiero_monetario_mensual_20 <- cs_financiero_monetario_mensual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_remuneraciones_anual_20 <- cs_remuneraciones_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_remuneraciones_trimestral_20 <- cs_remuneraciones_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_empleo_20 <- cs_empleo %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
-cs_desempleo_20 <- cs_desempleo %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_desempleo_anual_20 <- cs_desempleo_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_desempleo_trimestral_20 <- cs_desempleo_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_bp_anual_20 <- cs_bp_anual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_bp_trimestral_20 <- cs_bp_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_deuda_externa_20 <- cs_deuda_externa %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
@@ -276,6 +319,7 @@ cs_x_m_gran_cat_20 <- cs_x_m_gran_cat %>% filter(iso3c %in% cepal_20_countries[[
 cs_x_m_10_ppales_20 <- cs_x_m_10_ppales %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_x_m_servicios_20 <- cs_x_m_servicios %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_x_m_total_mensual_20 <- cs_x_m_total_mensual %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_x_m_total_trimestral_20 <- cs_x_m_total_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_x_prim_manuf_20 <- cs_x_prim_manuf %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_tipo_cambio_20 <- cs_tipo_cambio %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_x_m_vol_precios_20 <- cs_x_m_vol_precios %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
@@ -289,10 +333,14 @@ cs_real_mn_trimestral_20 <- cs_real_mn_trimestral %>% filter(iso3c %in% cepal_20
 
 
 save(cs_real_dolares_20, file = "./produced_data/cs_real_dolares_20")
-save(cs_financiero_monetario_20, file = "./produced_data/cs_financiero_monetario_20")
-save(cs_remuneraciones_20, file = "./produced_data/cs_remuneraciones_20")
+save(cs_financiero_monetario_anual_20, file = "./produced_data/cs_financiero_monetario_anual_20")
+save(cs_financiero_monetario_trimestral_20, file = "./produced_data/cs_financiero_monetario_trimestral_20")
+save(cs_financiero_monetario_mensual_20, file = "./produced_data/cs_financiero_monetario_mensual_20")
+save(cs_remuneraciones_anual_20, file = "./produced_data/cs_remuneraciones_anual_20")
+save(cs_remuneraciones_trimestral_20, file = "./produced_data/cs_remuneraciones_trimestral_20")
 save(cs_empleo_20, file = "./produced_data/cs_empleo_20")
-save(cs_desempleo_20, file = "./produced_data/cs_desempleo_20")
+save(cs_desempleo_anual_20, file = "./produced_data/cs_desempleo_anual_20")
+save(cs_desempleo_trimestral_20, file = "./produced_data/cs_desempleo_trimestral_20")
 save(cs_bp_anual_20, file = "./produced_data/cs_bp_anual_20")
 save(cs_bp_trimestral_20, file = "./produced_data/cs_bp_trimestral_20")
 save(cs_deuda_externa_20, file = "./produced_data/cs_deuda_externa_20")
@@ -303,6 +351,7 @@ save(cs_x_m_gran_cat_20, file = "./produced_data/cs_x_m_gran_cat_20")
 save(cs_x_m_10_ppales_20, file = "./produced_data/cs_x_m_10_ppales_20")
 save(cs_x_m_servicios_20, file = "./produced_data/cs_x_m_servicios_20")
 save(cs_x_m_total_mensual_20, file = "./produced_data/cs_x_m_total_mensual_20")
+save(cs_x_m_total_trimestral_20, file = "./produced_data/cs_x_m_total_trimestral_20")
 save(cs_x_prim_manuf_20, file = "./produced_data/cs_x_prim_manuf_20")
 save(cs_tipo_cambio_20, file = "./produced_data/cs_tipo_cambio_20")
 save(cs_x_m_vol_precios_20, file = "./produced_data/cs_x_m_vol_precios_20")
