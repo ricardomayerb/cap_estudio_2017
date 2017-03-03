@@ -278,6 +278,15 @@ cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
   separate(col="País [Año base]", into=c("País", "Año base"), sep="\\[") %>% 
   select(-contains("base")) %>% mutate(País = str_trim(País))
 
+
+gdp <- cepalstat_sector_real_mn_trimestral %>% 
+  filter(Rubro == "Producto interno bruto (PIB)") %>% 
+  arrange(Años, Trimestres)
+
+gdp_cl <-  gdp %>% 
+  filter(`País [Año base]`=="Chile [año base 2008]") %>% 
+  arrange(Años, Trimestres)
+
 cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 

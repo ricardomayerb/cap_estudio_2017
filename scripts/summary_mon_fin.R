@@ -17,7 +17,9 @@ cv_no_na <- cartera_vencida_20_tidy %>%
   filter( !is.na(cartera_vencida_percent) )
 
 gdp_currentlc_q <- cs_real_mn_trimestral_20 %>% 
-    filter(Rubro=="Producto interno bruto (PIB)") %>% 
+    filter(Rubro == "Producto interno bruto (PIB)" ) %>% 
+    filter(indicador==
+             "Producto interno bruto trimestral por objeto del gasto a precios corrientes") %>% 
     select( -c(indicador, Rubro_1, notas, fuente)) %>% 
     dplyr::rename(gdp = valor) 
 
