@@ -1,0 +1,34 @@
+---
+title: "making thematic dbs"
+author: "Ricardo Mayer"
+date: "March 6, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Sector externo
+
+Fuentes:
+
+- cepalstat:
+    +   Países: todos los de interés
+    +   Frecuencia: anual para todas las series, adicionalmente trimestral para Balanza de Pagos
+    +   Series: Componentes Balanza de Pagos, deuda externa
+    +   Rango:
+
+- EDD (Cecilia):
+    +   Países: todos los de interés
+    +   Frecuencia: anual para todas las series
+    +   Series: Componentes Balanza de Pagos 
+
+- ITID (S Castresana)
+
+- World Bank (on behalf of the Joint Exteral Debt Hub, JEDH)
+
+- Bank of International Settlement
+
+

@@ -3,6 +3,7 @@ library(stringr)
 library(tidyverse)
 
 load( "./produced_data/cs_real_dolares_20")
+load( "./produced_data/cs_real_dolares")
 
 cs_real <- cs_real_dolares %>% 
   select(-c(notas, fuente))

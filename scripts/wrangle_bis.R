@@ -1,5 +1,6 @@
 library(tidyverse)
 library(stringr)
+library(countrycode)
 
 load("./produced_data/bis_gap_tc_dsr")
 
@@ -35,6 +36,10 @@ tc_qs_long <- gather(totcredit_qs, key = code, value, -Period) %>%
              "country.name.en")
   )
 
+
+save(c_gaps1612_content, c_gaps1612_documentation, 
+     dsr_content, dsr_documentation, totcredit_content, totcredit_documentation,
+     c_g_qs_long, dsr_qs_long, tc_qs_long, file = "./produced_data/bis_tidy")
 
 # foo <- dsr_documentation$Code
 # str_extract(foo, "(?<=:).*?(?=:)" )
