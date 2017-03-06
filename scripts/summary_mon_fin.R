@@ -134,7 +134,7 @@ tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>%
 
 
 
-p_pb_t <- ggplot(filter(tab_pb, year >= 2000),
+p_pb_t <- ggplot(filter(tab_pb_qtr, year >= 2000),
                  aes(x=year, y=avg_tot_to_gdp, col=iso2c)) + 
           geom_line()
 p_pb_t
@@ -163,4 +163,13 @@ tab_meta <- meta_inf_tidy %>%
     avg_meta_high = mean(meta_inf_hi, rm.na = TRUE)
   ) %>% 
   filter(n_meta_center + n_meta_low + n_meta_hi != 0)
+
+
+save(cartera_vencida_qtr , credito_interno_qtr, meta_inf_tidy,
+     prestamos_bancarios_qtr, tpm_33_tidy, tpm_20_tidy,
+     cartera_vencida_20_tidy, prestamos_bancarios_20_tidy, 
+     credito_interno_20_tidy,
+     file = "./produced_data/refined_mon_fin_alejandra")
+
+
 
