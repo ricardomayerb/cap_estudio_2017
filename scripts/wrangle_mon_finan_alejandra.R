@@ -215,6 +215,12 @@ meta_inf_tidy <- meta_inf_long %>%
     left_join(meta_inf_limsup_long, by=c("nombre_pais","date")) %>% 
     mutate(year=year(date), month=month(date))
 
+meta_inf_tidy <- meta_inf_tidy %>% 
+  mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
+                             custom_dict=cepal_33_countries),
+         iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
+                             custom_dict=cepal_33_countries))
+
 
 save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
      cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 

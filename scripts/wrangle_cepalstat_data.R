@@ -3,6 +3,9 @@ library(stringr)
 library(countrycode)
 library(xts)
 library(lubridate)
+library(seasonal)
+library(lubridate)
+
 
 load("./produced_data/cepal_33_countries")
 load("./produced_data/cepal_20_countries")
@@ -279,13 +282,13 @@ cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
   select(-contains("base")) %>% mutate(País = str_trim(País))
 
 
-gdp <- cepalstat_sector_real_mn_trimestral %>% 
-  filter(Rubro == "Producto interno bruto (PIB)") %>% 
-  arrange(Años, Trimestres)
-
-gdp_cl <-  gdp %>% 
-  filter(`País [Año base]`=="Chile [año base 2008]") %>% 
-  arrange(Años, Trimestres)
+# gdp <- cepalstat_sector_real_mn_trimestral %>% 
+#   filter(Rubro == "Producto interno bruto (PIB)") %>% 
+#   arrange(Años, Trimestres)
+# 
+# gdp_cl <-  gdp %>% 
+#   filter(`País [Año base]`=="Chile [año base 2008]") %>% 
+#   arrange(Años, Trimestres)
 
 cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
@@ -297,16 +300,65 @@ cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
            date = date(year_quarter)) %>%
   select(- Trimestres)
 
+cs_gdp_currentlc_q <- cs_real_mn_trimestral %>% 
+  filter(Rubro == "Producto interno bruto (PIB)" ) %>% 
+  filter(indicador ==
+           "Producto interno bruto trimestral por objeto del gasto a precios corrientes") %>% 
+  select( -c(indicador, Rubro_1, notas, fuente)) %>% 
+  dplyr::rename(gdp = valor) %>% 
+  arrange(iso2c, date) 
 
-# 
-# gdp_currentlc_q <- cs_real_mn_trimestral_20 %>% 
-#   filter(Rubro=="Producto interno bruto (PIB)") %>% 
-#   select( -c(indicador, Rubro_1, notas, fuente)) %>% 
-#   mutate(quarter = str_replace(Trimestres, "Trimestre ", "Q")) %>% 
-#   unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>% 
-#   mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-Q%q"),
-#          date = date(year_quarter)) %>% 
-#   select(- Trimestres)
+gdp_iso <- unique(cs_gdp_currentlc_q$iso2c)
+cs_gdp_currentlc_q$gdp_sa_seas <- NA
+cs_gdp_currentlc_q$gdp_sa_stl <- NA
+
+for (country in gdp_iso) {
+  idx <- which(cs_gdp_currentlc_q$iso2c == country)
+  alldates = cs_gdp_currentlc_q$date[idx]
+  fdate = first(alldates)
+
+  ystart = year(fdate)
+  mstart = month(fdate)
+  sgdp = ts(cs_gdp_currentlc_q$gdp[idx], start = c(ystart, mstart), frequency = 4)
+  
+  gdp_decom = decompose(sgdp)$trend
+  gdp_seas = final(seas(sgdp))
+  gdp_stl_list = stl(sgdp, s.window = "periodic")
+  gdp_stl = gdp_stl_list$time.series[ , 2]
+  cs_gdp_currentlc_q$gdp_sa_seas[idx] <- gdp_seas
+  cs_gdp_currentlc_q$gdp_sa_stl[idx] <- gdp_stl
+}
+
+
+
+cs_gdp_constantlc_q <- cs_real_mn_trimestral %>% 
+  filter(Rubro == "Producto interno bruto (PIB)" ) %>% 
+  filter(indicador ==
+           "Producto interno bruto trimestral por objeto del gasto a precios constantes") %>% 
+  select( -c(indicador, Rubro_1, notas, fuente)) %>% 
+  dplyr::rename(gdp = valor) %>% 
+  arrange(iso2c, date) 
+
+gdp_iso <- unique(cs_gdp_constantlc_q$iso2c)
+cs_gdp_constantlc_q$gdp_sa_seas <- NA
+cs_gdp_constantlc_q$gdp_sa_stl <- NA
+
+for (country in gdp_iso) {
+  idx <- which(cs_gdp_constantlc_q$iso2c == country)
+  alldates = cs_gdp_constantlc_q$date[idx]
+  fdate = first(alldates)
+  
+  ystart = year(fdate)
+  mstart = month(fdate)
+  sgdp = ts(cs_gdp_constantlc_q$gdp[idx], start = c(ystart, mstart), frequency = 4)
+  
+  gdp_decom = decompose(sgdp)$trend
+  gdp_seas = final(seas(sgdp))
+  gdp_stl_list = stl(sgdp, s.window = "periodic")
+  gdp_stl = gdp_stl_list$time.series[ , 2]
+  cs_gdp_constantlc_q$gdp_sa_seas[idx] <- gdp_seas
+  cs_gdp_constantlc_q$gdp_sa_stl[idx] <- gdp_stl
+}
 
 
 cs_real_dolares_20 <- cs_real_dolares %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
@@ -340,6 +392,8 @@ cs_turismo_20 <- cs_turismo %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_precios_combustibles_20 <- cs_precios_combustibles %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 cs_real_mn_trimestral_20 <- cs_real_mn_trimestral %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 
+cs_gdp_constantlc_q_20 <- cs_gdp_constantlc_q  %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
+cs_gdp_currentlc_q_20 <- cs_gdp_currentlc_q  %>% filter(iso3c %in% cepal_20_countries[["iso3c"]])
 
 
 save(cs_real_dolares, file = "./produced_data/cs_real_dolares")
@@ -373,6 +427,8 @@ save(cs_turismo, file = "./produced_data/cs_turismo")
 save(cs_precios_combustibles, file = "./produced_data/cs_precios_combustibles")
 save(cs_real_mn_trimestral, file = "./produced_data/cs_real_mn_trimestral")
 
+save(cs_gdp_currentlc_q, file = "./produced_data/cs_gdp_currentlc_q")
+save(cs_gdp_constantlc_q, file = "./produced_data/cs_gdp_constantlc_q")
 
 
 
@@ -408,4 +464,6 @@ save(cs_turismo_20, file = "./produced_data/cs_turismo_20")
 save(cs_precios_combustibles_20, file = "./produced_data/cs_precios_combustibles_20")
 save(cs_real_mn_trimestral_20, file = "./produced_data/cs_real_mn_trimestral_20")
 
+save(cs_gdp_currentlc_q_20, file = "./produced_data/cs_gdp_currentlc_q_20")
+save(cs_gdp_constantlc_q_20, file = "./produced_data/cs_gdp_constantlc_q_20")
 
