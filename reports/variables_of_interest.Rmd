@@ -1,0 +1,26 @@
+---
+title: "variables of interest"
+author: "Ricardo Mayer"
+date: "March 6, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## A tentative list
+
+### What variables are related to (lack of) resilience and policy oportunities?
+
+#### Threats to financial sustainability
+
+##### In the public sector
+
+- fiscal deficit
+- 
+
+
+
+

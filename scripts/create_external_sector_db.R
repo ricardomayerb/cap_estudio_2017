@@ -47,3 +47,10 @@ cs_deuda_externa_to_join <- cs_deuda_externa %>%
 
 
 bop_de_20 <- bind_rows(bop_tidy_20_to_join, cs_deuda_externa_to_join)
+
+
+imp_by_prod_to_join <- imp_by_prod_tidy %>% 
+  rename(producto_m = producto)
+
+exp_by_prod_to_join <- exp_by_prod_tidy %>% 
+  rename(producto_x = producto)
