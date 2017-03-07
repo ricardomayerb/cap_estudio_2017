@@ -18,8 +18,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##### In the public sector
 
-- fiscal deficit
-- 
+1. fiscal deficit
+2. tendency fiscal deficit
+3. debt service ratio
+4. expected primary deficits
+5. debt half-life (summarize variables such as expected growth, interest, repayments, etc.)
+
+6. Public enterprises solvency
+
+Don't forget to specify the coverage of the fiscal variable (central, nfps, etc.)
+
+
+## Data 
+
+### Fiscal
+
 
 
 
