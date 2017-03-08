@@ -1,4 +1,5 @@
 ## ---- prepare_cs_fiscal
+library(dygraphs)
 
 library(stringr)
 library(lubridate)
@@ -93,10 +94,10 @@ year_as_date <- date( as.POSIXct(as.character(res_global_gc_porpib$year),
                                  format = "%Y", 
                                  origin=as.POSIXct("1990-12-31")))
 
-res_global_gc_porpib$year <- year_as_date
+res_global_gc_porpib$year_as_date <- year_as_date
 
 res_global_gc_porpib_xts <- as_xts(res_global_gc_porpib, 
-                                   date_col = year)
+                                   date_col = year_as_date)
 
 
 res_global_gg_porpib <- operaciones_porpib %>% 
@@ -110,13 +111,12 @@ res_global_gc_porpib_for_xts_wide <- res_global_gc_porpib %>%
   select(iso3c, year, valor) %>% 
   spread(iso3c, valor)
 
-library(dygraphs)
 dygraph(res_global_gc_porpib_for_xts_wide[, c("year", "ARG", "BRA", "CHL")])
 
 
 res_global_gc_porpib_for_xts_wide_d <- res_global_gc_porpib_for_xts_wide
-res_global_gc_porpib_for_xts_wide_d$year <- seq.Date(as.Date("1990-12-31"), as.Date("2015-12-31"), "year")
-foo <- as_xts(res_global_gc_porpib_for_xts_wide_d, date_col = year)
+res_global_gc_porpib_for_xts_wide_d$year_d <- seq.Date(as.Date("1990-12-31"), as.Date("2015-12-31"), "year")
+foo <- as_xts(res_global_gc_porpib_for_xts_wide_d, date_col = year_d)
 
 
 
