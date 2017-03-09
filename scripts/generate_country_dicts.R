@@ -17,19 +17,26 @@ cepal_33_countries <- countrycode_data %>%
 cepal_33_countries$country.name.es[cepal_33_countries$iso3c == "TTO"] <- "Trinidad y Tabago"
 
 
-carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD", 
+carib_minus_dom_plus_jam = c("ATG", "BHS", "BRB", "DMA", "GRD", 
                     "HTI", "KNA", "LCA", "TTO", "VCT")
+
+carib_minus_dom = c("ATG", "BHS", "BRB", "DMA", "GRD", 
+                    "HTI", "KNA", "LCA", "TTO", "VCT", "JAM")
 
 other_to_drop = c("GUY", "SUR", "BLZ") 
 
 # without caribbean (except cuba and dom rep) and without belize, suriname and guyana
 cepal_20_countries = cepal_33_countries %>% 
+  filter(!iso3c %in% carib_minus_dom_plus_jam) %>% 
+  filter(!iso3c %in% other_to_drop)
+
+cepal_19_countries = cepal_33_countries %>% 
   filter(!iso3c %in% carib_minus_dom) %>% 
   filter(!iso3c %in% other_to_drop)
 
-
 save(cepal_33_countries, file = "./produced_data/cepal_33_countries")
 save(cepal_20_countries, file = "./produced_data/cepal_20_countries")
+save(cepal_19_countries, file = "./produced_data/cepal_19_countries")
 
 
 

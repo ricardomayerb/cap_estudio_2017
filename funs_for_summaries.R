@@ -5,6 +5,16 @@ library(tidyverse)
 library(lazyeval)
 
 load("./produced_data/cs_sector_publico")
+load("./produced_data/cepal_19_countries")
+load("./produced_data/cs_deuda_externa")
+
+
+de_data_possible_duplicates <- cs_deuda_externa  %>% 
+  select( -c(fuente, notas) ) %>% 
+  rename(year = Años)
+de_data_dupli_idx <- duplicated(de_data_possible_duplicates[,1:3])
+de_data <- de_data_possible_duplicates[!de_data_dupli_idx, ]
+
 
 sp_data_possible_duplicates <- cs_sector_publico %>% 
   select( -c(fuente, notas) ) %>% 
@@ -22,20 +32,21 @@ operaciones <- sp_data %>%
             `Tipo de persona`, `Tasa mínima/máxima`, Periodo_1,
             Clasificación_deuda, `Cobertura institucional_2`, Periodo))  %>% 
   rename(operacion = `Clasificación económica Operaciones del gobierno`) %>% 
-  mutate(operacion = recode(operacion,
-                            resultado_global = `Resultado global`,
-                            resultado_primario = `Resultado primario`
-                            )
-         ) %>% 
+  rename(cobertura =  `Cobertura institucional_1`) %>% 
+  mutate(cobertura = str_to_lower(cobertura),
+         cobertura = str_replace_all(cobertura, pattern = " ", replacement = "_")) %>% 
+  mutate(operacion =  str_to_lower(operacion),
+         operacion = str_replace_all(operacion, pattern = " ", replacement = "_"))  %>% 
   arrange(iso3c, operacion, year)
 
 operaciones_pib <- operaciones %>% 
   filter( str_detect(indicador, "porcentajes")) 
 
+members_operaciones_pib <- unique(operaciones_pib$operacion)
 
 ing_trib <- sp_data %>% 
   filter(`Cobertura institucional` != "n/a") %>% 
-  rename(cobertura = `Cobertura institucional`) %>% 
+  rename(cobertura =  `Cobertura institucional`) %>% 
   select(-c(`Tipo de persona`, Periodo, `Tasa mínima/máxima`, Periodo_1,
             `Clasificación económica Operaciones del gobierno`, 
             `Cobertura institucional_1`, `Cobertura institucional_2`,
@@ -50,7 +61,12 @@ ing_trib_lc <- ing_trib %>%
 
 
 
-fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX")) {
+fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
+                             c_year=2015,
+                             sel_cobertura = c("gobierno_central",
+                                               "gobierno_general",
+                                               "sector_público_no_financiero"))
+                             {
 
   filter_countries = interp(~ iso3c %in% countries, 
                            list(iso3c = as.name("iso3c"),
@@ -64,23 +80,93 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX")) {
     summarise(avg_inc = mean(valor))
 
   s_operaciones_pib <- operaciones_pib %>% 
-    filter_(filter_countries)  
+    filter_(filter_countries) %>% 
+    filter(cobertura %in% sel_cobertura)
   
-  op_report <- s_ing_trib_pib %>% 
-    group_by(cobertura, iso3c, year) %>% 
-      summarise(rg = `Resultado global`)
+  print(names(s_operaciones_pib))
+  
+  sel_operaciones = c("resultado_global", "resultado_primario", 
+                      "pagos_de_intereses", "gastos_de_capital")
+  
+  op_report_date_ranges_by_country <- s_operaciones_pib %>% 
+    group_by(operacion, cobertura, iso3c) %>% 
+    summarise(nobs = n(),
+              first_date = min(year),
+              last_date = max(year)
+              ) %>% 
+    arrange(cobertura, operacion, nobs)
+    
+  op_report_date_ranges <- s_operaciones_pib %>% 
+    group_by(operacion, cobertura) %>% 
+    summarise(n_countries = length(unique(iso3c)),
+              first_date = min(year),
+              last_date = max(year)
+              ) %>% 
+    arrange(cobertura, operacion, n_countries)
+  
+  op_report_current_year <- s_operaciones_pib %>% 
+    filter(year == c_year) %>% 
+    filter(operacion %in% sel_operaciones) %>% 
+    group_by(operacion, cobertura, iso3c) %>% 
+    summarise(resultado = valor
+              ) %>% 
+    arrange(resultado)
+  
+  op_report <- s_operaciones_pib %>% 
+    filter(operacion %in% sel_operaciones) %>% 
+    group_by(operacion, cobertura, iso3c) %>% 
+    summarise(valor_mr = last(valor),
+              promedio_3_mr = mean(tail(valor, 3)),
+              promedio_5_mr = mean(tail(valor, 5)),
+              first_date = min(year),
+              last_date = max(year)
+    ) %>% 
+    arrange(valor_mr)
  
     
-  return (list(it_df = s_ing_trib_pib, it_rep = it_report))
+  return (list(it_df = s_ing_trib_pib, it_rep = it_report, op_rep = op_report,
+               op_cy = op_report_current_year, op_dates = op_report_date_ranges,
+               op_dates_c = op_report_date_ranges_by_country))
 }
 
-
-my_fr = fiscal_reporting()
+sel_countries_1 = c("ARG", "CHL", "MEX")
+sel_countries_2 = c("ARG", "BOL", "CHL", "MEX")
+sel_countries_3 = c("ARG", "BOL", "CHL", "MEX", "VEN")
+cepal_19 = cepal_19_countries$iso3c
+# my_fr = fiscal_reporting(sel_countries_3)
+my_fr = fiscal_reporting(countries = cepal_19,
+                         sel_cobertura = c("gobierno_central",
+                                           "gobierno_general"))
 my_fr
 
 foo <- my_fr[[1]]
 moo <- my_fr[[2]]
 
+op <-  my_fr[[3]]
+op_cy <-  my_fr[[4]]
 
-foos = c("ARG", "CHL", "MEX")
-fool = unique(ing_trib_pib$iso3c)
+op_d <-  my_fr[[5]]
+op_d_c <-  my_fr[[6]]
+
+
+View(op)
+View(op_cy)
+View(op_d)
+View(op_d_c)
+
+
+# unique(operaciones_pib$operacion)
+# [1] "adquisición_de_activos_de_capital_fijo"      "compras_de_bienes_y_servicios"              
+# [3] "concesión_de_préstamos_menos_recuperaciones" "donaciones_externas"                        
+# [5] "gasto_total_y_préstamo_neto"                 "gastos_corrientes"                          
+# [7] "gastos_de_capital"                           "ingreso_total_y_donaciones"                 
+# [9] "ingresos_corrientes"                         "ingresos_de_capital"                        
+# [11] "ingresos_no_tributarios"                     "ingresos_tributarios"                       
+# [13] "otros_gastos_corrientes"                     "otros_gastos_de_capital"                    
+# [15] "pagos_de_intereses"                          "resultado_global"                           
+# [17] "resultado_primario"                          "subsidios_y_transferencias_corrientes"      
+# [19] "sueldos_y_salarios"                          "transferencias_de_capital"                  
+# [21] "financiamiento_externo"                      "financiamiento_interno"                     
+# [23] "financiamiento_otro"                         "financiamiento_total" 
+
+
