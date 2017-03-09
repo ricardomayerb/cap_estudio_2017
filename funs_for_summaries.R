@@ -14,7 +14,8 @@ de_data_possible_duplicates <- cs_deuda_externa  %>%
   rename(year = Años)
 de_data_dupli_idx <- duplicated(de_data_possible_duplicates[,1:3])
 de_data <- de_data_possible_duplicates[!de_data_dupli_idx, ]
-
+de_pib <- de_data %>% 
+  filter( str_detect(indicador, "porcentaje")) 
 
 sp_data_possible_duplicates <- cs_sector_publico %>% 
   select( -c(fuente, notas) ) %>% 
@@ -34,9 +35,11 @@ operaciones <- sp_data %>%
   rename(operacion = `Clasificación económica Operaciones del gobierno`) %>% 
   rename(cobertura =  `Cobertura institucional_1`) %>% 
   mutate(cobertura = str_to_lower(cobertura),
-         cobertura = str_replace_all(cobertura, pattern = " ", replacement = "_")) %>% 
+         cobertura = str_replace_all(cobertura, pattern = " ",
+                                     replacement = "_")) %>% 
   mutate(operacion =  str_to_lower(operacion),
-         operacion = str_replace_all(operacion, pattern = " ", replacement = "_"))  %>% 
+         operacion = str_replace_all(operacion, pattern = " ",
+                                     replacement = "_"))  %>% 
   arrange(iso3c, operacion, year)
 
 operaciones_pib <- operaciones %>% 
@@ -65,8 +68,9 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
                              c_year=2015,
                              sel_cobertura = c("gobierno_central",
                                                "gobierno_general",
-                                               "sector_público_no_financiero"))
-                             {
+                                               "sector_público_no_financiero"),
+                             sel_ops = c("resultado_global",
+                                         "resultado_primario")) {
 
   filter_countries = interp(~ iso3c %in% countries, 
                            list(iso3c = as.name("iso3c"),
@@ -85,8 +89,8 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
   
   print(names(s_operaciones_pib))
   
-  sel_operaciones = c("resultado_global", "resultado_primario", 
-                      "pagos_de_intereses", "gastos_de_capital")
+  # sel_ops = c("resultado_global", "resultado_primario", 
+  #                     "pagos_de_intereses", "gastos_de_capital")
   
   op_report_date_ranges_by_country <- s_operaciones_pib %>% 
     group_by(operacion, cobertura, iso3c) %>% 
@@ -106,14 +110,14 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
   
   op_report_current_year <- s_operaciones_pib %>% 
     filter(year == c_year) %>% 
-    filter(operacion %in% sel_operaciones) %>% 
+    filter(operacion %in% sel_ops) %>% 
     group_by(operacion, cobertura, iso3c) %>% 
     summarise(resultado = valor
               ) %>% 
     arrange(resultado)
   
   op_report <- s_operaciones_pib %>% 
-    filter(operacion %in% sel_operaciones) %>% 
+    filter(operacion %in% sel_ops) %>% 
     group_by(operacion, cobertura, iso3c) %>% 
     summarise(valor_mr = last(valor),
               promedio_3_mr = mean(tail(valor, 3)),
