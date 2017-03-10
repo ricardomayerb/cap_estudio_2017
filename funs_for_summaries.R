@@ -12,19 +12,17 @@ load("./produced_data/cs_deuda_externa")
 de_data_possible_duplicates <- cs_deuda_externa  %>% 
   select( -c(fuente, notas) ) %>% 
   rename(year = Años)
+rm(cs_deuda_externa)
 de_data_dupli_idx <- duplicated(de_data_possible_duplicates[,1:3])
-de_data <- de_data_possible_duplicates[!de_data_dupli_idx, ]
+de_data <- de_data_possible_duplicates[!de_data_dupli_idx, ] 
 de_pib <- de_data %>% 
   filter( str_detect(indicador, "porcentaje")) 
 
 sp_data_possible_duplicates <- cs_sector_publico %>% 
   select( -c(fuente, notas) ) %>% 
   rename(year = Años)
-
 rm(cs_sector_publico)
-
 sp_data_dupli_idx <- duplicated(sp_data_possible_duplicates[,1:13])
-
 sp_data <- sp_data_possible_duplicates[!sp_data_dupli_idx, ]
 
 operaciones <- sp_data %>% 
@@ -66,7 +64,7 @@ ing_trib_lc <- ing_trib %>%
 
 fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
                              c_year=2015,
-                             sel_cobertura = c("gobierno_central",
+                             ops_cobertura = c("gobierno_central",
                                                "gobierno_general",
                                                "sector_público_no_financiero"),
                              sel_ops = c("resultado_global",
@@ -75,22 +73,35 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
   filter_countries = interp(~ iso3c %in% countries, 
                            list(iso3c = as.name("iso3c"),
                            countries = as.name("countries")))
-                           
-  s_ing_trib_pib <- ing_trib_pib %>% 
-    filter_(filter_countries)  
   
-  it_report <- s_ing_trib_pib %>% 
-    group_by(cobertura, iso3c, Clasificacion_impuestos) %>% 
-    summarise(avg_inc = mean(valor))
+  s_de_pib <- de_pib %>% 
+    filter_(filter_countries) 
+    
 
   s_operaciones_pib <- operaciones_pib %>% 
     filter_(filter_countries) %>% 
-    filter(cobertura %in% sel_cobertura)
+    filter(cobertura %in% ops_cobertura)
   
   print(names(s_operaciones_pib))
   
-  # sel_ops = c("resultado_global", "resultado_primario", 
-  #                     "pagos_de_intereses", "gastos_de_capital")
+  de_report_date_ranges_by_country <- s_de_pib %>% 
+    filter_(filter_countries) %>% 
+    group_by(iso3c) %>% 
+    summarise(nobs = n(),
+              first_date = min(year),
+              last_date = max(year)
+    ) %>% 
+    arrange(nobs)
+  
+  de_report_by_country <- de_pib %>% 
+    filter_(filter_countries) %>% 
+    group_by(iso3c) %>% arrange(year) %>% 
+    summarise(ex_debt_mr = last(valor),
+              ex_debt_last_3 = mean(tail(valor, n=3)),
+              ex_debt_last_5 = mean(tail(valor, n=5))
+              ) %>% 
+    arrange(ex_debt_mr)
+    
   
   op_report_date_ranges_by_country <- s_operaciones_pib %>% 
     group_by(operacion, cobertura, iso3c) %>% 
@@ -128,9 +139,11 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
     arrange(valor_mr)
  
     
-  return (list(it_df = s_ing_trib_pib, it_rep = it_report, op_rep = op_report,
+  return (list(op_rep = op_report,
                op_cy = op_report_current_year, op_dates = op_report_date_ranges,
-               op_dates_c = op_report_date_ranges_by_country))
+               op_dates_c = op_report_date_ranges_by_country,
+               de_dates = de_report_date_ranges_by_country,
+               de_valor_c = de_report_by_country))
 }
 
 sel_countries_1 = c("ARG", "CHL", "MEX")
@@ -138,26 +151,27 @@ sel_countries_2 = c("ARG", "BOL", "CHL", "MEX")
 sel_countries_3 = c("ARG", "BOL", "CHL", "MEX", "VEN")
 cepal_19 = cepal_19_countries$iso3c
 # my_fr = fiscal_reporting(sel_countries_3)
-my_fr = fiscal_reporting(countries = cepal_19,
-                         sel_cobertura = c("gobierno_central",
+my_fr = fiscal_reporting(countries = sel_countries_3,
+                         ops_cobertura = c("gobierno_central",
                                            "gobierno_general"))
 my_fr
 
-foo <- my_fr[[1]]
-moo <- my_fr[[2]]
+op <-  my_fr[[1]]
+op_cy <-  my_fr[[2]]
 
-op <-  my_fr[[3]]
-op_cy <-  my_fr[[4]]
+op_d <-  my_fr[[3]]
+op_d_c <-  my_fr[[4]]
 
-op_d <-  my_fr[[5]]
-op_d_c <-  my_fr[[6]]
+de_d <-  my_fr[[5]]
+de_v <-  my_fr[[6]]
 
 
 View(op)
 View(op_cy)
 View(op_d)
 View(op_d_c)
-
+View(de_d)
+View(de_v)
 
 # unique(operaciones_pib$operacion)
 # [1] "adquisición_de_activos_de_capital_fijo"      "compras_de_bienes_y_servicios"              
