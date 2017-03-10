@@ -3,10 +3,95 @@ library(lubridate)
 library(stringr)
 library(tidyverse)
 library(lazyeval)
+library(stringi)
 
 load("./produced_data/cs_sector_publico")
 load("./produced_data/cepal_19_countries")
 load("./produced_data/cs_deuda_externa")
+load("./produced_data/debt_data_33_tidy")
+load("./produced_data/debt_data_JEDH_cepal_33")
+load("./produced_data/x_m_locations_products_tidy")
+load("./produced_data/cs_x_m_10_ppales")
+load("./produced_data/cs_x_m_gran_cat")
+load("./produced_data/cs_x_m_total_mensual")
+load("./produced_data/bop_edd_tidy")
+
+
+cs_x_m_10_ppales_cepal_19 <- cs_x_m_10_ppales %>% 
+  filter(iso3c %in% cepal_19_countries[["iso3c"]])
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales` != "n/a", 
+          !is.na(`Productos principales`)) %>% 
+  distinct(iso3c) # ARG, MEX
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_1` != "n/a", 
+         !is.na(`Productos principales_1`)) %>% 
+  distinct(iso3c) # NIC
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_2` != "n/a", 
+         !is.na(`Productos principales_2`)) %>% 
+  distinct(iso3c) # PAN
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_3` != "n/a", 
+         !is.na(`Productos principales_3`)) %>% 
+  distinct(iso3c) # BOL, PRY
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_4` != "n/a", 
+         !is.na(`Productos principales_4`)) %>% 
+  distinct(iso3c) # BRA, PER
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_5` != "n/a", 
+         !is.na(`Productos principales_5`)) %>% 
+  distinct(iso3c) # CHL
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_6` != "n/a", 
+         !is.na(`Productos principales_6`)) %>% 
+  distinct(iso3c) # COL, URY
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_7` != "n/a", 
+         !is.na(`Productos principales_7`)) %>% 
+  distinct(iso3c) # CRI, VEN
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_8` != "n/a", 
+         !is.na(`Productos principales_8`)) %>% 
+  distinct(iso3c) # CUB
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_10` != "n/a", 
+         !is.na(`Productos principales_10`)) %>% 
+  distinct(iso3c) # ECU
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_11` != "n/a", 
+         !is.na(`Productos principales_11`)) %>% 
+  distinct(iso3c) # SLV
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_12` != "n/a", 
+         !is.na(`Productos principales_12`)) %>% 
+  distinct(iso3c) # GTM
+
+cs_x_m_10_ppales_cepal_19 %>% 
+  filter(`Productos principales_13` != "n/a", 
+         !is.na(`Productos principales_13`)) %>% 
+  distinct(iso3c) # HND
+
+
+exp_by_prod_tidy_per <- exp_by_prod_tidy %>% 
+  mutate(producto = str_to_lower(producto)) %>% 
+  mutate(producto = str_replace_all(producto, pattern = " ",
+                                    replacement = "_")) %>% 
+  mutate(producto = stri_trans_general(producto, "Latin-ASCII"))
+
 
 
 de_data_possible_duplicates <- cs_deuda_externa  %>% 
@@ -68,7 +153,8 @@ fiscal_reporting <- function(countries = c("ARG", "CHL", "MEX"),
                                                "gobierno_general",
                                                "sector_público_no_financiero"),
                              sel_ops = c("resultado_global",
-                                         "resultado_primario")) {
+                                         "resultado_primario",
+                                         "pagos_de_intereses")) {
 
   filter_countries = interp(~ iso3c %in% countries, 
                            list(iso3c = as.name("iso3c"),
@@ -172,6 +258,9 @@ View(op_d)
 View(op_d_c)
 View(de_d)
 View(de_v)
+
+
+
 
 # unique(operaciones_pib$operacion)
 # [1] "adquisición_de_activos_de_capital_fijo"      "compras_de_bienes_y_servicios"              
