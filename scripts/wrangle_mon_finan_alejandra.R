@@ -222,10 +222,14 @@ meta_inf_tidy <- meta_inf_tidy %>%
                              custom_dict=cepal_33_countries))
 
 
+# save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
+#      cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
+#      credito_interno_20_tidy, cartera_vencida_20_tidy, 
+#      meta_inf_tidy,
+#      file = "./produced_data/monetary_fin_tidy")
+
 save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
      cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
      credito_interno_20_tidy, cartera_vencida_20_tidy, 
      meta_inf_tidy,
-     file = "./produced_data/monetary_fin_tidy")
-
-
+     file = "./produced_data/data_with_basic_wrangling/monetary_fin_tidy")

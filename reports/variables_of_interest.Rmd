@@ -16,6 +16,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### Threats to financial sustainability
 
+- Deuda externa total/publica/privada a PIB
+- costo del servicio de la deuda a PIB
+- Cartera vencida como porcentaje de prestamos
+- TPM
+- Tasa activa promedio
+
+#### Structural fragilities
+
+- export concentration (products). Top 1 over total, Top 3 over total, Herfindahl
+- export concentration (markets). Top 1 over total, Top 3 over total, Herfindahl
+
+
+
 ##### In the public sector
 
 1. fiscal deficit
