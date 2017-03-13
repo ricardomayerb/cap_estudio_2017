@@ -7,7 +7,7 @@ library(seasonal)
 library(lubridate)
 library(purrr)
 
-source('~/GitHub/cap_estudio_2017/functions/add_iso.R')
+source('./functions/add_iso.R')
 quiet_iso <- purrr::quietly(add_iso)
 # quiet_iso2 <- function(purrr::quietly(add_iso)[["result"]]
 

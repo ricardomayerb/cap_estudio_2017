@@ -142,7 +142,7 @@ tab_ci_qrt_gdp <- credito_interno_qtr %>%
 
 credito_interno_qtr <- cs_gdp_currentlc_q_gasto %>% 
   select(-c(iso3c, nombre_pais, Rubro)) %>% 
-  left_join( credito_interno_20_tidy ,  by = c("iso2c", "date")) %>% 
+  left_join( credito_interno_33_tidy ,  by = c("iso2c", "date")) %>% 
   filter( !is.na(total) ) %>% 
   mutate(total_to_gdp_seas = total/gdp_sa_seas,
          al_spub_gdp_seas = al.sector.público/gdp_sa_seas,
