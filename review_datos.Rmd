@@ -1,3 +1,16 @@
+---
+title: "review datos"
+author: "ricardo mayer"
+date: "March 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r create_elements}
 #collect financial stress related variables
 library(tidyverse)
 library(stringr)
@@ -213,17 +226,13 @@ exp_10_ppales_by_iso <- exp_10_ppales %>%
 dt_exp_10_ppales_by_iso <- datatable(exp_10_ppales_by_iso %>%  
                                        filter(year >= 2000 ))
 
+```
+
+
+
+COncentracion de exportacion
+
+```{r exp_herfindahl}
 dt_exp_10_ppales_by_iso
-# imp_by_prod_shares <- exp_by_prod_to_join %>% 
-#   group_by(iso3c, date) %>% 
-  # summarise(agri_agropec_share = product)
+```
 
-
-# ing_trib <- sp_data %>% 
-#   filter( str_detect(indicador, "porcentajes")) %>% 
-#   filter(`Cobertura institucional` != "n/a") %>% 
-#   rename(cobertura =  `Cobertura institucional`) %>% 
-#   select(-c(`Tipo de persona`, Periodo, `Tasa mínima/máxima`, Periodo_1,
-#             `Clasificación económica Operaciones del gobierno`, 
-#             `Cobertura institucional_1`, `Cobertura institucional_2`,
-#             Clasificación_deuda))

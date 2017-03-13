@@ -1,3 +1,16 @@
+---
+title: "review datos"
+author: "ricardo mayer"
+date: "March 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r create_elements, message=FALSE, warning=FALSE}
 #collect financial stress related variables
 library(tidyverse)
 library(stringr)
@@ -178,9 +191,9 @@ exp_by_prod_to_join <- exp_by_prod_tidy %>%
 
 exp_by_prod_wide <- exp_by_prod_to_join %>% 
   spread(producto_x, value) %>% 
-  mutate(agro_agropec_share = 100*productos_agricolas_y_agropecuarios/total,
-         mineria_y_petro_share = 100*mineria_y_petroleo/total,
-         manufacturas_share = 100*manufacturas/total) %>% 
+  mutate(agro_agropec_share = productos_agricolas_y_agropecuarios/total,
+         mineria_y_petro_share = mineria_y_petroleo/total,
+         manufacturas_share = manufacturas/total) %>% 
   select(-c(productos_agricolas_y_agropecuarios,mineria_y_petroleo,
             manufacturas))
 
@@ -213,17 +226,34 @@ exp_10_ppales_by_iso <- exp_10_ppales %>%
 dt_exp_10_ppales_by_iso <- datatable(exp_10_ppales_by_iso %>%  
                                        filter(year >= 2000 ))
 
+```
+
+
+
+Concentración de exportaciones: Herfindahl index, usando los 10 productos principales de exportacion por año
+
+```{r exp_herfindahl}
 dt_exp_10_ppales_by_iso
-# imp_by_prod_shares <- exp_by_prod_to_join %>% 
-#   group_by(iso3c, date) %>% 
-  # summarise(agri_agropec_share = product)
+```
 
+Cartera vencida:
 
-# ing_trib <- sp_data %>% 
-#   filter( str_detect(indicador, "porcentajes")) %>% 
-#   filter(`Cobertura institucional` != "n/a") %>% 
-#   rename(cobertura =  `Cobertura institucional`) %>% 
-#   select(-c(`Tipo de persona`, Periodo, `Tasa mínima/máxima`, Periodo_1,
-#             `Clasificación económica Operaciones del gobierno`, 
-#             `Cobertura institucional_1`, `Cobertura institucional_2`,
-#             Clasificación_deuda))
+```{r cartera_vencida_qtr}
+datatable(cartera_vencida_qtr %>% select(iso3c, year, quarter,
+                                         cartera_vencida_percent)) %>% 
+          formatRound('cartera_vencida_percent', 1)
+```
+
+Resultado fiscal
+
+```{r sp_deuda}
+datatable(sp_deuda_porc_pib %>% select(iso3c, year,cobertura, total_deuda_publica,
+                                       deuda_externa_publica))
+```
+
+Crédito interno:
+
+```{r}
+datatable(tab_ci_qrt_gdp %>% select(iso2c, year, avg_spu_gdp, avg_spr_gdp, avg_tot_gdp)) %>% formatPercentage(c('avg_spu_gdp','avg_spr_gdp','avg_tot_gdp'), 1)
+```
+
