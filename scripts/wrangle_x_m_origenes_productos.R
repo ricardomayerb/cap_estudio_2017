@@ -76,5 +76,7 @@ exp_by_prod_tidy <- exp_by_prod
 imp_by_ori_tidy <- imp_by_ori
 imp_by_prod_tidy <- imp_by_prod
 
+# save(exp_by_dest_tidy, exp_by_prod_tidy, imp_by_ori_tidy, imp_by_prod_tidy,
+#      file = "./produced_data/x_m_locations_products_tidy")
 save(exp_by_dest_tidy, exp_by_prod_tidy, imp_by_ori_tidy, imp_by_prod_tidy,
-     file = "./produced_data/x_m_locations_products_tidy")
+     file = "./produced_data/data_with_basic_wrangling/x_m_locations_products_tidy")

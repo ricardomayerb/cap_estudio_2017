@@ -5,8 +5,7 @@ library(tidyverse)
 load( "./produced_data/cs_real_dolares_20")
 load( "./produced_data/cs_real_dolares")
 
-cs_real <- cs_real_dolares %>% 
-  select(-c(notas, fuente))
+cs_real <- cs_real_dolares 
 
 names_real <- names(cs_real)
 
@@ -119,6 +118,13 @@ incor_by_idp <- cs_real_Ingreso_nacional_corrientes %>%
   ) %>% 
   arrange(indicador, Rubro, iso3c)
 
+cs_prod_interno_anual_usd_constantes <- cs_real_PIB_constantes %>% 
+  filter(str_detect(Rubro, "PIB"))
 
+cs_prod_interno_anual_usd_corrientes <- cs_real_PIB_corrientes %>% 
+  filter(str_detect(Rubro, "PIB"))
+
+save(cs_prod_interno_anual_usd_constantes, cs_prod_interno_anual_usd_constantes,
+     file = "./produced_data/data_with_basic_wrangling/pib_anual_usd")
 
 
