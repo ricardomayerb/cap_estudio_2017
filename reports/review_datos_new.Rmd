@@ -2,22 +2,31 @@
 title: "review datos"
 author: "ricardo mayer"
 date: "March 13, 2017"
-always_allow_html: yes
 output:
+  word_document: default
   pdf_document: default
   html_document:
     code_folding: hide
+params:
+  end_year: 2000
+  start_year: 1990
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
+library(printr)
 knitr::opts_knit$set(root.dir = "./../")
 knitr::opts_chunk$set(echo = FALSE)
+
 ```
 
 
 
 ```{r libs_dicts_country_sel, include = FALSE}
-library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(tibble)
+library(ggplot2)
 library(stringr)
 library(stringi)
 library(DT)
@@ -29,24 +38,45 @@ options(digits = 3)
 
 load("./produced_data/cepal_19_countries")
 load("./produced_data/cepal_33_countries")
-coi <-  cepal_19_countries$iso3c
+# coi <-  cepal_19_countries$iso3c
+coi <-  c("ARG", "BRA", "CHL")
+
+year_filter_condition = TRUE
+mr_year <- params$end_year
 ```
 
 External debt parts
-```{r ext_debt_make, echo=TRUE}
+```{r ext_debt_make, echo=FALSE}
 # prepare tables re external debt
 ## make the tibble
 load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
+
 dext_to_gdp <- cs_deuda_externa %>% 
   filter(iso3c %in% coi) %>% 
-  filter(str_detect(indicador, "porcentaje")) %>% 
   rename(deuda_ext_porc_pib = valor,
-         year = Años) 
+         year = Años) %>% 
+  filter(year <= params$end_year) %>% 
+  filter(str_detect(indicador, "porcentaje")) 
 
 narr_dext_to_gdp <- dext_to_gdp %>% 
-  select(iso3c, year, deuda_ext_porc_pib)
+  select(iso3c, year, deuda_ext_porc_pib) 
+
+mr_3_dext_to_gdp <- narr_dext_to_gdp %>% 
+  group_by(iso3c) %>% 
+  arrange(year) %>% 
+  summarise(year_mr = max(year),
+            deuda_ext_mr = last(deuda_ext_porc_pib),
+            avg_mr_3 = mean(tail(deuda_ext_porc_pib, 3) , rm.na = TRUE)
+  ) %>% 
+  arrange(desc(deuda_ext_mr)) %>% 
+  mutate(rnk_mr_dext = min_rank(-deuda_ext_mr),
+         rnk_mr_3_dext = min_rank(-avg_mr_3)) %>% 
+  arrange(iso3c)
 
 ## make the table
+
+kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp)
+
 kb_dext_to_gdp <- kable(narr_dext_to_gdp)
 
 dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
@@ -54,7 +84,7 @@ dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
 
 ```{r ext_debt_show}
 # dt_dext_to_gdp
-kb_dext_to_gdp
+kb_mr_3_dext_to_gdp
 ```
 
 
