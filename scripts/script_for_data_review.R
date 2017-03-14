@@ -3,7 +3,7 @@
 
 ## to emulate parametrized reports I will define a params df
 
-params = data.frame(end_year = 2015, start_year = 1990)
+params = data.frame(end_year = 2012, start_year = 1990)
 
 end_year_for_filter = rep(params$start_year,2)
 
@@ -68,7 +68,8 @@ load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
 
 sp_data <- cs_sector_publico %>% 
   filter(iso3c %in% coi) %>% 
-  rename(year = Años)
+  rename(year = Años) %>% 
+  filter(year <= params$end_year) 
 
 sp_deuda_porc_pib <- sp_data %>% 
   filter(`Cobertura institucional_2` != "n/a") %>%
@@ -192,19 +193,71 @@ dt_mr_3_spnf
 
 ## prepare tables for non performing loans
 load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
-
-cv_no_na <- cartera_vencida_33_tidy %>% 
-  filter(iso3c %in% coi) %>% 
-  filter( !is.na(cartera_vencida_percent) )
+load("./produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto")
 
 cv_december <- cartera_vencida_33_tidy %>% 
+  filter(year <= params$end_year) %>% 
   filter(iso3c %in% coi) %>% 
   filter( month == 12 )
 
-cartera_vencida_qtr <- cs_gdp_currentlc_q_gasto %>% 
-  select(-c(iso3c, nombre_pais, Rubro)) %>% 
-  left_join( cartera_vencida_33_tidy ,  by = c("iso2c", "date")) %>% 
-  filter( !is.na(cartera_vencida_percent) ) %>% 
-  filter(iso3c %in% coi) 
+cv_3_6_9_12 <- cartera_vencida_33_tidy %>% 
+  filter(year <= params$end_year) %>% 
+  filter(iso3c %in% coi) %>% 
+  filter( month  %in%  c(3,6,9,12))
+
+cartera_vencida_qtr_with_gdp <- cs_gdp_currentlc_q_gasto %>%
+  select(-c(iso3c, nombre_pais, Rubro)) %>%
+  left_join( cartera_vencida_33_tidy ,  by = c("iso2c", "date")) %>%
+  filter( !is.na(cartera_vencida_percent) ) %>%
+  filter(iso3c %in% coi)
+
+mr_3_cv_anual <- cv_december %>%
+  filter(!is.na(cartera_vencida_percent)) %>% 
+  group_by(iso3c) %>% 
+  arrange(year) %>% 
+  summarise(year_mr = max(year),
+            cv_mr = last(cartera_vencida_percent),
+            avg_mr_3 = mean(tail(cartera_vencida_percent, 4) , rm.na = TRUE)
+  ) %>% 
+  arrange(desc(cv_mr)) %>% 
+  mutate(rnk_mr_cv = min_rank(-cv_mr),
+         rnk_mr_3_cv = min_rank(-avg_mr_3)) %>% 
+  arrange(iso3c)
+
+load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
+
+exp_10_ppales <- cs_x_m_10_ppales %>%
+  filter(iso3c %in% coi) %>% 
+  rename(year = Años) %>% 
+  filter(year <= params$end_year) %>% 
+  unite(productos_principales, contains("rincipales")) %>% 
+  mutate(productos_principales = str_replace_all(productos_principales,
+                                                 "_", "") %>% 
+           str_replace_all("n/a", "") %>% 
+           str_replace_all("NA", ""))
+
+exp_10_ppales_by_iso <- exp_10_ppales %>% 
+  group_by(iso3c, year) %>% 
+  summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
+  arrange(iso3c, year)
+
+mr_3_expo_concentration <- exp_10_ppales_by_iso %>% 
+  group_by(iso3c) %>% 
+  arrange(year) %>% 
+  summarise(year_mr = max(year),
+            conc_mr = last(concentracion),
+            avg_mr_3 = mean(tail(concentracion, 3) , rm.na = TRUE)
+  ) %>% 
+  arrange(desc(conc_mr)) %>% 
+  mutate(rnk_mr_conc = min_rank(-conc_mr),
+         rnk_mr_3_conc = min_rank(-avg_mr_3)) %>% 
+  arrange(iso3c)
 
 
+kb_mr_3_expo_concentration <- kable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
+dt_mr_3_expo_concentration <- datatable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
+
+
+kb_mr_3_expo_concentration
+
+dt_mr_3_expo_concentration
