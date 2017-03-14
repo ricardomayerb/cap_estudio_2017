@@ -16,6 +16,10 @@ library(DT)
 library(lubridate)
 library(ineq)
 library(knitr)
+library(xtable)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+options(width = 60)
 
 
 options(digits = 3)

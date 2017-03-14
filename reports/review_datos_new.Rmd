@@ -1,5 +1,5 @@
 ---
-title: "review datos"
+title: "revision preliminar de datos"
 author: "ricardo mayer"
 date: "March 13, 2017"
 output:
@@ -10,7 +10,7 @@ output:
   pdf_document: default
   word_document: default
 params:
-  end_year: 2012
+  end_year: 2015
   start_year: 1990
 always_allow_html: yes
 ---
@@ -18,7 +18,7 @@ always_allow_html: yes
 ```{r setup, include=FALSE}
 library(printr)
 knitr::opts_knit$set(root.dir = "./../")
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
@@ -35,19 +35,26 @@ library(DT)
 library(lubridate)
 library(ineq)
 library(knitr)
+library(xtable)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+options(width = 60)
+
 
 options(digits = 3)
 
 load("./produced_data/cepal_19_countries")
 load("./produced_data/cepal_33_countries")
-# coi <-  cepal_19_countries$iso3c
-coi <-  c("ARG", "BRA", "CHL", "MEX", "CRI", "COL")
+coi <-  cepal_19_countries$iso3c
+# coi <-  c("ARG", "BRA", "CHL", "MEX", "CRI", "COL")
 
 year_filter_condition = TRUE
 mr_year <- params$end_year
 ```
 
-External debt parts
+# Debt
+
+## Country as a whole, external debt
 ```{r ext_debt_make, echo=FALSE}
 # prepare tables re external debt
 ## make the tibble
@@ -77,19 +84,31 @@ mr_3_dext_to_gdp <- narr_dext_to_gdp %>%
 
 ## make the table
 
-kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp)
+kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp,
+                             caption = "Deuda externa (% del PIB) (kb)" )
+
+dt_mr_3_dext_to_gdp <- datatable(mr_3_dext_to_gdp,
+                                 caption = "Deuda externa (% del PIB) (dt)") %>% formatRound(c("deuda_ext_mr", "avg_mr_3"), 1)
+
+xt_mr_3_dext_to_gdp <- xtable(mr_3_dext_to_gdp, 
+                              caption = "Deuda externa (% del PIB) (xt)")
 
 kb_dext_to_gdp <- kable(narr_dext_to_gdp)
 
 dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
+
+xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
 ```
 
 ```{r ext_debt_show}
 # dt_dext_to_gdp
-kb_mr_3_dext_to_gdp
+# kb_mr_3_dext_to_gdp
+dt_mr_3_dext_to_gdp
+# xt_mr_3_dext_to_gdp
+
 ```
 
-More on public debt, domestic and external:
+## Public debt, domestic and external:
 
 ```{r secpub_debt_make_dfs}
 load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
@@ -213,23 +232,23 @@ dt_mr_3_spnf <- datatable(mr_3_spnf, caption = "Deuda, Sector Público No Fianci
 
 
 
-```{r secpub_debt_show_k, results="asis"}
+```{r secpub_debt_show_k, results="asis", echo=TRUE}
 ## present the table
-kb_mr_3_desepub 
-kb_mr_3_gcentral
-kb_mr_3_gsubn 
-kb_mr_3_spnf 
+# kb_mr_3_desepub 
+# kb_mr_3_gcentral
+# # kb_mr_3_gsubn 
+# kb_mr_3_spnf 
 ```
 
-```{r secpub_debt_show_dt, results="asis"}
+```{r secpub_debt_show_dt, results="asis", echo=TRUE}
 dt_mr_3_desepub 
 dt_mr_3_gcentral 
-dt_mr_3_gsubn 
+# dt_mr_3_gsubn 
 dt_mr_3_spnf
 ```
 
 
-Cartera vencida (NPL) como porcentaje del total de creditos
+## Cartera vencida 
 
 ```{r cartera_vencida_make}
 load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
@@ -265,8 +284,18 @@ mr_3_cv_anual <- cv_december %>%
   arrange(iso3c)
 
 ```
+```{r cv_make_tables}
+kb_mr_3_cv_anual = kable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
+dt_mr_3_cv_anual = datatable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
 
-Credito interno
+```
+
+```{r cv_show_tables, echo=TRUE}
+# kb_mr_3_cv_anual 
+dt_mr_3_cv_anual
+```
+
+## Crédito interno
 
 ```{r credito_interno_make_dfs}
 credito_interno_qtr <- cs_gdp_currentlc_q_gasto %>% 
@@ -327,11 +356,12 @@ dt_mr_3_ci_to_gdp = datatable(mr_3_ci_to_gdp, caption = "Crédito Interno / PIB"
 
 ```
 
-```{r ci_show_tables}
-kb_mr_3_ci_to_gdp 
+```{r ci_show_tables, echo=TRUE}
+# kb_mr_3_ci_to_gdp 
 dt_mr_3_ci_to_gdp 
 ```
 
+## Préstamos Bancarios
 
 ```{r prestamos_bancarios_make_dfs}
 
@@ -386,23 +416,28 @@ dt_mr_3_pb_to_gdp = datatable(mr_3_pb_to_gdp, caption = "P´restamos Bancarios /
 
 ```
 
-```{r pb_show_tables}
-kb_mr_3_pb_to_gdp 
+```{r pb_show_tables, echo=TRUE}
+# kb_mr_3_pb_to_gdp 
 dt_mr_3_pb_to_gdp 
 ```
 
 
+# Exportaciones
 
-Concentracion de exportaciones
+## Concentracion de exportaciones
+
+Índice de Herfindahl, concentración al interior de los 10 principales productos 
+de cada país, en cada año.
 
 ```{r exp_imp_make_dfs}
 load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
+
 
 exp_10_ppales <- cs_x_m_10_ppales %>%
   filter(iso3c %in% coi) %>% 
   rename(year = Años) %>% 
   filter(year <= params$end_year) %>% 
-  unite(productos_principales, contains("rincipales")) %>% 
+  unite(productos_principales,  starts_with("Produ")) %>% 
   mutate(productos_principales = str_replace_all(productos_principales,
                                                  "_", "") %>% 
            str_replace_all("n/a", "") %>% 
@@ -425,32 +460,114 @@ mr_3_expo_concentration <- exp_10_ppales_by_iso %>%
          rnk_mr_3_conc = min_rank(-avg_mr_3)) %>% 
   arrange(iso3c)
 
+
+  
 ```
 
 ```{r exp_imp_make_tables}
 
 kb_mr_3_expo_concentration <- kable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
-dt_mr_3_expo_concentration <- datatable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
+
+dt_mr_3_expo_concentration <- datatable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos") %>% formatRound(c("conc_mr", "avg_mr_3"), 3)
 
 ```
 
 
-```{r exp_imp_show_tables}
+```{r exp_imp_show_tables, echo=TRUE}
 
-kb_mr_3_expo_concentration
+# kb_mr_3_expo_concentration
 
 dt_mr_3_expo_concentration
 
 ```
 
+## Shares en exportaciones de 3 categorías a priori
+
+Datos mensuales, promediados por año
+
+```{r shares_exp_3_cat}
+load("./produced_data/data_with_basic_wrangling/x_m_locations_products_tidy")
+
+imp_by_prod_to_join <- imp_by_prod_tidy %>% 
+   filter(iso3c %in% coi) %>% 
+  rename(producto_m = producto) 
+
+exp_by_prod_to_join <- exp_by_prod_tidy %>% 
+   filter(iso3c %in% coi) %>% 
+  rename(producto_x = producto) %>% 
+  mutate(producto_x = stri_trans_general(producto_x, "Latin-ASCII") %>% 
+           str_to_lower() %>% str_replace_all(" ", "_"))
+
+exp_by_prod_wide <- exp_by_prod_to_join %>% 
+   filter(iso3c %in% coi) %>% 
+  spread(producto_x, value) %>% 
+  mutate(agro_agropec_share = productos_agricolas_y_agropecuarios/total,
+         mineria_y_petro_share = mineria_y_petroleo/total,
+         manufacturas_share = manufacturas/total) %>% 
+  select(-c(productos_agricolas_y_agropecuarios,mineria_y_petroleo,
+            manufacturas))
+
+exp_by_prod_wide_anual <- exp_by_prod_wide %>% 
+  mutate(year = year(date)) %>% 
+  group_by(iso3c, year) %>% 
+  mutate(avg_share_agr = mean(agro_agropec_share, rm.na = TRUE),
+         avg_share_min_pet = mean(mineria_y_petro_share, rm.na = TRUE),
+         avg_share_manuf = mean(manufacturas_share, rm.na = TRUE)) %>% 
+  arrange(year, desc(avg_share_min_pet))
 
 
-## 
-Tasa de politica monetaria
+exp_by_prod_shares <- exp_by_prod_wide_anual %>% 
+  rename(agro_pec=agro_agropec_share, mineria_y_petro=mineria_y_petro_share,
+         manuf=manufacturas_share) %>% 
+  gather(key = product, value = share, agro_pec, mineria_y_petro, manuf ) %>% 
+  select(-c(avg_share_agr, avg_share_min_pet, avg_share_manuf, total)) %>% 
+  arrange(iso3c, year, product)
 
-```{r tpm_make_dfs}
-nada <-  3
+exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>% 
+  group_by(iso3c, year, product) %>% 
+  summarise(share_anual = mean(share, rm.na=TRUE))
+
+
+mr_3_prod_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  group_by(iso3c, product) %>% 
+  arrange(year) %>% 
+  summarise(year_mr = max(year),
+            share_mr = last(share_anual),
+            avg_mr_3 = mean(tail(share_anual, 3) , rm.na = TRUE)
+  ) %>% 
+  arrange(desc(share_mr)) %>% 
+  mutate(rnk_mr_share = min_rank(-share_mr),
+         rnk_mr_3_share = min_rank(-avg_mr_3)) %>% 
+  arrange(iso3c)
 ```
+
+```{r shares_3_make_tables}
+kb_mr_3_prod_shares_anual_avg <- kable(mr_3_prod_shares_anual_avg, 
+                                       caption = "Export shares, 3 categories")
+
+dt_mr_3_prod_shares_anual_avg <- datatable(mr_3_prod_shares_anual_avg, 
+                                           caption = "Export shares, 3 categories") 
+```
+
+```{r shares_3_show_tables}
+# kb_mr_3_prod_shares_anual_avg 
+
+dt_mr_3_prod_shares_anual_avg
+
+```
+
+```{r shares_3_plots}
+pshares3 <- ggplot(data=exp_by_prod_shares)
+
+```
+
+
+<!-- ##  -->
+<!-- Tasa de politica monetaria -->
+
+<!-- ```{r tpm_make_dfs} -->
+<!-- nada <-  3 -->
+<!-- ``` -->
 
 
 

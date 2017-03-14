@@ -178,9 +178,9 @@ exp_by_prod_to_join <- exp_by_prod_tidy %>%
 
 exp_by_prod_wide <- exp_by_prod_to_join %>% 
   spread(producto_x, value) %>% 
-  mutate(agro_agropec_share = 100*productos_agricolas_y_agropecuarios/total,
-         mineria_y_petro_share = 100*mineria_y_petroleo/total,
-         manufacturas_share = 100*manufacturas/total) %>% 
+  mutate(agro_agropec_share = productos_agricolas_y_agropecuarios/total,
+         mineria_y_petro_share = mineria_y_petroleo/total,
+         manufacturas_share = manufacturas/total) %>% 
   select(-c(productos_agricolas_y_agropecuarios,mineria_y_petroleo,
             manufacturas))
 
@@ -193,31 +193,39 @@ exp_by_prod_wide_anual <- exp_by_prod_wide %>%
   arrange(year, desc(avg_share_min_pet))
 
 
+exp_by_prod_shares <- exp_by_prod_wide_anual %>% 
+  rename(agro_pec=agro_agropec_share, mineria_y_petro=mineria_y_petro_share,
+         manuf=manufacturas_share) %>% 
+  gather(key = product, value = share, agro_pec, mineria_y_petro, manuf ) %>% 
+  select(-c(avg_share_agr, avg_share_min_pet, avg_share_manuf, total)) %>% 
+  arrange(iso3c, year, product)
+
+exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>% 
+  group_by(iso3c, year, product) %>% 
+  summarise(avg_anual = mean(share, rm.na=TRUE))
+
+# exp_10_ppales <- cs_x_m_10_ppales %>%
+#   filter(iso3c %in% coi) %>% 
+#   unite(productos_principales, contains("rincipales")) %>% 
+#   mutate(productos_principales = str_replace_all(productos_principales,
+#                                                  "_", "") %>% 
+#            str_replace_all("n/a", "") %>% 
+#            str_replace_all("NA", "")) %>% 
+#   rename(year = Años)
+# 
+# exp_10_ppales_by_iso <- exp_10_ppales %>% 
+#   group_by(iso3c, year) %>% 
+#   summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
+#   arrange(iso3c, year)
+# 
+# dt_exp_10_ppales_by_iso <- datatable(exp_10_ppales_by_iso %>%  
+#                                        filter(year >= 2000 ))
+# 
+# dt_exp_10_ppales_by_iso
 
 
-
-exp_10_ppales <- cs_x_m_10_ppales %>%
-  filter(iso3c %in% coi) %>% 
-  unite(productos_principales, contains("rincipales")) %>% 
-  mutate(productos_principales = str_replace_all(productos_principales,
-                                                 "_", "") %>% 
-           str_replace_all("n/a", "") %>% 
-           str_replace_all("NA", "")) %>% 
-  rename(year = Años)
-
-exp_10_ppales_by_iso <- exp_10_ppales %>% 
-  group_by(iso3c, year) %>% 
-  summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
-  arrange(iso3c, year)
-
-dt_exp_10_ppales_by_iso <- datatable(exp_10_ppales_by_iso %>%  
-                                       filter(year >= 2000 ))
-
-dt_exp_10_ppales_by_iso
-# imp_by_prod_shares <- exp_by_prod_to_join %>% 
-#   group_by(iso3c, date) %>% 
-  # summarise(agri_agropec_share = product)
-
+imp_by_prod_shares <- exp_by_prod_to_join %>%
+  group_by(iso3c, date)
 
 # ing_trib <- sp_data %>% 
 #   filter( str_detect(indicador, "porcentajes")) %>% 
