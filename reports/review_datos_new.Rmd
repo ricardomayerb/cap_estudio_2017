@@ -12,13 +12,14 @@ output:
 params:
   end_year: 2015
   start_year: 1990
+  is_html: FALSE
 always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
 library(printr)
 knitr::opts_knit$set(root.dir = "./../")
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
@@ -50,15 +51,23 @@ coi <-  cepal_19_countries$iso3c
 
 year_filter_condition = TRUE
 mr_year <- params$end_year
+print(rmarkdown::metadata$title)
 ```
 
 # Debt
 
+
+
 ## Country as a whole, external debt
-```{r ext_debt_make, echo=FALSE}
+
+```{r load_ext_debt_data}
+load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
+```
+
+
+```{r ext_debt_make_dfs, echo=FALSE}
 # prepare tables re external debt
 ## make the tibble
-load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
 
 dext_to_gdp <- cs_deuda_externa %>% 
   filter(iso3c %in% coi) %>% 
@@ -93,25 +102,46 @@ dt_mr_3_dext_to_gdp <- datatable(mr_3_dext_to_gdp,
 xt_mr_3_dext_to_gdp <- xtable(mr_3_dext_to_gdp, 
                               caption = "Deuda externa (% del PIB) (xt)")
 
-kb_dext_to_gdp <- kable(narr_dext_to_gdp)
-
-dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
-
-xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
 ```
 
-```{r ext_debt_show}
-# dt_dext_to_gdp
-# kb_mr_3_dext_to_gdp
+```{r ext_debt_make_tables}
+
+if (params$is_html == TRUE) {
+print("html doc, only DT tables")  
+dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
+}
+
+
+#this could be changed later to if-else chain if pdf and word become explicit options
+if (params$is_html != TRUE) {
+print("not an html doc, prefer kable and xtable packages, over DT")   
+kb_dext_to_gdp <- kable(narr_dext_to_gdp)
+xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
+}
+```
+
+
+```{r ext_debt_show_tables, results="asis"}
+
+if (params$is_html == TRUE) {
 dt_mr_3_dext_to_gdp
-# xt_mr_3_dext_to_gdp
+}
+
+if (params$is_html != TRUE) {
+kb_mr_3_dext_to_gdp
+# dt_mr_3_dext_to_gdp 
+}
 
 ```
 
 ## Public debt, domestic and external:
 
-```{r secpub_debt_make_dfs}
+```{r load_public_debt_data}
 load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
+```
+
+```{r secpub_debt_make_dfs, echo=FALSE }
+
 
 sp_data <- cs_sector_publico %>% 
   filter(iso3c %in% coi) %>% 
