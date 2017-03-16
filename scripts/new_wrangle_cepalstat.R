@@ -7,7 +7,7 @@ library(seasonal)
 library(lubridate)
 library(purrr)
 
-source('./functions/add_iso.R')
+source('./functions/add_iso.R', encoding = 'UTF-8')
 quiet_iso <- purrr::quietly(add_iso)
 # quiet_iso2 <- function(purrr::quietly(add_iso)[["result"]]
 
@@ -115,7 +115,7 @@ cs_x_m_total_mensual_trim <- quiet_iso(cepalstat_exp_imp_totales_mensuales,
 cs_x_m_total_mensual <- cs_x_m_total_mensual_trim %>% 
   filter(! `Trimestres y meses` %in% c("I","II","III","IV")) %>% 
   mutate(month = match(`Trimestres y meses`, nombres_mes)) %>% 
-  unite(year_month, Años, month, remove = FALSE, sep = "-") %>%
+  unite(year_month, year, month, remove = FALSE, sep = "-") %>%
   mutate(year_month = as.yearmon(year_month, format = "%Y-%m"),
          date = date(year_month)) %>% 
   select(-`Trimestres y meses`)
@@ -125,7 +125,7 @@ quarters_roman_num <- c("I", "II", "III", "IV")
 cs_x_m_total_trimestral <- cs_x_m_total_mensual_trim %>% 
   filter( `Trimestres y meses` %in% c("I","II","III","IV")) %>% 
   mutate(quarter = match(`Trimestres y meses`, quarters_roman_num)) %>% 
-  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  unite(year_quarter, year, quarter, remove=FALSE, sep="-") %>%
   mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
          date = date(year_quarter)) %>%
   select(-`Trimestres y meses`)
@@ -192,7 +192,7 @@ cs_financiero_monetario_anual <- cs_financiero_monetario %>%
 cs_financiero_monetario_trimestral <- cs_financiero_monetario %>% 
   filter( str_detect(Periodo, "Trimestre")) %>% 
   mutate(quarter = str_replace(Periodo, "Trimestre ", "")) %>%
-  unite(year_quarter, Años, quarter, remove = FALSE, sep = "-") %>%
+  unite(year_quarter, year, quarter, remove = FALSE, sep = "-") %>%
   mutate(year_quarter = as.yearqtr(year_quarter, format = "%Y-%q"),
          date = date(year_quarter)) %>%
   select(-Periodo)
@@ -201,7 +201,7 @@ cs_financiero_monetario_trimestral <- cs_financiero_monetario %>%
 cs_financiero_monetario_mensual <- cs_financiero_monetario %>% 
   filter( Periodo != "Anual" & !str_detect(Periodo, "Trimestre")) %>% 
   mutate(month = match(Periodo, nombres_mes)) %>% 
-  unite(year_month, Años, month, remove = FALSE, sep = "-") %>%
+  unite(year_month, year, month, remove = FALSE, sep = "-") %>%
   mutate(year_month = as.yearmon(year_month, format = "%Y-%m"),
          date = date(year_month)) %>%
   select(-Periodo)
@@ -213,7 +213,7 @@ cs_remuneraciones_anual <- cs_remuneraciones %>%
 cs_remuneraciones_trimestral <- cs_remuneraciones %>% 
   filter(Trimestre != "n/a")  %>% 
   mutate(quarter = str_replace(Trimestre, "T", "")) %>%
-  unite(year_quarter, Años, quarter, remove = FALSE, sep = "-") %>%
+  unite(year_quarter, year, quarter, remove = FALSE, sep = "-") %>%
   mutate(year_quarter = as.yearqtr(year_quarter, format = "%Y-%q"),
          date = date(year_quarter)) %>%
   select(-Trimestre)
@@ -227,7 +227,7 @@ cs_desempleo_anual <- cs_desempleo %>%
 cs_desempleo_trimestral <- cs_desempleo %>% 
   filter(indicador == "Tasa de desempleo trimestral" ) %>% 
   mutate(quarter = str_replace(Trimestre, "T", "")) %>%
-  unite(year_quarter, Años, quarter, remove=FALSE, sep="-") %>%
+  unite(year_quarter, year, quarter, remove=FALSE, sep="-") %>%
   mutate(year_quarter = as.yearqtr(year_quarter, format="%Y-%q"),
          date = date(year_quarter)) %>%
   select(- Trimestre)

@@ -1,9 +1,20 @@
 library(countrycode)
 library(dplyr)
 library(replyr)
+library(wrapr)
+library(dplyr)
+library(stringr)
 # library(purrr)
 
 add_iso <- function(df, names_col, dict, lang="es", rm_nf = FALSE) {
+  
+
+  if (any(str_detect("Años", names(cepalstat_sector_real_dolares_completo)))) {
+
+    names(df) <- str_replace_all(names(df), "Años","year")
+
+  }
+
   if (lang == "es") {
     ori <-  "country.name.es"
     new_names_col <- "nombre_pais"
@@ -13,7 +24,7 @@ add_iso <- function(df, names_col, dict, lang="es", rm_nf = FALSE) {
     new_names_col <- "country_name"
   }
   
-  # replyr::let(
+
   wrapr::let(
       alias = list(names_col = names_col, new_names_col = new_names_col),
     expr = {
@@ -34,6 +45,7 @@ add_iso <- function(df, names_col, dict, lang="es", rm_nf = FALSE) {
   if (rm_nf) {
     df <- df %>% select(-c(fuente, notas))
   }
+ 
   
   return(df)
 }
