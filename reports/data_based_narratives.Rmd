@@ -12,7 +12,7 @@ output:
 params:
   end_year: 2015
   start_year: 1990
-  is_html: FALSE
+  is_html: TRUE
 always_allow_html: yes
 ---
 
@@ -22,8 +22,6 @@ knitr::opts_knit$set(root.dir = "./../")
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
-
-
 
 ```{r libs_dicts_country_sel, include = FALSE}
 library(plotly)
@@ -65,19 +63,14 @@ mr_year <- params$end_year
 
 ```
 
-
-
 # Debt
-
-
-
-## Country as a whole, external debt
+## Total external debt {.tabset}
 
 ```{r load_ext_debt_data}
 load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
 ```
 
-
+### Latin America
 ```{r ext_debt_make_dfs, echo=FALSE}
 # prepare tables re external debt
 ## make the tibble
@@ -91,29 +84,18 @@ dext_to_gdp <- cs_deuda_externa %>%
 dext_to_gdp_18 <- dext_to_gdp %>% 
   filter(iso3c %in% coi_18)
 
-dext_to_gdp_18_spread <- dext_to_gdp_18 %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-  
 dext_to_gdp_18_m_bmv <- dext_to_gdp_18 %>% 
   filter(iso3c %in% coi_18_minus_br_mx_ven)
 
 dext_to_gdp_sa <- dext_to_gdp_18 %>% 
   filter(iso3c %in% coi_sa)
 
-dext_to_gdp_sa_spread <- dext_to_gdp_sa %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
 
 dext_to_gdp_sa_mbv <- dext_to_gdp_sa %>% 
   filter(iso3c %in% coi_sa_minus_BRA_VEN)
 
-dext_to_gdp_sa_mbv_spread <- dext_to_gdp_sa_mbv %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-
 dext_to_gdp_ca <- dext_to_gdp_18 %>% 
   filter(iso3c %in% coi_ca)
-
-dext_to_gdp_ca_spread <- dext_to_gdp_ca %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
 
 dext_to_gdp_ca_mm <- dext_to_gdp_ca %>% 
   filter(iso3c %in% coi_ca_minus_mex)
@@ -139,20 +121,20 @@ mr_3_dext_to_gdp <- narr_dext_to_gdp %>%
          rnk_mr_3_dext = min_rank(-avg_mr_3)) %>% 
   arrange(iso3c)
 
-## make the table
-
-kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp,
-                             caption = "Deuda externa (% del PIB) (kb)" )
-
-dt_mr_3_dext_to_gdp <- datatable(mr_3_dext_to_gdp,
-                                 caption = "Deuda externa (% del PIB) (dt)") %>% formatRound(c("deuda_ext_mr", "avg_mr_3"), 1)
-
-xt_mr_3_dext_to_gdp <- xtable(mr_3_dext_to_gdp, 
-                              caption = "Deuda externa (% del PIB) (xt)")
+# ## make the table
+# 
+# kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp,
+#                              caption = "Deuda externa (% del PIB) (kb)" )
+# 
+# dt_mr_3_dext_to_gdp <- datatable(mr_3_dext_to_gdp,
+#                                  caption = "Deuda externa (% del PIB) (dt)") %>% formatRound(c("deuda_ext_mr", "avg_mr_3"), 1)
+# 
+# xt_mr_3_dext_to_gdp <- xtable(mr_3_dext_to_gdp, 
+#                               caption = "Deuda externa (% del PIB) (xt)")
 
 ```
 
-```{r ext_debt_make_ggplot_18}
+```{r ext_debt_make_ggplot_18, eval=FALSE, include=FALSE}
 #using ggplot
 dext_title <- "(Gross) External debt, as % of GDP (E18)"
 g_18 <- ggplot(data = dext_to_gdp_18, aes(x = year, y = deuda_ext_porc_pib, color = iso3c)) + 
@@ -163,30 +145,44 @@ pl_18
 
 ```
 
-```{r ext_debt_make_dygraph_18}
+```{r ext_debt_make_dygraph_18_18mbmv}
 #using dygraph
+dext_to_gdp_18_spread <- dext_to_gdp_18 %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
 dext_to_gdp_18_xts <- dext_to_gdp_18_spread %>% 
   select(-year) %>% 
   xts(order.by = dext_to_gdp_18_spread$year)
 
-dext_title_sa <- "(Gross) External debt, as % of GDP (sa)"
-dext_title_sa <- "(Gross) External debt, as % of GDP (sambv)"
+dext_to_gdp_18_spread_m_bmv <- dext_to_gdp_18_m_bmv %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
+dext_to_gdp_18_m_bmv_xts <- dext_to_gdp_18_spread_m_bmv %>% 
+  select(-year) %>% 
+  xts(order.by = dext_to_gdp_18_spread$year)
 
-dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_sa)
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18)
+dg_18_m_bmv <- dygraph(dext_to_gdp_18_m_bmv_xts, main = dext_title_18mbmv)
 
 dg_18
+dg_18_m_bmv
 
 ```
 
 
-
+### South America
 
 ```{r ext_debt_make_dygraph_sa_sambv}
 #using dygraph
+dext_to_gdp_sa_spread <- dext_to_gdp_sa %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
 dext_to_gdp_sa_xts <- dext_to_gdp_sa_spread %>% 
   select(-year) %>% 
   xts(order.by = dext_to_gdp_sa_spread$year)
 
+dext_to_gdp_sa_mbv_spread <- dext_to_gdp_sa_mbv %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
 dext_to_gdp_sambv_xts <- dext_to_gdp_sa_mbv_spread %>% 
   select(-year) %>% 
   xts(order.by = dext_to_gdp_sa_mbv_spread$year)
@@ -203,7 +199,36 @@ dg_sa_mbv
 
 ```
 
-```{r ext_debt_make_tables}
+### Central America
+
+```{r ext_debt_make_dygraph_ca_camm}
+dext_to_gdp_ca_spread <- dext_to_gdp_ca %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
+dext_to_gdp_ca_xts <- dext_to_gdp_ca_spread %>% 
+  select(-year) %>% 
+  xts(order.by = dext_to_gdp_ca_spread$year)
+
+dext_to_gdp_ca_mm_spread <- dext_to_gdp_ca_mm %>% 
+  spread(key = iso3c, value = deuda_ext_porc_pib)
+dext_to_gdp_ca_mm_xts <- dext_to_gdp_ca_mm_spread %>% 
+  select(-year) %>% 
+  xts(order.by = dext_to_gdp_ca_mm_spread$year)
+
+dext_title_ca <- "(Gross) External debt, as % of GDP (CA)"
+dext_title_camm <- "(Gross) External debt, as % of GDP (CAmM)"
+
+dg_ca <- dygraph(dext_to_gdp_ca_xts, main = dext_title_ca)
+
+dg_ca_mm <- dygraph(dext_to_gdp_ca_mm_xts, main = dext_title_camm)
+
+dg_ca
+dg_ca_mm
+
+
+```
+
+
+```{r ext_debt_make_tables, eval=FALSE, include=FALSE}
 
 if (params$is_html == TRUE) {
 print("html doc, only DT tables")  
@@ -220,7 +245,7 @@ xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
 ```
 
 
-```{r ext_debt_show_tables, results="asis"}
+```{r ext_debt_show_tables, eval=FALSE, include=FALSE, results="asis"}
 
 if (params$is_html == TRUE) {
 dt_mr_3_dext_to_gdp
@@ -240,11 +265,8 @@ load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
 ```
 
 ```{r secpub_debt_make_dfs, echo=FALSE }
-
-
 sp_data <- cs_sector_publico %>% 
   filter(iso3c %in% coi) %>% 
-  rename(year = Años) %>% 
   filter(year <= params$end_year) 
 
 sp_deuda_porc_pib <- sp_data %>% 
@@ -346,7 +368,7 @@ mr_3_spnf <- gspnf_deuda_pib %>%
 
 ```
 
-```{r secpub_debt_make_tables}
+```{r secpub_debt_make_tables, eval=FALSE, include=FALSE}
 ## make the tables
 kb_mr_3_desepub <- kable(mr_3_desepub, caption = "Deuda, Sector Público")
 kb_mr_3_gcentral <- kable(mr_3_gcentral, caption = "Deuda, Gobierno Central")
@@ -361,7 +383,7 @@ dt_mr_3_spnf <- datatable(mr_3_spnf, caption = "Deuda, Sector Público No Fianci
 
 
 
-```{r secpub_debt_show_k, results="asis", echo=TRUE}
+```{r secpub_debt_show_k, eval=FALSE, include=FALSE, results="asis"}
 ## present the table
 # kb_mr_3_desepub 
 # kb_mr_3_gcentral
@@ -369,7 +391,7 @@ dt_mr_3_spnf <- datatable(mr_3_spnf, caption = "Deuda, Sector Público No Fianci
 # kb_mr_3_spnf 
 ```
 
-```{r secpub_debt_show_dt, results="asis", echo=TRUE}
+```{r secpub_debt_show_dt, eval=FALSE, include=FALSE, results="asis"}
 dt_mr_3_desepub 
 dt_mr_3_gcentral 
 # dt_mr_3_gsubn 
@@ -413,13 +435,13 @@ mr_3_cv_anual <- cv_december %>%
   arrange(iso3c)
 
 ```
-```{r cv_make_tables}
+```{r cv_make_tables, eval=FALSE, include=FALSE}
 kb_mr_3_cv_anual = kable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
 dt_mr_3_cv_anual = datatable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
 
 ```
 
-```{r cv_show_tables, echo=TRUE}
+```{r cv_show_tables, eval=FALSE, include=FALSE}
 # kb_mr_3_cv_anual 
 dt_mr_3_cv_anual
 ```
@@ -485,7 +507,7 @@ dt_mr_3_ci_to_gdp = datatable(mr_3_ci_to_gdp, caption = "Crédito Interno / PIB"
 
 ```
 
-```{r ci_show_tables, echo=TRUE}
+```{r ci_show_tables, eval=FALSE, include=FALSE}
 # kb_mr_3_ci_to_gdp 
 dt_mr_3_ci_to_gdp 
 ```
@@ -539,20 +561,21 @@ mr_3_pb_to_gdp <- tab_pb_qtr %>%
 ```
 
 
-```{r pb_make_tables}
+```{r pb_make_tables, eval=FALSE, include=FALSE}
 kb_mr_3_pb_to_gdp = kable(mr_3_pb_to_gdp, caption = "P´restamos Bancarios / PIB")
 dt_mr_3_pb_to_gdp = datatable(mr_3_pb_to_gdp, caption = "P´restamos Bancarios / PIB")
 
 ```
 
-```{r pb_show_tables, echo=TRUE}
+```{r pb_show_tables, eval=FALSE, include=FALSE}
 # kb_mr_3_pb_to_gdp 
 dt_mr_3_pb_to_gdp 
 ```
 
 
-# Exportaciones
 
+
+# Exportaciones
 ## Concentracion de exportaciones
 
 Índice de Herfindahl, concentración al interior de los 10 principales productos 
@@ -564,7 +587,6 @@ load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
 
 exp_10_ppales <- cs_x_m_10_ppales %>%
   filter(iso3c %in% coi) %>% 
-  rename(year = Años) %>% 
   filter(year <= params$end_year) %>% 
   unite(productos_principales,  starts_with("Produ")) %>% 
   mutate(productos_principales = str_replace_all(productos_principales,
@@ -593,7 +615,7 @@ mr_3_expo_concentration <- exp_10_ppales_by_iso %>%
   
 ```
 
-```{r exp_imp_make_tables}
+```{r exp_imp_make_tables, eval=FALSE, include=FALSE}
 
 kb_mr_3_expo_concentration <- kable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
 
@@ -602,7 +624,7 @@ dt_mr_3_expo_concentration <- datatable(mr_3_expo_concentration, caption = "Herf
 ```
 
 
-```{r exp_imp_show_tables, echo=TRUE}
+```{r exp_imp_show_tables, eval=FALSE, include=FALSE}
 
 # kb_mr_3_expo_concentration
 
@@ -670,7 +692,7 @@ mr_3_prod_shares_anual_avg <- exp_by_prod_shares_anual_avg %>%
   arrange(iso3c)
 ```
 
-```{r shares_3_make_tables}
+```{r shares_3_make_tables, eval=FALSE, include=FALSE}
 kb_mr_3_prod_shares_anual_avg <- kable(mr_3_prod_shares_anual_avg, 
                                        caption = "Export shares, 3 categories")
 
@@ -678,7 +700,7 @@ dt_mr_3_prod_shares_anual_avg <- datatable(mr_3_prod_shares_anual_avg,
                                            caption = "Export shares, 3 categories") 
 ```
 
-```{r shares_3_show_tables}
+```{r shares_3_show_tables, eval=FALSE, include=FALSE}
 # kb_mr_3_prod_shares_anual_avg 
 
 dt_mr_3_prod_shares_anual_avg
@@ -691,12 +713,6 @@ pshares3 <- ggplot(data=exp_by_prod_shares)
 ```
 
 
-<!-- ##  -->
-<!-- Tasa de politica monetaria -->
-
-<!-- ```{r tpm_make_dfs} -->
-<!-- nada <-  3 -->
-<!-- ``` -->
 
 
 
