@@ -1,7 +1,7 @@
 ---
-title: "revision preliminar de datos"
-author: "ricardo mayer"
-date: "March 13, 2017"
+title: "Agrupando condiciones macro en AL"
+author: "Ricardo Mayer"
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
 output:
   html_document:
     code_folding: hide
@@ -16,14 +16,22 @@ params:
 always_allow_html: yes
 ---
 
-```{r setup, include=FALSE}
-library(printr)
+```{r knit_config, include=FALSE}
+
 knitr::opts_knit$set(root.dir = "./../")
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
+```{r setup, include=FALSE}
+
+source('./functions/break_down_table.R')
+# source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/break_down_table.R')
+```
+
+
 ```{r libs_dicts_country_sel, include = FALSE}
+library(printr)
 library(plotly)
 library(dygraphs)
 library(tidyr)
@@ -42,13 +50,12 @@ library(xtable)
 options(xtable.floating = FALSE)
 options(xtable.timestamp = "")
 options(width = 60)
-
-
-
 options(digits = 3)
+
 
 load("./produced_data/cepal_19_countries")
 load("./produced_data/cepal_33_countries")
+
 coi_19 <- cepal_19_countries$iso3c
 coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))]
 coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
@@ -70,10 +77,8 @@ mr_year <- params$end_year
 load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
 ```
 
-### Latin America
 ```{r ext_debt_make_dfs, echo=FALSE}
-# prepare tables re external debt
-## make the tibble
+# make tibble for future tables and plots
 
 dext_to_gdp <- cs_deuda_externa %>% 
   filter(str_detect(indicador, "porcentaje")) %>% 
@@ -100,39 +105,10 @@ dext_to_gdp_ca <- dext_to_gdp_18 %>%
 dext_to_gdp_ca_mm <- dext_to_gdp_ca %>% 
   filter(iso3c %in% coi_ca_minus_mex)
 
-dext_to_gdp2 <- cs_deuda_externa %>% 
-  filter(iso3c %in% coi) %>% 
-  rename(deuda_ext_porc_pib = valor) %>% 
-  filter(year <= params$end_year) %>% 
-  filter(str_detect(indicador, "porcentaje")) 
-
-narr_dext_to_gdp <- dext_to_gdp2 %>% 
-  select(iso3c, year, deuda_ext_porc_pib) 
-
-mr_3_dext_to_gdp <- narr_dext_to_gdp %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise(year_mr = max(year),
-            deuda_ext_mr = last(deuda_ext_porc_pib),
-            avg_mr_3 = mean(tail(deuda_ext_porc_pib, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(deuda_ext_mr)) %>% 
-  mutate(rnk_mr_dext = min_rank(-deuda_ext_mr),
-         rnk_mr_3_dext = min_rank(-avg_mr_3)) %>% 
-  arrange(iso3c)
-
-# ## make the table
-# 
-# kb_mr_3_dext_to_gdp <- kable(mr_3_dext_to_gdp,
-#                              caption = "Deuda externa (% del PIB) (kb)" )
-# 
-# dt_mr_3_dext_to_gdp <- datatable(mr_3_dext_to_gdp,
-#                                  caption = "Deuda externa (% del PIB) (dt)") %>% formatRound(c("deuda_ext_mr", "avg_mr_3"), 1)
-# 
-# xt_mr_3_dext_to_gdp <- xtable(mr_3_dext_to_gdp, 
-#                               caption = "Deuda externa (% del PIB) (xt)")
-
 ```
+
+### Latin America
+
 
 ```{r ext_debt_make_ggplot_18, eval=FALSE, include=FALSE}
 #using ggplot
@@ -162,11 +138,19 @@ dext_to_gdp_18_m_bmv_xts <- dext_to_gdp_18_spread_m_bmv %>%
 dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
 dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
 
-dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18)
-dg_18_m_bmv <- dygraph(dext_to_gdp_18_m_bmv_xts, main = dext_title_18mbmv)
-
+dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 dg_18
-dg_18_m_bmv
+
+# dg_18_m_bmv <- dygraph(dext_to_gdp_18_m_bmv_xts, main = dext_title_18mbmv) %>%
+#   dyRangeSelector() %>%
+#   dyHighlight(highlightCircleSize = 4, 
+#               highlightSeriesBackgroundAlpha = 0.3,
+#               hideOnMouseOut = FALSE)
+# dg_18_m_bmv
 
 ```
 
@@ -190,12 +174,19 @@ dext_to_gdp_sambv_xts <- dext_to_gdp_sa_mbv_spread %>%
 dext_title_sa <- "(Gross) External debt, as % of GDP (SA)"
 dext_title_sambv <- "(Gross) External debt, as % of GDP (SAmBV)"
 
-dg_sa <- dygraph(dext_to_gdp_sa_xts, main = dext_title_sa)
-
-dg_sa_mbv <- dygraph(dext_to_gdp_sambv_xts, main = dext_title_sambv)
-
+dg_sa <- dygraph(dext_to_gdp_sa_xts, main = dext_title_sa) %>%
+dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 dg_sa
-dg_sa_mbv
+
+# dg_sa_mbv <- dygraph(dext_to_gdp_sambv_xts, main = dext_title_sambv) %>%
+#   dyRangeSelector() %>%
+#   dyHighlight(highlightCircleSize = 4, 
+#               highlightSeriesBackgroundAlpha = 0.3,
+#               hideOnMouseOut = FALSE)
+# dg_sa_mbv
 
 ```
 
@@ -217,46 +208,127 @@ dext_to_gdp_ca_mm_xts <- dext_to_gdp_ca_mm_spread %>%
 dext_title_ca <- "(Gross) External debt, as % of GDP (CA)"
 dext_title_camm <- "(Gross) External debt, as % of GDP (CAmM)"
 
-dg_ca <- dygraph(dext_to_gdp_ca_xts, main = dext_title_ca)
-
-dg_ca_mm <- dygraph(dext_to_gdp_ca_mm_xts, main = dext_title_camm)
-
+dg_ca <- dygraph(dext_to_gdp_ca_xts, main = dext_title_ca) %>%
+dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 dg_ca
-dg_ca_mm
+
+# dg_ca_mm <- dygraph(dext_to_gdp_ca_mm_xts, main = dext_title_camm) %>%
+#   dyRangeSelector() %>%
+#   dyHighlight(highlightCircleSize = 4, 
+#               highlightSeriesBackgroundAlpha = 0.3,
+#               hideOnMouseOut = FALSE)
+# dg_ca_mm
+
+```
+
+<!-- ### BRA, MEX, VEN -->
+
+<!-- ```{r dext_make_dygraph_bmv} -->
+
+<!-- dext_to_gdp_bmv_xts <- cbind.xts(dext_to_gdp_sa_xts[ ,"BRA"], -->
+<!--                      dext_to_gdp_ca_xts[ ,"MEX"], -->
+<!--                      dext_to_gdp_sa_xts[ ,"VEN"]) -->
+
+<!-- dext_title_bmv <- "(Gross) External debt, as % of GDP (BMV)" -->
+
+<!-- dg_bmv <- dygraph(dext_to_gdp_bmv_xts, main = dext_title_bmv) %>% -->
+<!--   dyRangeSelector() %>% -->
+<!--   dyHighlight(highlightCircleSize = 4,  -->
+<!--               highlightSeriesBackgroundAlpha = 0.3, -->
+<!--               hideOnMouseOut = FALSE) -->
+<!-- dg_bmv -->
+<!-- ``` -->
 
 
+### Based on 1990-2001, 2002-2015 averages
+
+```{r dext_to_gdp_1990_2002_2015}
+source('./functions/break_down_table.R')
+dext_18_avg_1990_2001 <- dext_to_gdp_18 %>%
+  filter(year(year) >= 1990 & year(year) <= 2001) %>% 
+  group_by(iso3c) %>% 
+  summarise(dext_avg_1990_2001 = mean(deuda_ext_porc_pib, rm.na = TRUE))
+
+pctiles_50_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001,
+                                  probs = c(0.5))
+
+# dext_to_gdp_18_aug <-  dext_to_gdp_18 %>% 
+#   mutate(g_median_1990_2001 = if_else(deuda_ext_porc_pib > pctiles_50_1990_2001,
+#                                       "High", "Low"))
+
+# dext_to_gdp_18_aug <-  dext_to_gdp_18 %>% 
+#   mutate(g_median_1990_2001 = if_else(deuda_ext_porc_pib > pctiles_50_1990_2001,
+#                                       "High", "Low"))
+
+dext_18_avg_2002_2015 <- dext_to_gdp_18 %>%
+  filter(year(year) >= 2002 & year(year) <= 2015) %>% 
+  group_by(iso3c) %>% 
+  summarise(dext_avg_2002_2015 = mean(deuda_ext_porc_pib, rm.na = TRUE))
+
+pctiles_50_2002_2015 <-  quantile(dext_18_avg_2002_2015$dext_avg_2002_2015,
+                                  probs = c(0.5))
+
+
+dext_18_avg_1990_2001_sa <- dext_18_avg_1990_2001 %>% 
+  filter(iso3c %in% coi_sa)
+
+dext_18_avg_1990_2001_ca <- dext_18_avg_1990_2001 %>% 
+  filter(iso3c %in% coi_ca)
+
+
+
+dext_18_avg_2002_2015_sa <- dext_18_avg_2002_2015 %>% 
+  filter(iso3c %in% coi_sa)
+
+dext_18_avg_2002_2015_ca <- dext_18_avg_2002_2015 %>% 
+  filter(iso3c %in% coi_ca)
+
+
+
+pctiles_50_1990_2001_sa <-  quantile(dext_18_avg_1990_2001_sa$dext_avg_1990_2001,
+                                  probs = c(0.5))
+pctiles_50_2002_2015_sa <-  quantile(dext_18_avg_2002_2015_sa$dext_avg_2002_2015,
+                                  probs = c(0.5))
+
+pctiles_50_1990_2001_ca <-  quantile(dext_18_avg_1990_2001_ca$dext_avg_1990_2001,
+                                  probs = c(0.5))
+pctiles_50_2002_2015_ca <-  quantile(dext_18_avg_2002_2015_ca$dext_avg_2002_2015,
+                                  probs = c(0.5))
+
+pctiles_33_66_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001,
+                                  probs = c(0.33, 0.66))
+pctiles_33_66_2002_2015 <-  quantile(dext_18_avg_2002_2015$dext_avg_2002_2015,
+                                  probs = c(0.33, 0.66))
+
+pctiles_33_66_1990_2001_sa <-  quantile(dext_18_avg_1990_2001_sa$dext_avg_1990_2001,
+                                  probs = c(0.33, 0.66))
+pctiles_33_66_2002_2015_sa <-  quantile(dext_18_avg_2002_2015_sa$dext_avg_2002_2015,
+                                  probs = c(0.33, 0.66))
+
+pctiles_33_66_1990_2001_ca <-  quantile(dext_18_avg_1990_2001_ca$dext_avg_1990_2001,
+                                  probs = c(0.33, 0.66))
+pctiles_33_66_2002_2015_ca <-  quantile(dext_18_avg_2002_2015_ca$dext_avg_2002_2015,
+                                  probs = c(0.33, 0.66))
+
+# cuts_quantile <- cut(deuda_chica$valor, quantile(deuda_chica$valor), include.lowest = TRUE)
+# soo <- break_down_table(deuda_chica, cuts_vector = cuts_quantile)
+
+dext_to_gdp_18_median_split <- break_down_table(
+  dext_18_avg_1990_2001,
+  cuts_vector = cut(dext_18_avg_1990_2001$dext_avg_1990_2001, 
+                    pctiles_50_1990_2001,
+                    include.lowest = TRUE)
+  ) 
+  
+  
 ```
 
 
-```{r ext_debt_make_tables, eval=FALSE, include=FALSE}
-
-if (params$is_html == TRUE) {
-print("html doc, only DT tables")  
-dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
-}
 
 
-#this could be changed later to if-else chain if pdf and word become explicit options
-if (params$is_html != TRUE) {
-print("not an html doc, prefer kable and xtable packages, over DT")   
-kb_dext_to_gdp <- kable(narr_dext_to_gdp)
-xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
-}
-```
-
-
-```{r ext_debt_show_tables, eval=FALSE, include=FALSE, results="asis"}
-
-if (params$is_html == TRUE) {
-dt_mr_3_dext_to_gdp
-}
-
-if (params$is_html != TRUE) {
-kb_mr_3_dext_to_gdp
-# dt_mr_3_dext_to_gdp 
-}
-
-```
 
 ## Public debt, domestic and external:
 
@@ -304,100 +376,7 @@ gspnf_deuda_pib <- sp_deuda_porc_pib %>%
   filter(cobertura == "Sector público no financiero") %>% 
   select(iso3c, year, externa_p, interna_p, total_p)
 
-mr_3_gcentral <- gcentral_deuda_pib %>% 
-  select(iso3c, year, externa_p, interna_p) %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise( year_mr = max(year),
-            deuda_p_ext_mr = last(externa_p),
-            avg_ext_p_mr_3 = mean(tail(externa_p, 3) , rm.na = TRUE),
-            deuda_p_int_mr = last(interna_p),
-            avg_int_p_mr_3 = mean(tail(interna_p, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(deuda_p_ext_mr)) %>% 
-  mutate(rnk_mr_ext_p = min_rank(-deuda_p_ext_mr),
-         rnk_mr_3_ext_p = min_rank(-avg_ext_p_mr_3)) %>% 
-  arrange(iso3c)
-
-
-mr_3_desepub <- sectorpublico_deuda_pib %>% 
-  select(iso3c, year, externa_p, interna_p) %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise( year_mr = max(year),
-             deuda_p_ext_mr = last(externa_p),
-             avg_ext_p_mr_3 = mean(tail(externa_p, 3) , rm.na = TRUE),
-             deuda_p_int_mr = last(interna_p),
-             avg_int_p_mr_3 = mean(tail(interna_p, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(deuda_p_ext_mr)) %>% 
-  mutate(rnk_mr_ext_p = min_rank(-deuda_p_ext_mr),
-         rnk_mr_3_ext_p = min_rank(-avg_ext_p_mr_3)) %>% 
-  arrange(iso3c)
-
-mr_3_gsubn <- gsubnac_deuda_pib %>% 
-  select(iso3c, year, externa_p, interna_p) %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise( year_mr = max(year),
-             deuda_p_ext_mr = last(externa_p),
-             avg_ext_p_mr_3 = mean(tail(externa_p, 3) , rm.na = TRUE),
-             deuda_p_int_mr = last(interna_p),
-             avg_int_p_mr_3 = mean(tail(interna_p, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(deuda_p_ext_mr)) %>% 
-  mutate(rnk_mr_ext_p = min_rank(-deuda_p_ext_mr),
-         rnk_mr_3_ext_p = min_rank(-avg_ext_p_mr_3)) %>% 
-  arrange(iso3c)
-
-
-mr_3_spnf <- gspnf_deuda_pib %>% 
-  select(iso3c, year, externa_p, interna_p) %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise( year_mr = max(year),
-             deuda_p_ext_mr = last(externa_p),
-             avg_ext_p_mr_3 = mean(tail(externa_p, 3) , rm.na = TRUE),
-             deuda_p_int_mr = last(interna_p),
-             avg_int_p_mr_3 = mean(tail(interna_p, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(deuda_p_ext_mr)) %>% 
-  mutate(rnk_mr_ext_p = min_rank(-deuda_p_ext_mr),
-         rnk_mr_3_ext_p = min_rank(-avg_ext_p_mr_3)) %>% 
-  arrange(iso3c)
-
 ```
-
-```{r secpub_debt_make_tables, eval=FALSE, include=FALSE}
-## make the tables
-kb_mr_3_desepub <- kable(mr_3_desepub, caption = "Deuda, Sector Público")
-kb_mr_3_gcentral <- kable(mr_3_gcentral, caption = "Deuda, Gobierno Central")
-kb_mr_3_gsubn <- kable(mr_3_gsubn, caption = "Deuda, Gobiernos Subnacionales")
-kb_mr_3_spnf <- kable(mr_3_spnf, caption = "Deuda, Sector Público No Fianciero")
-
-dt_mr_3_desepub <- datatable(mr_3_desepub, caption = "Deuda, Sector Público")
-dt_mr_3_gcentral <- datatable(mr_3_gcentral, caption = "Deuda, Gobierno Central")
-dt_mr_3_gsubn <- datatable(mr_3_gsubn, caption = "Deuda, Gobiernos Subnacionales")
-dt_mr_3_spnf <- datatable(mr_3_spnf, caption = "Deuda, Sector Público No Fianciero")
-```
-
-
-
-```{r secpub_debt_show_k, eval=FALSE, include=FALSE, results="asis"}
-## present the table
-# kb_mr_3_desepub 
-# kb_mr_3_gcentral
-# # kb_mr_3_gsubn 
-# kb_mr_3_spnf 
-```
-
-```{r secpub_debt_show_dt, eval=FALSE, include=FALSE, results="asis"}
-dt_mr_3_desepub 
-dt_mr_3_gcentral 
-# dt_mr_3_gsubn 
-dt_mr_3_spnf
-```
-
 
 ## Cartera vencida 
 
@@ -435,16 +414,7 @@ mr_3_cv_anual <- cv_december %>%
   arrange(iso3c)
 
 ```
-```{r cv_make_tables, eval=FALSE, include=FALSE}
-kb_mr_3_cv_anual = kable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
-dt_mr_3_cv_anual = datatable(mr_3_cv_anual, caption = "Cartera Vencida (% de cartera total)")
 
-```
-
-```{r cv_show_tables, eval=FALSE, include=FALSE}
-# kb_mr_3_cv_anual 
-dt_mr_3_cv_anual
-```
 
 ## Crédito interno
 
@@ -501,17 +471,6 @@ mr_3_ci_to_gdp <- tab_ci_qrt_gdp %>%
 
 ```
 
-```{r ci_make_tables}
-kb_mr_3_ci_to_gdp = kable(mr_3_ci_to_gdp, caption = "Crédito Interno / PIB")
-dt_mr_3_ci_to_gdp = datatable(mr_3_ci_to_gdp, caption = "Crédito Interno / PIB")
-
-```
-
-```{r ci_show_tables, eval=FALSE, include=FALSE}
-# kb_mr_3_ci_to_gdp 
-dt_mr_3_ci_to_gdp 
-```
-
 ## Préstamos Bancarios
 
 ```{r prestamos_bancarios_make_dfs}
@@ -542,36 +501,9 @@ tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>%
             n_con_to_gdp = sum(!is.na(consumo_gdp_stl))
   )
 
-mr_3_pb_to_gdp <- tab_pb_qtr %>% 
-  group_by(iso2c) %>% 
-  arrange(year) %>% 
-  summarise(year_mr = max(year),
-            pb_total_mr = last(avg_tot_to_gdp),
-            avg_mr_pb_tot_3 = mean(tail(avg_tot_to_gdp, 3) , rm.na = TRUE),
-            pb_hip_mr = last(avg_hip_to_gdp),
-            avg_mr_pb_hip_3 = mean(tail(avg_hip_to_gdp, 3) , rm.na = TRUE),
-            pb_con_mr = last(avg_con_to_gdp),
-            avg_mr_pb_con_3 = mean(tail(avg_con_to_gdp, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(pb_total_mr)) %>% 
-  mutate(rnk_mr_tot = min_rank(-pb_total_mr),
-         rnk_mr_3_tot = min_rank(-avg_mr_pb_tot_3)) %>% 
-  arrange(iso2c)
+
 
 ```
-
-
-```{r pb_make_tables, eval=FALSE, include=FALSE}
-kb_mr_3_pb_to_gdp = kable(mr_3_pb_to_gdp, caption = "P´restamos Bancarios / PIB")
-dt_mr_3_pb_to_gdp = datatable(mr_3_pb_to_gdp, caption = "P´restamos Bancarios / PIB")
-
-```
-
-```{r pb_show_tables, eval=FALSE, include=FALSE}
-# kb_mr_3_pb_to_gdp 
-dt_mr_3_pb_to_gdp 
-```
-
 
 
 
@@ -599,36 +531,6 @@ exp_10_ppales_by_iso <- exp_10_ppales %>%
   summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
   arrange(iso3c, year)
 
-mr_3_expo_concentration <- exp_10_ppales_by_iso %>% 
-  group_by(iso3c) %>% 
-  arrange(year) %>% 
-  summarise(year_mr = max(year),
-            conc_mr = last(concentracion),
-            avg_mr_3 = mean(tail(concentracion, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(conc_mr)) %>% 
-  mutate(rnk_mr_conc = min_rank(-conc_mr),
-         rnk_mr_3_conc = min_rank(-avg_mr_3)) %>% 
-  arrange(iso3c)
-
-
-  
-```
-
-```{r exp_imp_make_tables, eval=FALSE, include=FALSE}
-
-kb_mr_3_expo_concentration <- kable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos")
-
-dt_mr_3_expo_concentration <- datatable(mr_3_expo_concentration, caption = "Herfindahl index, entre 10 ppales productos") %>% formatRound(c("conc_mr", "avg_mr_3"), 3)
-
-```
-
-
-```{r exp_imp_show_tables, eval=FALSE, include=FALSE}
-
-# kb_mr_3_expo_concentration
-
-dt_mr_3_expo_concentration
 
 ```
 
@@ -678,37 +580,6 @@ exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>%
   group_by(iso3c, year, product) %>% 
   summarise(share_anual = mean(share, rm.na=TRUE))
 
-
-mr_3_prod_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
-  group_by(iso3c, product) %>% 
-  arrange(year) %>% 
-  summarise(year_mr = max(year),
-            share_mr = last(share_anual),
-            avg_mr_3 = mean(tail(share_anual, 3) , rm.na = TRUE)
-  ) %>% 
-  arrange(desc(share_mr)) %>% 
-  mutate(rnk_mr_share = min_rank(-share_mr),
-         rnk_mr_3_share = min_rank(-avg_mr_3)) %>% 
-  arrange(iso3c)
-```
-
-```{r shares_3_make_tables, eval=FALSE, include=FALSE}
-kb_mr_3_prod_shares_anual_avg <- kable(mr_3_prod_shares_anual_avg, 
-                                       caption = "Export shares, 3 categories")
-
-dt_mr_3_prod_shares_anual_avg <- datatable(mr_3_prod_shares_anual_avg, 
-                                           caption = "Export shares, 3 categories") 
-```
-
-```{r shares_3_show_tables, eval=FALSE, include=FALSE}
-# kb_mr_3_prod_shares_anual_avg 
-
-dt_mr_3_prod_shares_anual_avg
-
-```
-
-```{r shares_3_plots}
-pshares3 <- ggplot(data=exp_by_prod_shares)
 
 ```
 
