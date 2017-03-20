@@ -3,16 +3,16 @@ title: "revision preliminar de datos"
 author: "ricardo mayer"
 date: "March 13, 2017"
 output:
+  pdf_document: default
   html_document:
     code_folding: hide
     number_sections: yes
     toc: yes
-  pdf_document: default
   word_document: default
 params:
   end_year: 2015
+  is_html: no
   start_year: 1990
-  is_html: FALSE
 always_allow_html: yes
 ---
 
