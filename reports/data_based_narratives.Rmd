@@ -24,11 +24,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-```{r setup, include=FALSE}
-
-source('./functions/break_down_table.R')
-# source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/break_down_table.R')
-```
 
 
 ```{r libs_dicts_country_sel, include = FALSE}
@@ -55,9 +50,26 @@ options(width = 60)
 options(digits = 3)
 
 
-load("./produced_data/cepal_19_countries")
-load("./produced_data/cepal_33_countries")
+mr_year <- params$end_year
 
+```
+
+
+
+```{r source_dext_funcs, warning=FALSE}
+# source(file = "./functions/cate_dext.R")
+source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R') 
+```
+
+```{r loading_country_dicts}
+# load("./produced_data/cepal_19_countries")
+# load("./produced_data/cepal_33_countries")
+
+load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_19_countries")
+load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_33_countries")
+```
+
+```{r define_ALC_groups}
 coi_19 <- cepal_19_countries$iso3c
 coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))]
 coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
@@ -67,14 +79,6 @@ coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
 coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))]
 
 coi <- coi_sa_minus_BRA_VEN
-
-mr_year <- params$end_year
-
-```
-
-
-```{r source_dext_funcs}
-source(file = "./functions/cate_dext.R")
 ```
 
 
@@ -82,7 +86,8 @@ source(file = "./functions/cate_dext.R")
 ## Total external debt {.tabset .tabset-fade .tabset-pills}
 
 ```{r load_ext_debt_data}
-load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
+# load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
+load('V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_deuda_externa')
 ```
 
 ```{r ext_debt_make_dfs, echo=FALSE}
@@ -94,152 +99,24 @@ dext_to_gdp <- cs_deuda_externa %>%
   select(iso3c, year, deuda_ext_porc_pib) %>% 
   mutate(year = as.Date(as.character(year), format = "%Y"))
 
+```
+
+### Latin America {.tabset}
+
+
+```{r ext_debt_make_dfs_18, include=TRUE}
 dext_to_gdp_18 <- dext_to_gdp %>% 
   filter(iso3c %in% coi_18)
+
+dext_to_gdp_18_xts <- cate_dext_to_xts_wide(dext_to_gdp_18, 
+                                            is_full = TRUE, is_med = FALSE)
 
 dext_to_gdp_18_m_bmv <- dext_to_gdp_18 %>% 
   filter(iso3c %in% coi_18_minus_br_mx_ven)
 
-dext_to_gdp_sa <- dext_to_gdp_18 %>% 
-  filter(iso3c %in% coi_sa)
+dext_to_gdp_18_m_bmv_xts <- cate_dext_to_xts_wide(dext_to_gdp_18_m_bmv,
+                                                is_full = TRUE, is_med = FALSE)
 
-
-dext_to_gdp_sa_mbv <- dext_to_gdp_sa %>% 
-  filter(iso3c %in% coi_sa_minus_BRA_VEN)
-
-dext_to_gdp_ca <- dext_to_gdp_18 %>% 
-  filter(iso3c %in% coi_ca)
-
-dext_to_gdp_ca_mm <- dext_to_gdp_ca %>% 
-  filter(iso3c %in% coi_ca_minus_mex)
-
-```
-
-### Latin America
-
-
-```{r ext_debt_make_ggplot_18, eval=FALSE, include=FALSE}
-#using ggplot
-dext_title <- "(Gross) External debt, as % of GDP (E18)"
-g_18 <- ggplot(data = dext_to_gdp_18, aes(x = year, y = deuda_ext_porc_pib, color = iso3c)) + 
-  geom_line() + ggtitle(dext_title, subtitle = "Countries: ECLAC 18")  
-
-pl_18 <- ggplotly(g_18)
-pl_18
-
-```
-
-```{r ext_debt_make_dygraph_18_18mbmv}
-#using dygraph
-dext_to_gdp_18_spread <- dext_to_gdp_18 %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_18_xts <- dext_to_gdp_18_spread %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_18_spread$year)
-
-dext_to_gdp_18_spread_m_bmv <- dext_to_gdp_18_m_bmv %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_18_m_bmv_xts <- dext_to_gdp_18_spread_m_bmv %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_18_spread$year)
-
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
-
-dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18) %>%
-  dyRangeSelector() %>%
-dyHighlight(highlightCircleSize = 4,
-            highlightSeriesBackgroundAlpha = 0.3,
-            hideOnMouseOut = FALSE)
-dg_18
-
-# dg_18_m_bmv <- dygraph(dext_to_gdp_18_m_bmv_xts, main = dext_title_18mbmv) %>%
-#   dyRangeSelector() %>%
-#   dyHighlight(highlightCircleSize = 4, 
-#               highlightSeriesBackgroundAlpha = 0.3,
-#               hideOnMouseOut = FALSE)
-# dg_18_m_bmv
-
-```
-
-
-
-### South America
-
-```{r ext_debt_make_dygraph_sa_sambv}
-#using dygraph
-dext_to_gdp_sa_spread <- dext_to_gdp_sa %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_sa_xts <- dext_to_gdp_sa_spread %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_sa_spread$year)
-
-dext_to_gdp_sa_mbv_spread <- dext_to_gdp_sa_mbv %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_sambv_xts <- dext_to_gdp_sa_mbv_spread %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_sa_mbv_spread$year)
-
-dext_title_sa <- "(Gross) External debt, as % of GDP (SA)"
-dext_title_sambv <- "(Gross) External debt, as % of GDP (SAmBV)"
-
-dg_sa <- dygraph(dext_to_gdp_sa_xts, main = dext_title_sa) %>%
-dyRangeSelector() %>%
-dyHighlight(highlightCircleSize = 4,
-            highlightSeriesBackgroundAlpha = 0.3,
-            hideOnMouseOut = FALSE)
-dg_sa
-
-# dg_sa_mbv <- dygraph(dext_to_gdp_sambv_xts, main = dext_title_sambv) %>%
-#   dyRangeSelector() %>%
-#   dyHighlight(highlightCircleSize = 4, 
-#               highlightSeriesBackgroundAlpha = 0.3,
-#               hideOnMouseOut = FALSE)
-# dg_sa_mbv
-
-```
-
-### Central America
-
-```{r ext_debt_make_dygraph_ca_camm}
-dext_to_gdp_ca_spread <- dext_to_gdp_ca %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_ca_xts <- dext_to_gdp_ca_spread %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_ca_spread$year)
-
-dext_to_gdp_ca_mm_spread <- dext_to_gdp_ca_mm %>% 
-  spread(key = iso3c, value = deuda_ext_porc_pib)
-dext_to_gdp_ca_mm_xts <- dext_to_gdp_ca_mm_spread %>% 
-  select(-year) %>% 
-  xts(order.by = dext_to_gdp_ca_mm_spread$year)
-
-dext_title_ca <- "(Gross) External debt, as % of GDP (CA)"
-dext_title_camm <- "(Gross) External debt, as % of GDP (CAmM)"
-
-dg_ca <- dygraph(dext_to_gdp_ca_xts, main = dext_title_ca) %>%
-dyRangeSelector() %>%
-dyHighlight(highlightCircleSize = 4,
-            highlightSeriesBackgroundAlpha = 0.3,
-            hideOnMouseOut = FALSE)
-dg_ca
-
-# dg_ca_mm <- dygraph(dext_to_gdp_ca_mm_xts, main = dext_title_camm) %>%
-#   dyRangeSelector() %>%
-#   dyHighlight(highlightCircleSize = 4, 
-#               highlightSeriesBackgroundAlpha = 0.3,
-#               hideOnMouseOut = FALSE)
-# dg_ca_mm
-
-```
-
-
-### Quantiles of indebtness {.tabset}
-
-
-```{r dext_avg_pctile, echo=TRUE}
-
-# sample of 18 countries:
 dext_18_class_med_1990_2015 <- cate_dext(dext_to_gdp_18)
 dext_18_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_18, 
                                           is_med = FALSE, is_pct3 = TRUE)
@@ -258,52 +135,6 @@ dext_18_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
                                                is_med = FALSE, is_pct3 = FALSE,
                                                is_pct4 = TRUE)
 
-# sample of south american countries
-dext_sa_class_med_1990_2015 <- cate_dext(dext_to_gdp_sa)
-dext_sa_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_sa, 
-                                          is_med = FALSE, is_pct3 = TRUE)
-dext_sa_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_sa,
-                                          is_med = FALSE, is_pct3 = FALSE,
-                                          is_pct4 = TRUE)
-
-dext_sa_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
-                                              time_breaks = 2001)
-dext_sa_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_sa, 
-                                               time_breaks = 2001,
-                                               is_med = FALSE,
-                                               is_pct3 = TRUE)
-dext_sa_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
-                                               time_breaks = 2001,
-                                               is_med = FALSE, is_pct3 = FALSE,
-                                               is_pct4 = TRUE)
-
-# sample of central american countries
-dext_ca_class_med_1990_2015 <- cate_dext(dext_to_gdp_ca)
-dext_ca_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_ca, 
-                                          is_med = FALSE, is_pct3 = TRUE)
-dext_ca_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_ca,
-                                          is_med = FALSE, is_pct3 = FALSE,
-                                          is_pct4 = TRUE)
-
-dext_ca_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
-                                              time_breaks = 2001)
-dext_ca_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_ca, 
-                                               time_breaks = 2001,
-                                               is_med = FALSE,
-                                               is_pct3 = TRUE)
-dext_ca_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
-                                               time_breaks = 2001,
-                                               is_med = FALSE, is_pct3 = FALSE,
-                                               is_pct4 = TRUE)
-
-# iso_18_above_median_90_15 <-  dext_18_class_med_1990_2015 %>% 
-#   filter(dext_group == "above_median") %>% select(iso3c) %>% distinct()
-# 
-# iso_18_below_median_90_15 <-  dext_18_class_med_1990_2015 %>% 
-#   filter(dext_group == "below_median") %>% select(iso3c) %>% distinct()
-```
-
-```{r dext_avg_pctile_xts_wide}
 dext_18_med_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_med_1990_2015)
 dext_18_pct3_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2015,
                                                       is_med = FALSE,
@@ -322,11 +153,522 @@ dext_18_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990
                                                       is_pct3 = FALSE,
                                                       is_pct4 = TRUE)
 
+```
+
+#### All (18) countries
+```{r ext_debt_make_dygraph_18}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_18
+
+```
+
+#### Country debt above and below group median
+
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_18_pct50}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18_med_a <- dygraph(dext_18_med_1990_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_med_b <- dygraph(dext_18_med_1990_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_18_med_a
+
+dg_18_med_b
+
+```
+
+##### Based on 1990-2001 and 2002-2015 values
+
+```{r ext_debt_make_dygraph_18_pct50_2001}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18_med_2001_a <- dygraph(dext_18_med_1990_2001_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_med_2001_b <- dygraph(dext_18_med_1990_2001_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_18_med_2001_a
+
+dg_18_med_2001_b
+
+```
+
+#### Country debt above and below percentiles 33 and 66
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_18_pct33_66}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18_pct3_b33 <- dygraph(dext_18_pct3_1990_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_33_to_66 <- dygraph(dext_18_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_a66 <- dygraph(dext_18_pct3_1990_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_a66
+
+dg_18_pct3_33_to_66
+
+dg_18_pct3_b33
+
+```
+
+
+##### Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_18_pct33_66_2001}
+dg_18_pct3_b33_2001 <- dygraph(dext_18_pct3_1990_2001_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_33_to_66_2001 <- dygraph(dext_18_pct3_1990_2001_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_a66_2001 <- dygraph(dext_18_pct3_1990_2001_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct3_a66_2001
+
+dg_18_pct3_33_to_66_2001
+
+dg_18_pct3_b33_2001
+
+
+```
+
+#### Country debt above and below percentiles 25, 50 and 75
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_18_pct25_50_75}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18_pct4_b25 <- dygraph(dext_18_pct4_1990_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_25_to_50 <- dygraph(dext_18_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_50_to_75 <- dygraph(dext_18_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_a75 <- dygraph(dext_18_pct4_1990_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_a75
+
+dg_18_pct4_50_to_75
+
+dg_18_pct4_25_to_50
+
+dg_18_pct4_b25
+
+```
+
+##### Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_18_2001_pct25_50_75}
+#using dygraph
+dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
+dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+
+dg_18_pct4_b25_2001 <- dygraph(dext_18_pct4_1990_2001_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_25_to_50_2001 <- dygraph(dext_18_pct4_1990_2001_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_50_to_75_2001 <- dygraph(dext_18_pct4_1990_2001_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_a75_2001 <- dygraph(dext_18_pct4_1990_2001_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_pct4_a75_2001
+
+dg_18_pct4_50_to_75_2001
+
+dg_18_pct4_25_to_50_2001
+
+dg_18_pct4_b25_2001
+
+```
+
+
+
+### South America {.tabset}
+
+```{r ext_debt_make_dfs_sa}
+
+dext_to_gdp_sa <- dext_to_gdp %>% 
+  filter(iso3c %in% coi_sa)
+
+dext_to_gdp_sa_xts <- cate_dext_to_xts_wide(dext_to_gdp_sa, 
+                                               is_med = FALSE, is_full = TRUE)
+
+dext_sa_class_med_1990_2015 <- cate_dext(dext_to_gdp_sa)
+dext_sa_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_sa, 
+                                          is_med = FALSE, is_pct3 = TRUE)
+dext_sa_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_sa,
+                                          is_med = FALSE, is_pct3 = FALSE,
+                                          is_pct4 = TRUE)
+
+dext_sa_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
+                                              time_breaks = 2001)
+dext_sa_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_sa, 
+                                               time_breaks = 2001,
+                                               is_med = FALSE,
+                                               is_pct3 = TRUE)
+dext_sa_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
+                                               time_breaks = 2001,
+                                               is_med = FALSE, is_pct3 = FALSE,
+                                               is_pct4 = TRUE)
+
+dext_sa_med_1990_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_med_1990_2015)
+dext_sa_pct3_1990_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct3_1990_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_sa_pct4_1990_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct4_1990_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
 dext_sa_med_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_med_1990_2001_2015)
 dext_sa_pct3_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct3_1990_2001_2015,
                                                       is_med = FALSE,
                                                       is_pct3 = TRUE)
 dext_sa_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct4_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
+# dext_to_gdp_sa_mbv <- dext_to_gdp_sa %>% 
+#   filter(iso3c %in% coi_sa_minus_BRA_VEN)
+# 
+# dext_to_gdp_sambv_xts <- cate_dext_to_xts_wide(dext_to_gdp_sa_mbv, 
+#                                                is_med = FALSE, is_full = TRUE)
+
+```
+
+#### All South America
+
+```{r ext_debt_make_dygraph_sa}
+#using dygraph
+
+dext_title_sa <- "(Gross) External debt, as % of GDP (SA)"
+
+dg_sa <- dygraph(dext_to_gdp_sa_xts, main = dext_title_sa) %>%
+dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_sa
+```
+
+#### Country debt above and below group median
+
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_sa_pct50}
+#using dygraph
+
+dg_sa_med_a <- dygraph(dext_sa_med_1990_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_med_b <- dygraph(dext_sa_med_1990_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_sa_med_a
+
+dg_sa_med_b
+
+```
+
+##### Based on 1990-2001 and 2002-2015 values
+
+```{r ext_debt_make_dygraph_sa_pct50_2001}
+
+dg_sa_med_2001_a <- dygraph(dext_sa_med_1990_2001_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_med_2001_b <- dygraph(dext_sa_med_1990_2001_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_sa_med_2001_a
+
+dg_sa_med_2001_b
+
+```
+
+
+
+#### Country debt above and below percentiles 33 and 66
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_sa_pct33_66}
+#using dygraph
+
+dg_sa_pct3_b33 <- dygraph(dext_sa_pct3_1990_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_33_to_66 <- dygraph(dext_sa_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_a66 <- dygraph(dext_sa_pct3_1990_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_a66
+
+dg_sa_pct3_33_to_66
+
+dg_sa_pct3_b33
+
+```
+
+
+##### Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_sa_pct33_66_2001}
+dg_sa_pct3_b33_2001 <- dygraph(dext_sa_pct3_1990_2001_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_33_to_66_2001 <- dygraph(dext_sa_pct3_1990_2001_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_a66_2001 <- dygraph(dext_sa_pct3_1990_2001_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct3_a66_2001
+
+dg_sa_pct3_33_to_66_2001
+
+dg_sa_pct3_b33_2001
+
+
+```
+
+#### Country debt above and below percentiles 25, 50 and 75
+
+##### Based on 1990-2015 values
+
+```{r ext_debt_make_dygraph_sa_pct25_50_75}
+
+dg_sa_pct4_b25 <- dygraph(dext_sa_pct4_1990_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_25_to_50 <- dygraph(dext_sa_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_50_to_75 <- dygraph(dext_sa_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_a75 <- dygraph(dext_sa_pct4_1990_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_a75
+
+dg_sa_pct4_50_to_75
+
+dg_sa_pct4_25_to_50
+
+dg_sa_pct4_b25
+
+```
+
+##### Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_sa_2001_pct25_50_75}
+
+dg_sa_pct4_b25_2001 <- dygraph(dext_sa_pct4_1990_2001_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_25_to_50_2001 <- dygraph(dext_sa_pct4_1990_2001_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_50_to_75_2001 <- dygraph(dext_sa_pct4_1990_2001_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_a75_2001 <- dygraph(dext_sa_pct4_1990_2001_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_sa_pct4_a75_2001
+
+dg_sa_pct4_50_to_75_2001
+
+dg_sa_pct4_25_to_50_2001
+
+dg_sa_pct4_b25_2001
+
+```
+
+
+
+
+
+### Central America  {.tabset}
+
+```{r ext_debt_make_dfs_ca}
+
+dext_to_gdp_ca <- dext_to_gdp %>% 
+  filter(iso3c %in% coi_ca)
+
+dext_to_gdp_ca_xts <- cate_dext_to_xts_wide(dext_to_gdp_ca, 
+                                               is_med = FALSE, is_full = TRUE)
+
+dext_ca_class_med_1990_2015 <- cate_dext(dext_to_gdp_ca)
+dext_ca_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_ca, 
+                                          is_med = FALSE, is_pct3 = TRUE)
+dext_ca_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_ca,
+                                          is_med = FALSE, is_pct3 = FALSE,
+                                          is_pct4 = TRUE)
+
+dext_ca_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
+                                              time_breaks = 2001)
+dext_ca_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_ca, 
+                                               time_breaks = 2001,
+                                               is_med = FALSE,
+                                               is_pct3 = TRUE)
+dext_ca_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
+                                               time_breaks = 2001,
+                                               is_med = FALSE, is_pct3 = FALSE,
+                                               is_pct4 = TRUE)
+
+dext_ca_med_1990_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_med_1990_2015)
+dext_ca_pct3_1990_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct3_1990_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_ca_pct4_1990_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct4_1990_2015,
                                                       is_med = FALSE,
                                                       is_pct3 = FALSE,
                                                       is_pct4 = TRUE)
@@ -340,173 +682,241 @@ dext_ca_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct4_1990
                                                       is_pct3 = FALSE,
                                                       is_pct4 = TRUE)
 
-```
+# dext_to_gdp_ca_mm <- dext_to_gdp_ca %>% 
+#   filter(iso3c %in% coi_ca_minus_mex)
 
 
-#### ALC three quantiles 
-```{r  dext_avg_pctile3_dygraph, echo=TRUE}
-# using 2001 as a time break, pct33 and pct66
-dg_dext_18_pct3_1990_2001_2015 <- purrr::map(dext_18_pct3_1990_2001_2015_xts,
-                                             dygraph)
-
-
-dg_dext_18_pct3_1990_2015 <- purrr::map(dext_18_pct3_1990_2015_xts,
-                                             dygraph)
-dg_dext_18_pct3_1990_2015[[3]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
-
-
-### Based on 1990-2001, 2002-2015 averages
-```
-
-```{r dext_to_gdp_1990_2002_2015}
-source('./functions/break_down_table.R')
-dext_18_avg_1990_2001 <- dext_to_gdp_18 %>%
-  filter(year(year) >= 1990 & year(year) <= 2001) %>% 
-  group_by(iso3c) %>% 
-  summarise(dext_avg_1990_2001 = mean(deuda_ext_porc_pib, rm.na = TRUE))
-
-pctiles_50_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001,
-                                  probs = c(0.5))
-
-
-dg_dext_18_pct3_1990_2015[[2]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
-
-dg_dext_18_pct3_1990_2015[[1]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
 
 ```
 
-#### ALC four quantiles
-```{r  dext_avg_pctile4_dygraph, echo=TRUE}
-# using 2001 as a time break, pct33 and pct66
-# dg_dext_18_pct4_1990_2001_2015 <- purrr::map(dext_18_pct3_1990_2001_2015_xts,
-#                                              dygraph)
+#### All Central America
 
-dg_dext_18_pct4_1990_2015 <- purrr::map(dext_18_pct4_1990_2015_xts,
-                                             dygraph)
-dg_dext_18_pct4_1990_2015[[4]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
+```{r ext_debt_make_dygraph_ca}
+#using dygraph
 
-dg_dext_18_pct4_1990_2015[[3]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
+dext_title_ca <- "(Gross) External debt, as % of GDP (CA)"
 
-dg_dext_18_pct4_1990_2015[[2]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
+dg_ca <- dygraph(dext_to_gdp_ca_xts, main = dext_title_ca) %>%
+dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_ca
+```
 
-dg_dext_18_pct4_1990_2015[[1]] %>% dyRangeSelector() %>%
-  dyHighlight(highlightCircleSize = 5, 
-              highlightSeriesBackgroundAlpha = 0.2,
-              hideOnMouseOut = FALSE)
-
-dext_18_avg_2002_2015 <- dext_to_gdp_18 %>%
-  filter(year(year) >= 2002 & year(year) <= 2015) %>% 
-  group_by(iso3c) %>% 
-  summarise(dext_avg_2002_2015 = mean(deuda_ext_porc_pib, rm.na = TRUE))
-
-pctiles_50_2002_2015 <-  quantile(dext_18_avg_2002_2015$dext_avg_2002_2015,
-                                  probs = c(0.5))
+#### Country debt above and below group median
 
 
-dext_18_avg_1990_2001_sa <- dext_18_avg_1990_2001 %>% 
-  filter(iso3c %in% coi_sa)
+##### Based on 1990-2015 values
 
-dext_18_avg_1990_2001_ca <- dext_18_avg_1990_2001 %>% 
-  filter(iso3c %in% coi_ca)
+```{r ext_debt_make_dygraph_ca_pct50}
+#using dygraph
+
+dg_ca_med_a <- dygraph(dext_ca_med_1990_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_med_b <- dygraph(dext_ca_med_1990_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_ca_med_a
+
+dg_ca_med_b
+
+```
+
+##### Based on 1990-2001 and 2002-2015 values
+
+```{r ext_debt_make_dygraph_ca_pct50_2001}
+
+dg_ca_med_2001_a <- dygraph(dext_ca_med_1990_2001_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_med_2001_b <- dygraph(dext_ca_med_1990_2001_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_ca_med_2001_a
+
+dg_ca_med_2001_b
+
+```
 
 
+#### Country debt above and below percentiles 33 and 66
 
-dext_18_avg_2002_2015_sa <- dext_18_avg_2002_2015 %>% 
-  filter(iso3c %in% coi_sa)
+##### Based on 1990-2015 values
 
-dext_18_avg_2002_2015_ca <- dext_18_avg_2002_2015 %>% 
-  filter(iso3c %in% coi_ca)
+```{r ext_debt_make_dygraph_ca_pct33_66}
+#using dygraph
+
+dg_ca_pct3_b33 <- dygraph(dext_ca_pct3_1990_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_33_to_66 <- dygraph(dext_ca_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_a66 <- dygraph(dext_ca_pct3_1990_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_a66
+
+dg_ca_pct3_33_to_66
+
+dg_ca_pct3_b33
+
+```
+
+Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_ca_pct33_66_2001}
+dg_ca_pct3_b33_2001 <- dygraph(dext_ca_pct3_1990_2001_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_33_to_66_2001 <- dygraph(dext_ca_pct3_1990_2001_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_a66_2001 <- dygraph(dext_ca_pct3_1990_2001_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct3_a66_2001
+
+dg_ca_pct3_33_to_66_2001
+
+dg_ca_pct3_b33_2001
 
 
+```
 
-pctiles_50_1990_2001_sa <-  quantile(dext_18_avg_1990_2001_sa$dext_avg_1990_2001,
-                                  probs = c(0.5))
-pctiles_50_2002_2015_sa <-  quantile(dext_18_avg_2002_2015_sa$dext_avg_2002_2015,
-                                  probs = c(0.5))
+#### Country debt above and below percentiles 25, 50 and 75
 
-pctiles_50_1990_2001_ca <-  quantile(dext_18_avg_1990_2001_ca$dext_avg_1990_2001,
-                                  probs = c(0.5))
-pctiles_50_2002_2015_ca <-  quantile(dext_18_avg_2002_2015_ca$dext_avg_2002_2015,
-                                  probs = c(0.5))
+##### Based on 1990-2015 values
 
-pctiles_33_66_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001,
-                                  probs = c(0.33, 0.66))
-pctiles_33_66_2002_2015 <-  quantile(dext_18_avg_2002_2015$dext_avg_2002_2015,
-                                  probs = c(0.33, 0.66))
+```{r ext_debt_make_dygraph_ca_pct25_50_75}
 
-pctiles_33_66_1990_2001_sa <-  quantile(dext_18_avg_1990_2001_sa$dext_avg_1990_2001,
-                                  probs = c(0.33, 0.66))
-pctiles_33_66_2002_2015_sa <-  quantile(dext_18_avg_2002_2015_sa$dext_avg_2002_2015,
-                                  probs = c(0.33, 0.66))
+dg_ca_pct4_b25 <- dygraph(dext_ca_pct4_1990_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 
-pctiles_33_66_1990_2001_ca <-  quantile(dext_18_avg_1990_2001_ca$dext_avg_1990_2001,
-                                  probs = c(0.33, 0.66))
-pctiles_33_66_2002_2015_ca <-  quantile(dext_18_avg_2002_2015_ca$dext_avg_2002_2015,
-                                  probs = c(0.33, 0.66))
+dg_ca_pct4_25_to_50 <- dygraph(dext_ca_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 
-# cuts_quantile <- cut(deuda_chica$valor, quantile(deuda_chica$valor), include.lowest = TRUE)
-# soo <- break_down_table(deuda_chica, cuts_vector = cuts_quantile)
+dg_ca_pct4_50_to_75 <- dygraph(dext_ca_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
 
-dext_to_gdp_18_median_split <- break_down_table(
-  dext_18_avg_1990_2001,
-  cuts_vector = cut(dext_18_avg_1990_2001$dext_avg_1990_2001, 
-                    pctiles_50_1990_2001,
-                    include.lowest = TRUE)
-  ) 
-  
-  
+dg_ca_pct4_a75 <- dygraph(dext_ca_pct4_1990_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct4_a75
+
+dg_ca_pct4_50_to_75
+
+dg_ca_pct4_25_to_50
+
+dg_ca_pct4_b25
+
+```
+
+##### Based on 1990-2001 ans 2002-2015 values
+
+```{r ext_debt_make_dygraph_ca_2001_pct25_50_75}
+
+dg_ca_pct4_b25_2001 <- dygraph(dext_ca_pct4_1990_2001_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct4_25_to_50_2001 <- dygraph(dext_ca_pct4_1990_2001_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct4_50_to_75_2001 <- dygraph(dext_ca_pct4_1990_2001_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct4_a75_2001 <- dygraph(dext_ca_pct4_1990_2001_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_ca_pct4_a75_2001
+
+dg_ca_pct4_50_to_75_2001
+
+dg_ca_pct4_25_to_50_2001
+
+dg_ca_pct4_b25_2001
+
 ```
 
 
 
 
-```{r ext_debt_make_tables, eval=FALSE, include=FALSE}
+<!-- ```{r dext_to_gdp_1990_2002_2015} -->
+<!-- source('./functions/break_down_table.R') -->
+<!-- dext_18_avg_1990_2001 <- dext_to_gdp_18 %>% -->
+<!--   filter(year(year) >= 1990 & year(year) <= 2001) %>%  -->
+<!--   group_by(iso3c) %>%  -->
+<!--   summarise(dext_avg_1990_2001 = mean(deuda_ext_porc_pib, rm.na = TRUE)) -->
 
-if (params$is_html == TRUE) {
-print("html doc, only DT tables")
-dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
-}
-
-
-#this could be changed later to if-else chain if pdf and word become explicit options
-if (params$is_html != TRUE) {
-print("not an html doc, prefer kable and xtable packages, over DT")
-kb_dext_to_gdp <- kable(narr_dext_to_gdp)
-xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
-}
-```
+<!-- pctiles_50_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001, -->
+<!--                                   probs = c(0.5)) -->
 
 
-```{r ext_debt_show_tables, eval=FALSE, include=FALSE, results="asis"}
+<!-- dg_dext_18_pct3_1990_2015[[2]] %>% dyRangeSelector() %>% -->
+<!--   dyHighlight(highlightCircleSize = 5,  -->
+<!--               highlightSeriesBackgroundAlpha = 0.2, -->
+<!--               hideOnMouseOut = FALSE) -->
 
-if (params$is_html == TRUE) {
-dt_mr_3_dext_to_gdp
-}
+<!-- dg_dext_18_pct3_1990_2015[[1]] %>% dyRangeSelector() %>% -->
+<!--   dyHighlight(highlightCircleSize = 5,  -->
+<!--               highlightSeriesBackgroundAlpha = 0.2, -->
+<!--               hideOnMouseOut = FALSE) -->
 
-if (params$is_html != TRUE) {
-kb_mr_3_dext_to_gdp
-# dt_mr_3_dext_to_gdp
-}
-
-```
+<!-- ``` -->
 
 
 ## Public debt, domestic and external:
