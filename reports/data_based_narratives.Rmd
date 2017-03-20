@@ -7,6 +7,7 @@ output:
     code_folding: hide
     number_sections: yes
     toc: yes
+    toc_depth: 3
   pdf_document: default
   word_document: default
 params:
@@ -45,6 +46,7 @@ library(lubridate)
 library(ineq)
 library(knitr)
 library(xts)
+library(purrr)
 
 library(xtable)
 options(xtable.floating = FALSE)
@@ -70,8 +72,14 @@ mr_year <- params$end_year
 
 ```
 
+
+```{r source_dext_funcs}
+source(file = "./functions/cate_dext.R")
+```
+
+
 # Debt
-## Total external debt {.tabset}
+## Total external debt {.tabset .tabset-fade .tabset-pills}
 
 ```{r load_ext_debt_data}
 load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
@@ -155,6 +163,7 @@ dg_18
 ```
 
 
+
 ### South America
 
 ```{r ext_debt_make_dygraph_sa_sambv}
@@ -224,26 +233,133 @@ dg_ca
 
 ```
 
-<!-- ### BRA, MEX, VEN -->
 
-<!-- ```{r dext_make_dygraph_bmv} -->
+### Quantiles of indebtness {.tabset}
 
-<!-- dext_to_gdp_bmv_xts <- cbind.xts(dext_to_gdp_sa_xts[ ,"BRA"], -->
-<!--                      dext_to_gdp_ca_xts[ ,"MEX"], -->
-<!--                      dext_to_gdp_sa_xts[ ,"VEN"]) -->
 
-<!-- dext_title_bmv <- "(Gross) External debt, as % of GDP (BMV)" -->
+```{r dext_avg_pctile, echo=TRUE}
 
-<!-- dg_bmv <- dygraph(dext_to_gdp_bmv_xts, main = dext_title_bmv) %>% -->
-<!--   dyRangeSelector() %>% -->
-<!--   dyHighlight(highlightCircleSize = 4,  -->
-<!--               highlightSeriesBackgroundAlpha = 0.3, -->
-<!--               hideOnMouseOut = FALSE) -->
-<!-- dg_bmv -->
-<!-- ``` -->
+# sample of 18 countries:
+dext_18_class_med_1990_2015 <- cate_dext(dext_to_gdp_18)
+dext_18_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_18, 
+                                          is_med = FALSE, is_pct3 = TRUE)
+dext_18_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_18,
+                                          is_med = FALSE, is_pct3 = FALSE,
+                                          is_pct4 = TRUE)
+
+dext_18_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
+                                              time_breaks = 2001)
+dext_18_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_18, 
+                                               time_breaks = 2001,
+                                               is_med = FALSE,
+                                               is_pct3 = TRUE)
+dext_18_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
+                                               time_breaks = 2001,
+                                               is_med = FALSE, is_pct3 = FALSE,
+                                               is_pct4 = TRUE)
+
+# sample of south american countries
+dext_sa_class_med_1990_2015 <- cate_dext(dext_to_gdp_sa)
+dext_sa_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_sa, 
+                                          is_med = FALSE, is_pct3 = TRUE)
+dext_sa_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_sa,
+                                          is_med = FALSE, is_pct3 = FALSE,
+                                          is_pct4 = TRUE)
+
+dext_sa_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
+                                              time_breaks = 2001)
+dext_sa_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_sa, 
+                                               time_breaks = 2001,
+                                               is_med = FALSE,
+                                               is_pct3 = TRUE)
+dext_sa_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_sa,
+                                               time_breaks = 2001,
+                                               is_med = FALSE, is_pct3 = FALSE,
+                                               is_pct4 = TRUE)
+
+# sample of central american countries
+dext_ca_class_med_1990_2015 <- cate_dext(dext_to_gdp_ca)
+dext_ca_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_ca, 
+                                          is_med = FALSE, is_pct3 = TRUE)
+dext_ca_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_ca,
+                                          is_med = FALSE, is_pct3 = FALSE,
+                                          is_pct4 = TRUE)
+
+dext_ca_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
+                                              time_breaks = 2001)
+dext_ca_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_ca, 
+                                               time_breaks = 2001,
+                                               is_med = FALSE,
+                                               is_pct3 = TRUE)
+dext_ca_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_ca,
+                                               time_breaks = 2001,
+                                               is_med = FALSE, is_pct3 = FALSE,
+                                               is_pct4 = TRUE)
+
+# iso_18_above_median_90_15 <-  dext_18_class_med_1990_2015 %>% 
+#   filter(dext_group == "above_median") %>% select(iso3c) %>% distinct()
+# 
+# iso_18_below_median_90_15 <-  dext_18_class_med_1990_2015 %>% 
+#   filter(dext_group == "below_median") %>% select(iso3c) %>% distinct()
+```
+
+```{r dext_avg_pctile_xts_wide}
+dext_18_med_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_med_1990_2015)
+dext_18_pct3_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_18_pct4_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
+dext_18_med_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015)
+dext_18_pct3_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_18_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
+dext_sa_med_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_med_1990_2001_2015)
+dext_sa_pct3_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct3_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_sa_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_sa_class_pct4_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
+dext_ca_med_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_med_1990_2001_2015)
+dext_ca_pct3_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct3_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+dext_ca_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct4_1990_2001_2015,
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+
+```
+
+
+#### ALC three quantiles 
+```{r  dext_avg_pctile3_dygraph, echo=TRUE}
+# using 2001 as a time break, pct33 and pct66
+dg_dext_18_pct3_1990_2001_2015 <- purrr::map(dext_18_pct3_1990_2001_2015_xts,
+                                             dygraph)
+
+
+dg_dext_18_pct3_1990_2015 <- purrr::map(dext_18_pct3_1990_2015_xts,
+                                             dygraph)
+dg_dext_18_pct3_1990_2015[[3]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
 
 
 ### Based on 1990-2001, 2002-2015 averages
+```
 
 ```{r dext_to_gdp_1990_2002_2015}
 source('./functions/break_down_table.R')
@@ -255,13 +371,46 @@ dext_18_avg_1990_2001 <- dext_to_gdp_18 %>%
 pctiles_50_1990_2001 <-  quantile(dext_18_avg_1990_2001$dext_avg_1990_2001,
                                   probs = c(0.5))
 
-# dext_to_gdp_18_aug <-  dext_to_gdp_18 %>% 
-#   mutate(g_median_1990_2001 = if_else(deuda_ext_porc_pib > pctiles_50_1990_2001,
-#                                       "High", "Low"))
 
-# dext_to_gdp_18_aug <-  dext_to_gdp_18 %>% 
-#   mutate(g_median_1990_2001 = if_else(deuda_ext_porc_pib > pctiles_50_1990_2001,
-#                                       "High", "Low"))
+dg_dext_18_pct3_1990_2015[[2]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
+
+dg_dext_18_pct3_1990_2015[[1]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
+
+```
+
+#### ALC four quantiles
+```{r  dext_avg_pctile4_dygraph, echo=TRUE}
+# using 2001 as a time break, pct33 and pct66
+# dg_dext_18_pct4_1990_2001_2015 <- purrr::map(dext_18_pct3_1990_2001_2015_xts,
+#                                              dygraph)
+
+dg_dext_18_pct4_1990_2015 <- purrr::map(dext_18_pct4_1990_2015_xts,
+                                             dygraph)
+dg_dext_18_pct4_1990_2015[[4]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
+
+dg_dext_18_pct4_1990_2015[[3]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
+
+dg_dext_18_pct4_1990_2015[[2]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
+
+dg_dext_18_pct4_1990_2015[[1]] %>% dyRangeSelector() %>%
+  dyHighlight(highlightCircleSize = 5, 
+              highlightSeriesBackgroundAlpha = 0.2,
+              hideOnMouseOut = FALSE)
 
 dext_18_avg_2002_2015 <- dext_to_gdp_18 %>%
   filter(year(year) >= 2002 & year(year) <= 2015) %>% 
@@ -328,6 +477,36 @@ dext_to_gdp_18_median_split <- break_down_table(
 
 
 
+
+```{r ext_debt_make_tables, eval=FALSE, include=FALSE}
+
+if (params$is_html == TRUE) {
+print("html doc, only DT tables")
+dt_dext_to_gdp <- datatable(narr_dext_to_gdp)
+}
+
+
+#this could be changed later to if-else chain if pdf and word become explicit options
+if (params$is_html != TRUE) {
+print("not an html doc, prefer kable and xtable packages, over DT")
+kb_dext_to_gdp <- kable(narr_dext_to_gdp)
+xt_dext_to_gdp <- xtable(narr_dext_to_gdp)
+}
+```
+
+
+```{r ext_debt_show_tables, eval=FALSE, include=FALSE, results="asis"}
+
+if (params$is_html == TRUE) {
+dt_mr_3_dext_to_gdp
+}
+
+if (params$is_html != TRUE) {
+kb_mr_3_dext_to_gdp
+# dt_mr_3_dext_to_gdp
+}
+
+```
 
 
 ## Public debt, domestic and external:
