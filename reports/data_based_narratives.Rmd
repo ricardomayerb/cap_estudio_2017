@@ -7,6 +7,7 @@ output:
     code_folding: hide
     number_sections: yes
     toc: yes
+    toc_depth: 3
   pdf_document: default
   word_document: default
 params:
@@ -63,6 +64,12 @@ coi <- coi_sa_minus_BRA_VEN
 mr_year <- params$end_year
 
 ```
+
+
+```{r source_dext_funcs}
+source(file = "./functions/cate_dext.R")
+```
+
 
 # Debt
 ## Total external debt {.tabset .tabset-fade .tabset-pills}
@@ -229,11 +236,7 @@ dg_ca_mm
 
 ```
 
-### Quantiles of indebtness
-
-```{r source_dext_funcs}
-source(file = "./functions/cate_dext.R")
-```
+### Quantiles of indebtness {.tabset}
 
 
 ```{r dext_avg_pctile, echo=TRUE}
@@ -342,7 +345,7 @@ dext_ca_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_ca_class_pct4_1990
 ```
 
 
-#### ALC three quantiles
+#### ALC three quantiles 
 ```{r  dext_avg_pctile3_dygraph, echo=TRUE}
 # using 2001 as a time break, pct33 and pct66
 dg_dext_18_pct3_1990_2001_2015 <- purrr::map(dext_18_pct3_1990_2001_2015_xts,
