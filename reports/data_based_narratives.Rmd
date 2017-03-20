@@ -144,11 +144,23 @@ dext_18_pct4_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2015
                                                       is_pct3 = FALSE,
                                                       is_pct4 = TRUE)
 
-dext_18_med_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015)
-dext_18_pct3_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015,
+dext_18_med_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015[[1]])
+dext_18_med_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015[[2]])
+
+
+dext_18_pct3_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015[[1]],
                                                       is_med = FALSE,
                                                       is_pct3 = TRUE)
-dext_18_pct4_1990_2001_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015,
+dext_18_pct3_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015[[2]],
+                                                      is_med = FALSE,
+                                                      is_pct3 = TRUE)
+
+
+dext_18_pct4_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015[[2]],
+                                                      is_med = FALSE,
+                                                      is_pct3 = FALSE,
+                                                      is_pct4 = TRUE)
+dext_18_pct4_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015[[2]],
                                                       is_med = FALSE,
                                                       is_pct3 = FALSE,
                                                       is_pct4 = TRUE)
@@ -200,24 +212,37 @@ dg_18_med_b
 ##### Based on 1990-2001 and 2002-2015 values
 
 ```{r ext_debt_make_dygraph_18_pct50_2001}
-#using dygraph
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
 
-dg_18_med_2001_a <- dygraph(dext_18_med_1990_2001_2015_xts[["above_median"]]) %>%
+dg_18_med_2001_a_period1 <- dygraph(dext_18_med_1990_2001_2015_xts_1[["above_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_med_2001_b <- dygraph(dext_18_med_1990_2001_2015_xts[["below_median"]]) %>%
+dg_18_med_2001_b_period1 <- dygraph(dext_18_med_1990_2001_2015_xts_1[["below_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
-dg_18_med_2001_a
+dg_18_med_2001_a_period1
 
-dg_18_med_2001_b
+dg_18_med_2001_b_period1
+
+
+dg_18_med_2001_a_period2 <- dygraph(dext_18_med_1990_2001_2015_xts_2[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dg_18_med_2001_b_period2 <- dygraph(dext_18_med_1990_2001_2015_xts_2[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dg_18_med_2001_a_period2
+
+dg_18_med_2001_b_period2
 
 ```
 
