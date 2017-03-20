@@ -48,25 +48,40 @@ options(xtable.floating = FALSE)
 options(xtable.timestamp = "")
 options(width = 60)
 options(digits = 3)
-
-
 mr_year <- params$end_year
 
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017'
 ```
 
 
 
 ```{r source_dext_funcs, warning=FALSE}
-# source(file = "./functions/cate_dext.R")
-source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R') 
+# print(getwd())
+# source(file = "../functions/cate_dext.R")
+# source('~/GitHub/cap_estudio_2017/functions/cate_dext.R')
+# source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R') 
+source(paste0(pre_path, "functions/cate_dext.R"))
+
 ```
 
 ```{r loading_country_dicts}
+
+load(paste0(pre_path, "produced_data/cepal_19_countries"))
+load(paste0(pre_path, "produced_data/cepal_33_countries"))
+
+
 # load("./produced_data/cepal_19_countries")
 # load("./produced_data/cepal_33_countries")
+# load("../produced_data/cepal_19_countries")
+# load("../produced_data/cepal_33_countries")
 
-load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_19_countries")
-load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_33_countries")
+# load("~/GitHub/cap_estudio_2017/produced_data/cepal_19_countries")
+# load("~/GitHub/cap_estudio_2017/produced_data/cepal_33_countries")
+
+# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_19_countries")
+# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_33_countries")
+
 ```
 
 ```{r define_ALC_groups}
@@ -87,7 +102,10 @@ coi <- coi_sa_minus_BRA_VEN
 
 ```{r load_ext_debt_data}
 # load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
-load('V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_deuda_externa')
+# load('V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_deuda_externa')
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_deuda_externa"))
 ```
 
 ```{r ext_debt_make_dfs, echo=FALSE}
@@ -1236,7 +1254,10 @@ dg_ca_pct4_b25_2001_period2
 
 ```{r load_public_debt_data}
 # load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
-load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_sector_publico")
+# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_sector_publico")
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_sector_publico"))
 ```
 
 ```{r secpub_debt_make_dfs, echo=FALSE }
@@ -1261,7 +1282,8 @@ sp_deuda_porc_pib <- cs_sector_publico %>%
   spread(clasificacion_deuda, deuda_publica_porc_pib) %>%
   rename(total_p = total_deuda_publica__clasificacion_por_residencia_,
          externa_p = deuda_externa,
-         interna_p = deuda_interna)
+         interna_p = deuda_interna) %>% 
+  mutate(year = as.Date(as.character(year), format = "%Y"))
 
 gcentral_deuda_pib <- sp_deuda_porc_pib %>% 
   filter(cobertura == "Gobierno central"  ) %>% 
@@ -1290,34 +1312,74 @@ gspnf_deuda_pib <- sp_deuda_porc_pib %>%
 gobcen_deuda_18 <- gcentral_deuda_pib %>% 
   filter(iso3c %in% coi_18)
 
-gobcen_deuda_tot_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, total_p), 
-                                            is_full = TRUE, is_med = FALSE, value_col = "total_p")
+gobcen_deuda_tot_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, total_p), is_full = TRUE, is_med = FALSE, value_col_name = "total_p")
 
-gobcen_deuda_dom_xts <- cate_dext_to_xts_wide(gobcen_deuda_18[["interna_p"]], 
-                                            is_full = TRUE, is_med = FALSE)
+gobcen_deuda_dom_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, interna_p), is_full = TRUE, is_med = FALSE, value_col_name = "interna_p")
 
-gobcen_deuda_dom_xts <- cate_dext_to_xts_wide(gobcen_deuda_18[["externa_p"]], 
-                                            is_full = TRUE, is_med = FALSE)
+gobcen_deuda_ext_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, externa_p), is_full = TRUE, is_med = FALSE, value_col_name = "externa_p")
 
-dext_to_gdp_18_m_bmv <- dext_to_gdp_18 %>% 
-  filter(iso3c %in% coi_18_minus_br_mx_ven)
+# dext_to_gdp_18_m_bmv <- dext_to_gdp_18 %>% 
+#   filter(iso3c %in% coi_18_minus_br_mx_ven)
+# 
+# dext_to_gdp_18_m_bmv_xts <- cate_dext_to_xts_wide(dext_to_gdp_18_m_bmv,
+#                                                 is_full = TRUE, is_med = FALSE)
 
-dext_to_gdp_18_m_bmv_xts <- cate_dext_to_xts_wide(dext_to_gdp_18_m_bmv,
-                                                is_full = TRUE, is_med = FALSE)
+gobcen_deuda_tot_18_class_med_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p")
 
-dext_18_class_med_1990_2015 <- cate_dext(dext_to_gdp_18)
-dext_18_class_pct3_1990_2015 <- cate_dext(dext_to_gdp_18, 
-                                          is_med = FALSE, is_pct3 = TRUE)
-dext_18_class_pct4_1990_2015 <- cate_dext(dext_to_gdp_18,
-                                          is_med = FALSE, is_pct3 = FALSE,
-                                          is_pct4 = TRUE)
+gobcen_deuda_dom_18_class_med_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p")
 
-dext_18_class_med_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
-                                              time_breaks = 2001)
+gobcen_deuda_ext_18_class_med_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p")
+
+gobcen_deuda_tot_18_class_pct3_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_dom_18_class_pct3_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_ext_18_class_pct3_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", is_med = FALSE, is_pct3 = TRUE)
+
+
+gobcen_deuda_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", is_med = FALSE,  is_pct4 = TRUE)
+
+gobcen_deuda_dom_18_class_pct4_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", is_med = FALSE,  is_pct4 = TRUE)
+
+gobcen_deuda_ext_18_class_pct4_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", is_med = FALSE,  is_pct4 = TRUE)
+
+
+gobcen_deuda_tot_18_class_med_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", time_breaks = 2001)
+
+gobcen_deuda_dom_18_class_med_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", time_breaks = 2001)
+
+gobcen_deuda_ext_18_class_med_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", time_breaks = 2001)
+
 dext_18_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_18, 
                                                time_breaks = 2001,
                                                is_med = FALSE,
                                                is_pct3 = TRUE)
+
+
 dext_18_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
                                                time_breaks = 2001,
                                                is_med = FALSE, is_pct3 = FALSE,
@@ -1665,8 +1727,16 @@ dg_18_pct4_b25_2001_period2
 ## Cartera vencida 
 
 ```{r cartera_vencida_make}
-load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
-load("./produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto")
+# load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
+# load("./produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto")
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto"))
+
+
 
 cv_december <- cartera_vencida_33_tidy %>% 
   filter(year <= params$end_year) %>% 
@@ -1798,7 +1868,9 @@ tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>%
 de cada país, en cada año.
 
 ```{r exp_imp_make_dfs}
-load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
+# load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_x_m_10_ppales"))
 
 
 exp_10_ppales <- cs_x_m_10_ppales %>%
@@ -1823,7 +1895,9 @@ exp_10_ppales_by_iso <- exp_10_ppales %>%
 Datos mensuales, promediados por año
 
 ```{r shares_exp_3_cat}
-load("./produced_data/data_with_basic_wrangling/x_m_locations_products_tidy")
+# load("./produced_data/data_with_basic_wrangling/x_m_locations_products_tidy")
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/x_m_locations_products_tidy"))
 
 imp_by_prod_to_join <- imp_by_prod_tidy %>% 
    filter(iso3c %in% coi) %>% 

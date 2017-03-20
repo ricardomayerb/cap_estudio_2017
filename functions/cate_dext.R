@@ -150,6 +150,7 @@ cate_dext <- function(df, time_breaks = NULL, level_breaks = NULL,
   
 }
 
+
 cate_dext_to_xts_wide <- function(cate_dext_df, is_med = TRUE,
                                   is_pct3 = FALSE, is_pct4 = FALSE,
                                   is_full = FALSE) {
@@ -267,10 +268,155 @@ cate_dext_to_xts_wide <- function(cate_dext_df, is_med = TRUE,
   
 }
 
-cate_gen_to_xts_wide <- function(cate_gen_df, value_col, is_med = TRUE,
+cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL,
+                      is_med = TRUE, is_pct3 = FALSE, is_pct4 = FALSE) {
+  wrapr::let(alias = list(value_col = value_col_name), expr = {
+  if (is.null(time_breaks)) {
+    if (is_med == TRUE) {
+      new_df <- df %>% arrange(iso3c, year) %>% 
+        mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
+        group_by(iso3c) %>% 
+        mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+        mutate(gen_group = if_else(avg_value > median_of_avg, "above_median",
+                                    "below_median"))
+      return(new_df)
+    } else {
+      if (is_pct3) {
+        new_df <- df  %>% arrange(iso3c, year) %>% 
+          mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
+                                         na.rm = TRUE),
+                 pct66_of_avg = quantile(value_col, probs = 0.66,
+                                         na.rm = TRUE)
+          ) %>% 
+          group_by(iso3c) %>% 
+          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+          mutate(gen_group = if_else(avg_value > pct66_of_avg, "above_pct66",
+                                      if_else(avg_value > pct33_of_avg,
+                                              "pct33_to_66",
+                                              "below_pct33")
+          )
+          
+          )
+        return(new_df)
+      } else {
+        new_df <- df %>% 
+          mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
+                                         na.rm = TRUE),
+                 pct50_of_avg = quantile(value_col, probs = 0.50,
+                                         na.rm = TRUE),
+                 pct75_of_avg = quantile(value_col, probs = 0.75,
+                                         na.rm = TRUE)
+          ) %>% 
+          group_by(iso3c) %>% 
+          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+          mutate(gen_group = if_else(avg_value > pct75_of_avg, "above_pct75",
+                                      if_else(avg_value > pct50_of_avg, "pct50_to_75",
+                                              if_else(avg_value > pct25_of_avg,
+                                                      "pct25_to_50",
+                                                      "below_pct25"))
+          )
+          
+          )
+        return(new_df)
+      }
+    }
+    
+  } else {
+    # some time break used: e.g. 2001. Creates 1990-2001 and 2002, 2015
+    if (is_med) {
+      new_df <- df %>%  arrange(iso3c, year) %>% 
+        mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+        arrange(period) %>% 
+        group_by(period) %>% 
+        mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
+        group_by(period, iso3c) %>% 
+        mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+        ungroup() %>% 
+        group_by(iso3c) %>% 
+        mutate(gen_group = if_else(avg_value > median_of_avg, "above_median",
+                                    "below_median"))
+      
+      new_df_period_1 <- new_df %>% 
+        filter(period == "period_1")
+      
+      new_df_period_2 <- new_df %>% 
+        filter(period == "period_2")
+      
+      return( list(df_period_1 = new_df_period_1,
+                   df_period_2 = new_df_period_2, df_full =  new_df))
+    } else {
+      if (is_pct3) {
+        new_df <- df %>%  arrange(iso3c, year) %>% 
+          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+          arrange(period) %>% 
+          group_by(period) %>% 
+          mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
+                                         na.rm = TRUE),
+                 pct66_of_avg = quantile(value_col, probs = 0.66,
+                                         na.rm = TRUE)
+          ) %>% 
+          group_by(period, iso3c) %>% 
+          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+          ungroup() %>% 
+          group_by(iso3c) %>% 
+          mutate(gen_group = if_else(avg_value > pct66_of_avg, "above_pct66",
+                                      if_else(avg_value > pct33_of_avg,
+                                              "pct33_to_66",
+                                              "below_pct33")
+          )
+          
+          )
+        new_df_period_1 <- new_df %>% 
+          filter(period == "period_1")
+        
+        new_df_period_2 <- new_df %>% 
+          filter(period == "period_2")
+        
+        return( list(df_period_1 = new_df_period_1,
+                     df_period_2 = new_df_period_2, df_full =  new_df))
+      } else {
+        new_df <- df %>%  arrange(iso3c, year) %>% 
+          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+          arrange(period) %>% 
+          group_by(period) %>% 
+          mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
+                                         na.rm = TRUE),
+                 pct50_of_avg = quantile(value_col, probs = 0.50,
+                                         na.rm = TRUE),
+                 pct75_of_avg = quantile(value_col, probs = 0.75,
+                                         na.rm = TRUE)
+          ) %>% 
+          group_by(period, iso3c) %>% 
+          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
+          ungroup() %>% 
+          group_by(iso3c) %>% 
+          mutate(gen_group = if_else(avg_value > pct75_of_avg, "above_pct75",
+                                      if_else(avg_value > pct50_of_avg, "pct50_to_75",
+                                              if_else(avg_value > pct25_of_avg,
+                                                      "pct25_to_50",
+                                                      "below_pct25"))
+          )
+          
+          )
+        new_df_period_1 <- new_df %>% 
+          filter(period == "period_1")
+        
+        new_df_period_2 <- new_df %>% 
+          filter(period == "period_2")
+        
+        return( list(df_period_1 = new_df_period_1,
+                     df_period_2 = new_df_period_2, df_full =  new_df))
+        
+      }
+    }
+  }
+  })
+}
+
+cate_gen_to_xts_wide <- function(cate_gen_df, value_col_name, is_med = TRUE,
                                   is_pct3 = FALSE, is_pct4 = FALSE,
                                   is_full = FALSE) {
-  wrapr::let(alias = list(total_p = total_p), expr = {
+  wrapr::let(alias = list(value_col = value_col_name), expr = {
   if(is_full){
     df_sp <-  cate_gen_df %>% 
       select(iso3c, year, value_col) %>% 
@@ -384,6 +530,10 @@ cate_gen_to_xts_wide <- function(cate_gen_df, value_col, is_med = TRUE,
   })
 }
 
+# load("functions/gobcen.rda")
+# 
+# foo <- cate_gen_to_xts_wide(cate_gen_df = gobcen_deuda_18, value_col_name = "total_p",
+#                      is_med = FALSE, is_full = TRUE)
 
 break_down_table <- function(bigtable, iso2c_list=NULL,
                              cuts_vector=NULL, ...) {
