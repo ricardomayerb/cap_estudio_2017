@@ -4996,15 +4996,228 @@ exp_by_prod_shares <- exp_by_prod_wide_anual %>%
   arrange(iso3c, year, product)
 
 exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>% 
-  group_by(iso3c, year, product) %>% 
-  summarise(share_anual = mean(share, rm.na=TRUE))
+  mutate(year_as_date = as.Date(as.character(year), format = "%Y")) %>% 
+  group_by(iso3c, year_as_date, product) %>% 
+  summarise(share_anual = mean(share, rm.na=TRUE)) 
 
+exp_agro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "agro_pec")
+
+
+exp_manuf_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "manuf")
+
+exp_mineria_y_petro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "mineria_y_petro")
 
 ```
 
 
+### Latin America {.tabset}
 
 
 
+```{r xshares_make_dfs_18, include=TRUE}
+minsh_18 <- exp_mineria_y_petro_pec_shares_anual_avg  %>% 
+  filter(iso3c %in% coi_18)
+
+# minsh_18_xts <- cate_gen_to_xts_wide(minsh_18 %>% select(iso3c, year_as_date, share_anual),
+#                                   value_col_name = "share_anual",
+#                                   is_full = TRUE, is_med = FALSE,
+#                                   dating_col_name = "year_as_date")
+
+minsh_18_sp <- minsh_18 %>% select(iso3c, year_as_date, share_anual) %>% spread(key = iso3c, value = share_anual)
+minsh_18_xts <- minsh_18_sp %>% select(- year_as_date) %>% xts(order.by = minsh_18_sp$year_as_date) 
+minsh_18_xts$year_as_date <- NULL
+
+
+
+minsh_18_class_pct4_1990_2001_2015 <- cate_gen(minsh_18 %>% 
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+minsh_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(minsh_18_class_pct4_1990_2001_2015[[2]], 
+    value_col_name = "share_anual", is_med = FALSE, is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+
+manush_18 <- exp_manuf_shares_anual_avg  %>% 
+  filter(iso3c %in% coi_18)
+
+manush_18_sp <- manush_18 %>% select(iso3c, year_as_date, share_anual) %>% spread(key = iso3c, value = share_anual)
+manush_18_xts <- manush_18_sp %>% select(- year_as_date) %>% xts(order.by = minsh_18_sp$year_as_date) 
+manush_18_xts$year_as_date <- NULL
+
+# 
+# manush_18_xts <- cate_gen_to_xts_wide(manush_18 %>% select(iso3c, year_as_date, share_anual),
+#                                   value_col_name = "share_anual",
+#                                   is_full = TRUE, is_med = FALSE,
+#                                   dating_col_name = "year_as_date")
+
+manush_18_class_pct4_1990_2001_2015 <- cate_gen(manush_18 %>% 
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+manush_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(manush_18_class_pct4_1990_2001_2015[[2]], 
+    value_col_name = "share_anual", is_med = FALSE, is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+
+agropec_18 <- exp_agro_pec_shares_anual_avg %>% 
+  filter(iso3c %in% coi_18)
+
+agropec_18_xts <- cate_gen_to_xts_wide(agropec_18 %>% select(iso3c, year_as_date, share_anual),
+                                  value_col_name = "share_anual",
+                                  is_full = TRUE, is_med = FALSE,
+                                  dating_col_name = "year_as_date")
+
+agropec_18_class_pct4_1990_2001_2015 <- cate_gen(agropec_18 %>% 
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+agropec_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(agropec_18_class_pct4_1990_2001_2015[[2]], 
+    value_col_name = "share_anual", is_med = FALSE, is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+```
+
+
+#### All (18) countries
+```{r xshares_make_dygraph_18}
+dminsh_title_18 <- "Export shares, mining and oil (E18)"
+
+dminsh_18 <- dygraph(minsh_18_xts, main = dminsh_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dminsh_18
+
+dagropec_title_18 <- "Export shares, agro and agropec (E18)"
+
+dagropec_18 <- dygraph(agropec_18_xts, main = dagropec_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dagropec_18
+
+
+dmanush_title_18 <- "Export shares, manufactures (E18)"
+
+dmanush_18 <- dygraph(manush_18_xts, main = dmanush_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dmanush_18
+
+```
+
+
+#### Countries sorted into quartiles of the Y-axis variable
+
+
+```{r manush_make_dygraph_18_2001_pct25_50_75_period2}
+dmanush_18_pct4_b25_2001_period2 <- dygraph(
+  manush_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dmanush_18_pct4_25_to_50_2001_period2 <- dygraph(manush_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dmanush_18_pct4_50_to_75_2001_period2 <- dygraph(manush_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dmanush_18_pct4_a75_2001_period2 <- dygraph(manush_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dmanush_18_pct4_a75_2001_period2
+
+dmanush_18_pct4_50_to_75_2001_period2
+
+dmanush_18_pct4_25_to_50_2001_period2
+
+dmanush_18_pct4_b25_2001_period2
+
+
+dagropec_18_pct4_b25_2001_period2 <- dygraph(
+  agropec_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dagropec_18_pct4_25_to_50_2001_period2 <- dygraph(agropec_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dagropec_18_pct4_50_to_75_2001_period2 <- dygraph(agropec_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dagropec_18_pct4_a75_2001_period2 <- dygraph(agropec_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dagropec_18_pct4_a75_2001_period2
+
+dagropec_18_pct4_50_to_75_2001_period2
+
+dagropec_18_pct4_25_to_50_2001_period2
+
+dagropec_18_pct4_b25_2001_period2
+
+
+dminsh_18_pct4_b25_2001_period2 <- dygraph(
+  minsh_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dminsh_18_pct4_25_to_50_2001_period2 <- dygraph(minsh_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dminsh_18_pct4_50_to_75_2001_period2 <- dygraph(minsh_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dminsh_18_pct4_a75_2001_period2 <- dygraph(minsh_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dminsh_18_pct4_a75_2001_period2
+
+dminsh_18_pct4_50_to_75_2001_period2
+
+dminsh_18_pct4_25_to_50_2001_period2
+
+dminsh_18_pct4_b25_2001_period2
+
+
+```
 
 
