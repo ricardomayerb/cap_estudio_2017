@@ -269,8 +269,10 @@ cate_dext_to_xts_wide <- function(cate_dext_df, is_med = TRUE,
 }
 
 cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL,
-                      is_med = TRUE, is_pct3 = FALSE, is_pct4 = FALSE) {
-  wrapr::let(alias = list(value_col = value_col_name), expr = {
+                      is_med = TRUE, is_pct3 = FALSE, is_pct4 = FALSE,
+                     dating_col_name = "year") {
+  wrapr::let(alias = list(value_col = value_col_name, date_col = dating_col_name),
+             expr = {
   if (is.null(time_breaks)) {
     if (is_med == TRUE) {
       new_df <- df %>% arrange(iso3c, year) %>% 
@@ -323,9 +325,10 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
     
   } else {
     # some time break used: e.g. 2001. Creates 1990-2001 and 2002, 2015
+    
     if (is_med) {
-      new_df <- df %>%  arrange(iso3c, year) %>% 
-        mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+      new_df <- df %>%  arrange(iso3c, date_col) %>% 
+        mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
         arrange(period) %>% 
         group_by(period) %>% 
         mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
@@ -346,8 +349,8 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
                    df_period_2 = new_df_period_2, df_full =  new_df))
     } else {
       if (is_pct3) {
-        new_df <- df %>%  arrange(iso3c, year) %>% 
-          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+        new_df <- df %>%  arrange(iso3c, date_col) %>% 
+          mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
           arrange(period) %>% 
           group_by(period) %>% 
           mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
@@ -375,8 +378,8 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
         return( list(df_period_1 = new_df_period_1,
                      df_period_2 = new_df_period_2, df_full =  new_df))
       } else {
-        new_df <- df %>%  arrange(iso3c, year) %>% 
-          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
+        new_df <- df %>%  arrange(iso3c, date_col) %>% 
+          mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
           arrange(period) %>% 
           group_by(period) %>% 
           mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
@@ -415,8 +418,9 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
 
 cate_gen_to_xts_wide <- function(cate_gen_df, value_col_name, is_med = TRUE,
                                   is_pct3 = FALSE, is_pct4 = FALSE,
-                                  is_full = FALSE) {
-  wrapr::let(alias = list(value_col = value_col_name), expr = {
+                                  is_full = FALSE, 
+                                 dating_col_name = "year") {
+  wrapr::let(alias = list(value_col = value_col_name, year = dating_col_name), expr = {
   if(is_full){
     df_sp <-  cate_gen_df %>% 
       select(iso3c, year, value_col) %>% 
@@ -530,6 +534,24 @@ cate_gen_to_xts_wide <- function(cate_gen_df, value_col_name, is_med = TRUE,
   })
 }
 
+# load("./functions/prueba_cixts.rda")
+
+# foo <- ci_18 %>% select(iso3c, date, total_to_gdp_seas)
+# 
+# moo <-  cate_gen(
+#   df = foo,
+#   value_col_name = "total_to_gdp_seas", is_med = FALSE,
+#   is_pct4 = TRUE)
+# 
+# my_time_break = as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
+# 
+# goo <-  cate_gen(
+#   df = foo, time_breaks = my_time_break,
+#   value_col_name = "total_to_gdp_seas", is_med = FALSE,
+#   is_pct4 = TRUE,
+#   dating_col_name = "date")
+
+#  time_breaks = 2001,
 # load("functions/gobcen.rda")
 # 
 # foo <- cate_gen_to_xts_wide(cate_gen_df = gobcen_deuda_18, value_col_name = "total_p",

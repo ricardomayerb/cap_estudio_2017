@@ -50,8 +50,12 @@ options(width = 60)
 options(digits = 3)
 mr_year <- params$end_year
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017'
+default_time_break <- as.Date("2001-12-31", format = "%Y-%m-%d") 
+
+# time_breaks = 2001
+
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 ```
 
 
@@ -60,8 +64,8 @@ pre_path <- "~/GitHub/cap_estudio_2017/"
 # print(getwd())
 # source(file = "../functions/cate_dext.R")
 # source('~/GitHub/cap_estudio_2017/functions/cate_dext.R')
-# source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R') 
-source(paste0(pre_path, "functions/cate_dext.R"))
+source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R')
+# source(paste0(pre_path, "functions/cate_dext.R"))
 
 ```
 
@@ -1364,44 +1368,44 @@ gobcen_deuda_ext_18_class_pct4_1990_2015 <- cate_gen(
 
 gobcen_deuda_tot_18_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001)
+  value_col_name = "total_p", time_breaks = default_time_break)
 
 gobcen_deuda_dom_18_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001)
+  value_col_name = "interna_p", time_breaks = default_time_break)
 
 gobcen_deuda_ext_18_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001)
+  value_col_name = "externa_p", time_breaks = default_time_break)
 
 gobcen_deuda_tot_18_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_dom_18_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_ext_18_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_dom_18_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_ext_18_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 
@@ -2331,44 +2335,44 @@ gobcen_deuda_ext_sa_class_pct4_1990_2015 <- cate_gen(
 
 gobcen_deuda_tot_sa_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001)
+  value_col_name = "total_p", time_breaks = default_time_break)
 
 gobcen_deuda_dom_sa_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001)
+  value_col_name = "interna_p", time_breaks = default_time_break)
 
 gobcen_deuda_ext_sa_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001)
+  value_col_name = "externa_p", time_breaks = default_time_break)
 
 gobcen_deuda_tot_sa_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_dom_sa_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_ext_sa_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_tot_sa_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_dom_sa_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_ext_sa_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_sa %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 
@@ -3286,44 +3290,44 @@ gobcen_deuda_ext_ca_class_pct4_1990_2015 <- cate_gen(
 
 gobcen_deuda_tot_ca_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001)
+  value_col_name = "total_p", time_breaks = default_time_break)
 
 gobcen_deuda_dom_ca_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001)
+  value_col_name = "interna_p", time_breaks = default_time_break)
 
 gobcen_deuda_ext_ca_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001)
+  value_col_name = "externa_p", time_breaks = default_time_break)
 
 gobcen_deuda_tot_ca_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_dom_ca_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_ext_ca_class_pct3_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct3 = TRUE)
 
 gobcen_deuda_tot_ca_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, total_p),
-  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_dom_ca_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, interna_p),
-  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 gobcen_deuda_ext_ca_class_pct4_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_ca %>% select(iso3c, year, externa_p),
-  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
 
@@ -4210,7 +4214,7 @@ cv_3_6_9_12 <- cartera_vencida_33_tidy %>%
 cartera_vencida_qtr_with_gdp <- cs_gdp_currentlc_q_gasto %>%
   select(-c(iso3c, nombre_pais, Rubro)) %>%
   left_join( cartera_vencida_33_tidy ,  by = c("iso2c", "date")) %>%
-  filter( !is.na(cartera_vencida_percent) ) %>%
+  filter( !is.na(cartera_vencida_percent) ) %>% 
   filter(iso3c %in% coi)
 
 mr_3_cv_anual <- cv_december %>%
@@ -4238,7 +4242,7 @@ cv_18 <- cv_december %>%
 cv_18_xts <- cate_gen_to_xts_wide(cv_18 %>% select(iso3c, year, cartera_vencida_percent)    , value_col_name = "cartera_vencida_percent",  is_full = TRUE, is_med = FALSE)
 
 cv_18_class_pct4_1990_2001_2015 <- cate_gen(cv_18 %>% 
-    select(iso3c, year, cartera_vencida_percent), value_col_name = "cartera_vencida_percent", time_breaks = 2001, is_med = FALSE, is_pct3 = FALSE,
+    select(iso3c, year, cartera_vencida_percent), value_col_name = "cartera_vencida_percent", time_breaks = default_time_break, is_med = FALSE, is_pct3 = FALSE,
                                                is_pct4 = TRUE)
 
 # cv_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(cv_18_class_pct4_1990_2001_2015[[1]] %>% filter(!is.na(gen_group)), 
@@ -4304,36 +4308,38 @@ dcv_18_pct4_b25_2001_period2
 ## Crédito interno
 
 ```{r credito_interno_make_dfs}
+
 credito_interno_qtr <- cs_gdp_currentlc_q_gasto %>% 
-  select(-c(iso3c, nombre_pais, Rubro)) %>% 
+  select(-c(iso3c, nombre_pais, Rubro, year)) %>% 
   left_join( credito_interno_33_tidy ,  by = c("iso2c", "date")) %>% 
   filter( !is.na(total) ) %>% 
-  filter(iso3c %in% coi) %>% 
-  filter(year <= params$end_year) %>% 
   mutate(total_to_gdp_seas = total/gdp_sa_seas,
-         al_spub_gdp_seas = al.sector.público/gdp_sa_seas,
+         al_spub_gdp_seas = al.sector.publico/gdp_sa_seas,
          al_spriv_gdp_seas = al.sector.privado/gdp_sa_seas,
          al_gob_gdp_seas = gobierno/gdp_sa_seas,
          a_otros_gdp_seas = otros/gdp_sa_seas,
          total_to_gdp_stl = total/gdp_sa_stl,
-         al_spub_gdp_stl = al.sector.público/gdp_sa_stl,
+         al_spub_gdp_stl = al.sector.publico/gdp_sa_stl,
          al_spriv_gdp_stl = al.sector.privado/gdp_sa_stl,
          al_gob_gdp_stl = gobierno/gdp_sa_stl,
-         a_otros_gdp_stl = otros/gdp_sa_stl)
+         a_otros_gdp_stl = otros/gdp_sa_stl) %>% 
+  dplyr::select(- ends_with("_stl")) %>% 
+  select(- dplyr::contains("al.")) %>% 
+  select(- c(otros, otros.1, gdp,  total, gobierno, month))
 
 
 tab_ci_qrt_gdp <- credito_interno_qtr %>% 
   group_by(iso2c, year) %>%
   summarise(nobs = n(), 
             num_countries = length(unique(credito_interno_qtr$iso2c)),
-            avg_spu_gdp = mean(al_spub_gdp_stl, rm.na = TRUE),
-            avg_spr_gdp = mean(al_spriv_gdp_stl, rm.na = TRUE),
-            avg_tot_gdp = mean(total_to_gdp_stl, rm.na = TRUE),
-            avg_gob_gdp = mean(al_gob_gdp_stl, rm.na = TRUE),
-            n_gob_gdp = sum(!is.na(al_gob_gdp_stl)),
-            n_tot_gdp = sum(!is.na(total_to_gdp_stl)),
-            n_spub_gdp = sum(!is.na(al_spub_gdp_stl)),
-            n_spr_gdp = sum(!is.na(al_spriv_gdp_stl))
+            avg_spu_gdp = mean(al_spub_gdp_seas, rm.na = TRUE),
+            avg_spr_gdp = mean(al_spriv_gdp_seas, rm.na = TRUE),
+            avg_tot_gdp = mean(total_to_gdp_seas, rm.na = TRUE),
+            avg_gob_gdp = mean(al_gob_gdp_seas, rm.na = TRUE),
+            n_gob_gdp = sum(!is.na(al_gob_gdp_seas)),
+            n_tot_gdp = sum(!is.na(total_to_gdp_seas)),
+            n_spub_gdp = sum(!is.na(al_spub_gdp_seas)),
+            n_spr_gdp = sum(!is.na(al_spriv_gdp_seas))
   )
 
 
@@ -4353,19 +4359,243 @@ mr_3_ci_to_gdp <- tab_ci_qrt_gdp %>%
          rnk_mr_3_tot = min_rank(-avg_mr_ci_tot_3)) %>% 
   arrange(iso2c)
 
+```
+
+
+### Latin America {.tabset}
+
+
+```{r ci_make_dfs_18, include=TRUE}
+
+ci_time_break <- as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
+
+ci_18 <- credito_interno_qtr %>% 
+  filter(iso3c %in% coi_18)
+
+ci_tot_18_xts <- cate_gen_to_xts_wide(ci_18 %>% select(iso3c, date, total_to_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "total_to_gdp_seas", dating_col_name = "date")
+
+ci_spu_18_xts <- cate_gen_to_xts_wide(ci_18 %>% select(iso3c, date, al_spub_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "al_spub_gdp_seas", dating_col_name = "date")
+
+ci_spri_18_xts <- cate_gen_to_xts_wide(ci_18 %>% select(iso3c, date, al_spriv_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "al_spriv_gdp_seas", dating_col_name = "date")
+
+
+ci_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, total_to_gdp_seas),
+  value_col_name = "total_to_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+ci_spu_18_class_pct4_1990_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, al_spub_gdp_seas),
+  value_col_name = "al_spub_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+ci_spri_18_class_pct4_1990_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, al_spriv_gdp_seas),
+  value_col_name = "al_spriv_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+
+
+ci_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, total_to_gdp_seas),
+  value_col_name = "total_to_gdp_seas", time_breaks = ci_time_break, is_med = FALSE,
+                 is_pct4 = TRUE, dating_col_name = "date")
+
+ci_spu_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, al_spub_gdp_seas),
+  value_col_name = "al_spub_gdp_seas", time_breaks = ci_time_break, is_med = FALSE,
+                     is_pct4 = TRUE, dating_col_name = "date")
+
+ci_spri_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = ci_18 %>% select(iso3c, date, al_spriv_gdp_seas),
+  value_col_name = "al_spriv_gdp_seas", time_breaks = ci_time_break, is_med = FALSE,
+                    is_pct4 = TRUE, dating_col_name = "date")
+
+
+ci_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  ci_tot_18_class_pct4_1990_2015,
+  value_col_name = "total_to_gdp_seas",
+  dating_col_name = "date", is_med = FALSE, is_pct4 = TRUE)
+
+ci_spu_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  ci_spu_18_class_pct4_1990_2015,
+  value_col_name = "al_spub_gdp_seas", 
+  dating_col_name = "date", is_med = FALSE, is_pct4 = TRUE)
+
+ci_spri_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  ci_spri_18_class_pct4_1990_2015,
+  value_col_name = "al_spriv_gdp_seas", dating_col_name = "date",
+  is_med = FALSE, is_pct4 = TRUE)
+
+
+ci_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  ci_tot_18_class_pct4_1990_2001_2015[[1]], dating_col_name = "date",
+  value_col_name = "total_to_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+ci_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  ci_tot_18_class_pct4_1990_2001_2015[[2]], dating_col_name = "date",
+                    value_col_name = "total_to_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+ci_spu_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  ci_spu_18_class_pct4_1990_2001_2015[[1]], dating_col_name = "date", 
+                    value_col_name = "al_spub_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+ci_spu_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  ci_spu_18_class_pct4_1990_2001_2015[[2]],  dating_col_name = "date",
+                    value_col_name = "al_spub_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+ci_spri_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  ci_spri_18_class_pct4_1990_2001_2015[[1]],  dating_col_name = "date",
+                    value_col_name = "al_spriv_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+ci_spri_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  ci_spri_18_class_pct4_1990_2001_2015[[2]],  dating_col_name = "date", 
+                    value_col_name = "al_spriv_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
 
 ```
+
+#### All (18) countries
+```{r ci_make_dygraph_18}
+#using dygraph
+ci_tot_title_18 <- "Domestic credit, as % of GDP"
+
+ci_tot_18 <- dygraph(ci_tot_18_xts, main = ci_tot_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+ci_tot_18
+
+ci_spu_title_18 <- "Domestic credit to public sector, as % of GDP"
+
+ci_spu_18 <- dygraph(ci_spu_18_xts, main = ci_spu_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+ci_spu_18
+
+ci_spri_title_18 <- "Domestic credit to private sector, as % of GDP"
+
+ci_spri_18 <- dygraph(ci_spri_18_xts, main = ci_spri_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+ci_spri_18
+
+```
+
+
+Period: 2002-2015
+
+
+```{r ci_make_dygraph_18_2001_pct25_50_75_period2}
+dci_tot_18_pct4_b25_2001_period2 <- dygraph(ci_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_tot_18_pct4_25_to_50_2001_period2 <- dygraph(ci_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_tot_18_pct4_50_to_75_2001_period2 <- dygraph(ci_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_tot_18_pct4_a75_2001_period2 <- dygraph(ci_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_tot_18_pct4_a75_2001_period2
+
+dci_tot_18_pct4_50_to_75_2001_period2
+
+dci_tot_18_pct4_25_to_50_2001_period2
+
+dci_tot_18_pct4_b25_2001_period2
+
+
+dci_spu_18_pct4_b25_2001_period2 <- dygraph(ci_spu_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spu_18_pct4_25_to_50_2001_period2 <- dygraph(ci_spu_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spu_18_pct4_50_to_75_2001_period2 <- dygraph(ci_spu_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spu_18_pct4_a75_2001_period2 <- dygraph(ci_spu_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spu_18_pct4_a75_2001_period2
+
+dci_spu_18_pct4_50_to_75_2001_period2
+
+dci_spu_18_pct4_25_to_50_2001_period2
+
+dci_spu_18_pct4_b25_2001_period2
+
+dci_spri_18_pct4_b25_2001_period2 <- dygraph(ci_spri_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spri_18_pct4_25_to_50_2001_period2 <- dygraph(ci_spri_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spri_18_pct4_50_to_75_2001_period2 <- dygraph(ci_spri_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spri_18_pct4_a75_2001_period2 <- dygraph(ci_spri_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dci_spri_18_pct4_a75_2001_period2
+
+dci_spri_18_pct4_50_to_75_2001_period2
+
+dci_spri_18_pct4_25_to_50_2001_period2
+
+dci_spri_18_pct4_b25_2001_period2
+
+```
+
 
 ## Préstamos Bancarios
 
 ```{r prestamos_bancarios_make_dfs}
 
 prestamos_bancarios_qtr <- cs_gdp_currentlc_q_gasto %>% 
-    select(-c(iso3c, nombre_pais, Rubro)) %>% 
+    select(-c(iso3c, nombre_pais, Rubro, year)) %>% 
     left_join(prestamos_bancarios_33_tidy,  by = c("iso2c", "date")) %>% 
     filter( !is.na(total) ) %>% 
-    filter(iso3c %in% coi) %>% 
-    filter(year <= params$end_year) %>% 
     mutate(total_to_gdp_stl = total/gdp_sa_stl,
            consumo_gdp_stl = consumo/gdp_sa_stl,
            hipotecario_gdp_stl = hipotecario/gdp_sa_stl,
@@ -4405,8 +4635,6 @@ load(paste0(pre_path,
 
 
 exp_10_ppales <- cs_x_m_10_ppales %>%
-  filter(iso3c %in% coi) %>% 
-  filter(year <= params$end_year) %>% 
   unite(productos_principales,  starts_with("Produ")) %>% 
   mutate(productos_principales = str_replace_all(productos_principales,
                                                  "_", "") %>% 
