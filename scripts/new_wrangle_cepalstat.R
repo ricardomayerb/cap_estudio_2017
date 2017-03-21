@@ -235,7 +235,7 @@ cs_desempleo_trimestral <- cs_desempleo %>%
 
 
 
-cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
+cepalstat_sector_real_mn_trimestral_2 <- cepalstat_sector_real_mn_trimestral %>% 
   separate(col="País [Año base]", into=c("País", "Año base"), sep="\\[") %>% 
   select(-contains("base")) %>% mutate(País = str_trim(País))
 
@@ -248,7 +248,7 @@ cepalstat_sector_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>%
 #   filter(`País [Año base]`=="Chile [año base 2008]") %>% 
 #   arrange(Años, Trimestres)
 
-cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral %>% 
+cs_real_mn_trimestral <- cepalstat_sector_real_mn_trimestral_2 %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) %>% rename(nombre_pais = País) %>% 
@@ -263,7 +263,7 @@ cs_gdp_currentlc_q_gasto <- cs_real_mn_trimestral %>%
   filter(indicador ==
            "Producto interno bruto trimestral por objeto del gasto a precios corrientes") %>% 
   select( -c(indicador, Rubro_1, notas, fuente)) %>% 
-  dplyr::rename(gdp = valor) %>% 
+  dplyr::rename(gdp = valor, year = Años) %>% 
   arrange(iso2c, date) 
 
 cs_gdp_constantlc_q_gasto <- cs_real_mn_trimestral %>% 
@@ -271,7 +271,7 @@ cs_gdp_constantlc_q_gasto <- cs_real_mn_trimestral %>%
   filter(indicador ==
            "Producto interno bruto trimestral por objeto del gasto a precios constantes") %>% 
   select( -c(indicador, Rubro_1, notas, fuente)) %>% 
-  dplyr::rename(gdp = valor) %>% 
+  dplyr::rename(gdp = valor, year = Años) %>% 
   arrange(iso2c, date) 
 
 cs_gdp_currentlc_q_activ <- cs_real_mn_trimestral %>% 
@@ -279,7 +279,7 @@ cs_gdp_currentlc_q_activ <- cs_real_mn_trimestral %>%
   filter(indicador ==
            "Producto interno bruto trimestral por clase de actividad económica a precios corrientes") %>% 
   select( -c(indicador, Rubro, notas, fuente)) %>% 
-  dplyr::rename(gdp = valor) %>% 
+  dplyr::rename(gdp = valor, year = Años) %>% 
   arrange(iso2c, date) 
 
 cs_gdp_constantlc_q_activ <- cs_real_mn_trimestral %>% 
@@ -287,7 +287,7 @@ cs_gdp_constantlc_q_activ <- cs_real_mn_trimestral %>%
   filter(indicador ==
            "Producto interno bruto trimestral por clase de actividad económica a precios constantes") %>% 
   select( -c(indicador, Rubro, notas, fuente)) %>% 
-  dplyr::rename(gdp = valor) %>% 
+  dplyr::rename(gdp = valor, year = Años ) %>% 
   arrange(iso2c, date) 
 
 gdp_iso <- unique(cs_gdp_currentlc_q_gasto$iso2c)

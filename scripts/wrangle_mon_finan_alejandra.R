@@ -2,6 +2,7 @@ library(tidyverse)
 library(stringr)
 library(countrycode)
 library(lubridate)
+library(stringi)
 
 load("./produced_data/datos_mon_finan_alej_messy")
 load("./produced_data/cepal_33_countries")
@@ -29,6 +30,9 @@ tpm_tidy <-  tpm %>%
                 year = year(date),
                 month = month(date)
                 )
+
+names(tpm_tidy) <- stringi::stri_trans_general(
+  names(tpm_tidy), "Latin-ASCII") 
 
 tpm_33_tidy <- tpm_tidy %>% 
     mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
@@ -66,6 +70,9 @@ cartera_vencida_tidy <- cartera_vencida %>%
                                                  Santa.Lucía = "Santa Lucía",
                                                  Trinidad.y.Tabago = "Trinidad y Tabago",
                                                  Venezuela = "Venezuela (República Bolivariana de)"))
+
+names(cartera_vencida_tidy) <- stringi::stri_trans_general(
+  names(cartera_vencida_tidy), "Latin-ASCII") 
 
 cartera_vencida_33_tidy <- cartera_vencida_tidy %>% 
   mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
@@ -124,6 +131,10 @@ credito_interno_tidy <- credito_interno %>%
            month = month(date)
            )
 
+names(credito_interno_tidy) <- stringi::stri_trans_general(
+  names(credito_interno_tidy), "Latin-ASCII") 
+
+
 credito_interno_33_tidy <- credito_interno_tidy %>% 
   mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                              custom_dict=cepal_33_countries),
@@ -174,6 +185,9 @@ prestamos_bancarios_tidy <- prestamos_bancarios %>%
                              Venezuela = "Venezuela (República Bolivariana de)"),
           year=year(date), month=month(date))
 
+names(prestamos_bancarios) <- stringi::stri_trans_general(
+  names(prestamos_bancarios), "Latin-ASCII") 
+
 prestamos_bancarios_33_tidy <- prestamos_bancarios_tidy %>% 
   mutate(iso2c = countrycode(nombre_pais, "country.name.es", "iso2c", 
                              custom_dict=cepal_33_countries),
@@ -221,6 +235,9 @@ meta_inf_tidy <- meta_inf_tidy %>%
          iso3c = countrycode(nombre_pais, "country.name.es", "iso3c", 
                              custom_dict=cepal_33_countries))
 
+names(meta_inf_tidy) <- stringi::stri_trans_general(
+  names(meta_inf_tidy), "Latin-ASCII") 
+
 
 # save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
 #      cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
@@ -228,8 +245,12 @@ meta_inf_tidy <- meta_inf_tidy %>%
 #      meta_inf_tidy,
 #      file = "./produced_data/monetary_fin_tidy")
 
+
+
+
 save(tpm_33_tidy, prestamos_bancarios_33_tidy, credito_interno_33_tidy,
      cartera_vencida_33_tidy, tpm_20_tidy, prestamos_bancarios_20_tidy, 
      credito_interno_20_tidy, cartera_vencida_20_tidy, 
      meta_inf_tidy,
      file = "./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
+
