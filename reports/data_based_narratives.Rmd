@@ -1104,7 +1104,7 @@ dg_ca_pct3_b33_2001_period2
 ```
 
 
-#### Country debt above and below percentiles 25, 50 and 75
+#### Countries sorted into quartiles of the Y-axis variable
 
 ##### Based on 1990-2015 values
 
@@ -1948,7 +1948,7 @@ dgcd_ext_18_pct3_b33_2001_period2
 ```
 
 
-#### Country debt above and below percentiles 25, 50 and 75
+#### Countries sorted into quartiles of the Y-axis variable
 
 ##### Based on 1990-2015 values
 
@@ -2915,7 +2915,7 @@ dgcd_ext_sa_pct3_b33_2001_period2
 ```
 
 
-#### Country debt above and below percentiles 25, 50 and 75
+#### Countries sorted into quartiles of the Y-axis variable
 
 ##### Based on 1990-2015 values
 
@@ -3870,7 +3870,7 @@ dgcd_ext_ca_pct3_b33_2001_period2
 ```
 
 
-#### Country debt above and below percentiles 25, 50 and 75
+#### Countries sorted into quartiles of the Y-axis variable
 
 ##### Based on 1990-2015 values
 
@@ -4266,7 +4266,7 @@ dyHighlight(highlightCircleSize = 4,
 dcv_18
 ```
 
-Period: 2002-2015
+#### Countries sorted into quartiles of the Y-axis variable
 
 
 ```{r cv_make_dygraph_18_2001_pct25_50_75_period2}
@@ -4370,7 +4370,8 @@ mr_3_ci_to_gdp <- tab_ci_qrt_gdp %>%
 ci_time_break <- as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
 
 ci_18 <- credito_interno_qtr %>% 
-  filter(iso3c %in% coi_18)
+  filter(iso3c %in% coi_18) %>% 
+  filter( iso3c != "COL") # remove colombia until fix in ci or gdp data (ratio is off by 3 orders of magnitude)
 
 ci_tot_18_xts <- cate_gen_to_xts_wide(ci_18 %>% select(iso3c, date, total_to_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "total_to_gdp_seas", dating_col_name = "date")
 
@@ -4484,7 +4485,7 @@ ci_spri_18
 ```
 
 
-Period: 2002-2015
+#### Countries sorted into quartiles of the Y-axis variable
 
 
 ```{r ci_make_dygraph_18_2001_pct25_50_75_period2}
@@ -4596,11 +4597,11 @@ prestamos_bancarios_qtr <- cs_gdp_currentlc_q_gasto %>%
     select(-c(iso3c, nombre_pais, Rubro, year)) %>% 
     left_join(prestamos_bancarios_33_tidy,  by = c("iso2c", "date")) %>% 
     filter( !is.na(total) ) %>% 
-    mutate(total_to_gdp_stl = total/gdp_sa_stl,
-           consumo_gdp_stl = consumo/gdp_sa_stl,
-           hipotecario_gdp_stl = hipotecario/gdp_sa_stl,
-           industrial_gdp_stl = industrial/gdp_sa_stl,
-           comercial_gdp_stl = comercial/gdp_sa_stl)
+    mutate(total_to_gdp_seas = total/gdp_sa_seas,
+           consumo_gdp_seas = consumo/gdp_sa_seas,
+           hipotecario_gdp_seas = hipotecario/gdp_sa_seas,
+           industrial_gdp_seas = industrial/gdp_sa_seas,
+           comercial_gdp_seas = comercial/gdp_sa_seas)
 
 
 
@@ -4609,14 +4610,238 @@ tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>%
   filter(iso2c != "CO") %>% 
   summarise(nobs = n(), 
             num_countries = length(unique(prestamos_bancarios_qtr$iso2c)),
-            avg_tot_to_gdp = mean(total_to_gdp_stl),
-            avg_hip_to_gdp = mean(hipotecario_gdp_stl, rm.na=TRUE),
-            avg_con_to_gdp = mean(consumo_gdp_stl, rm.na=TRUE),
-            n_hip_to_gdp = sum(!is.na(hipotecario_gdp_stl)),
-            n_con_to_gdp = sum(!is.na(consumo_gdp_stl))
+            avg_tot_to_gdp = mean(total_to_gdp_seas),
+            avg_hip_to_gdp = mean(hipotecario_gdp_seas, rm.na=TRUE),
+            avg_con_to_gdp = mean(consumo_gdp_seas, rm.na=TRUE),
+            n_hip_to_gdp = sum(!is.na(hipotecario_gdp_seas)),
+            n_con_to_gdp = sum(!is.na(consumo_gdp_seas))
   )
 
+```
 
+
+### Latin America {.tabset}
+
+
+```{r pb_make_dfs_18, include=TRUE}
+
+pb_time_break <- as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
+
+pb_18 <- prestamos_bancarios_qtr %>% 
+  filter(iso3c %in% coi_18) %>% 
+  filter( iso3c != "COL") # remove colombia until fix in ci or gdp data (ratio is off by 3 orders of magnitude)
+
+pb_tot_18_xts <- cate_gen_to_xts_wide(pb_18 %>% select(iso3c, date, total_to_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "total_to_gdp_seas", dating_col_name = "date")
+
+pb_hip_18_xts <- cate_gen_to_xts_wide(pb_18 %>% select(iso3c, date, hipotecario_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "hipotecario_gdp_seas", dating_col_name = "date")
+
+pb_con_18_xts <- cate_gen_to_xts_wide(pb_18 %>% select(iso3c, date, consumo_gdp_seas), is_full = TRUE, is_med = FALSE, value_col_name = "consumo_gdp_seas", dating_col_name = "date")
+
+
+pb_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, total_to_gdp_seas),
+  value_col_name = "total_to_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+pb_hip_18_class_pct4_1990_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, hipotecario_gdp_seas),
+  value_col_name = "hipotecario_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+pb_con_18_class_pct4_1990_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, consumo_gdp_seas),
+  value_col_name = "consumo_gdp_seas", is_med = FALSE,  is_pct4 = TRUE)
+
+
+
+pb_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, total_to_gdp_seas),
+  value_col_name = "total_to_gdp_seas", time_breaks = pb_time_break, is_med = FALSE,
+                 is_pct4 = TRUE, dating_col_name = "date")
+
+pb_hip_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, hipotecario_gdp_seas),
+  value_col_name = "hipotecario_gdp_seas", time_breaks = pb_time_break, is_med = FALSE,
+                     is_pct4 = TRUE, dating_col_name = "date")
+
+pb_con_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = pb_18 %>% select(iso3c, date, consumo_gdp_seas),
+  value_col_name = "consumo_gdp_seas", time_breaks = pb_time_break, is_med = FALSE,
+                    is_pct4 = TRUE, dating_col_name = "date")
+
+
+pb_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  pb_tot_18_class_pct4_1990_2015,
+  value_col_name = "total_to_gdp_seas",
+  dating_col_name = "date", is_med = FALSE, is_pct4 = TRUE)
+
+pb_hip_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  pb_hip_18_class_pct4_1990_2015,
+  value_col_name = "hipotecario_gdp_seas", 
+  dating_col_name = "date", is_med = FALSE, is_pct4 = TRUE)
+
+pb_con_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  pb_con_18_class_pct4_1990_2015,
+  value_col_name = "consumo_gdp_seas", dating_col_name = "date",
+  is_med = FALSE, is_pct4 = TRUE)
+
+
+pb_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  pb_tot_18_class_pct4_1990_2001_2015[[1]], dating_col_name = "date",
+  value_col_name = "total_to_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+pb_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  pb_tot_18_class_pct4_1990_2001_2015[[2]], dating_col_name = "date",
+                    value_col_name = "total_to_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+pb_hip_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  pb_hip_18_class_pct4_1990_2001_2015[[1]], dating_col_name = "date", 
+                    value_col_name = "hipotecario_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+pb_hip_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  pb_hip_18_class_pct4_1990_2001_2015[[2]],  dating_col_name = "date",
+                    value_col_name = "hipotecario_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+pb_con_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(
+  pb_con_18_class_pct4_1990_2001_2015[[1]],  dating_col_name = "date",
+                    value_col_name = "consumo_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+pb_con_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
+  pb_con_18_class_pct4_1990_2001_2015[[2]],  dating_col_name = "date", 
+                    value_col_name = "consumo_gdp_seas",is_med = FALSE, is_pct4 = TRUE)
+
+```
+
+#### All (18) countries together
+```{r pb_make_dygraph_18}
+#using dygraph
+pb_tot_title_18 <- "Domestic credit, as % of GDP"
+
+pb_tot_18 <- dygraph(pb_tot_18_xts, main = pb_tot_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+pb_tot_18
+
+pb_hip_title_18 <- "Domestic credit to public sector, as % of GDP"
+
+pb_hip_18 <- dygraph(pb_hip_18_xts, main = pb_hip_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+pb_hip_18
+
+pb_con_title_18 <- "Domestic credit to private sector, as % of GDP"
+
+pb_con_18 <- dygraph(pb_con_18_xts, main = pb_con_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+pb_con_18
+
+```
+
+
+#### Countries sorted into quartiles of the Y-axis variable
+
+```{r pb_make_dygraph_18_2001_pct25_50_75_period2}
+dpb_tot_18_pct4_b25_2001_period2 <- dygraph(pb_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_tot_18_pct4_25_to_50_2001_period2 <- dygraph(pb_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_tot_18_pct4_50_to_75_2001_period2 <- dygraph(pb_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_tot_18_pct4_a75_2001_period2 <- dygraph(pb_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_tot_18_pct4_a75_2001_period2
+
+dpb_tot_18_pct4_50_to_75_2001_period2
+
+dpb_tot_18_pct4_25_to_50_2001_period2
+
+dpb_tot_18_pct4_b25_2001_period2
+
+
+dpb_hip_18_pct4_b25_2001_period2 <- dygraph(pb_hip_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_hip_18_pct4_25_to_50_2001_period2 <- dygraph(pb_hip_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_hip_18_pct4_50_to_75_2001_period2 <- dygraph(pb_hip_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_hip_18_pct4_a75_2001_period2 <- dygraph(pb_hip_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_hip_18_pct4_a75_2001_period2
+
+dpb_hip_18_pct4_50_to_75_2001_period2
+
+dpb_hip_18_pct4_25_to_50_2001_period2
+
+dpb_hip_18_pct4_b25_2001_period2
+
+dpb_con_18_pct4_b25_2001_period2 <- dygraph(pb_con_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_con_18_pct4_25_to_50_2001_period2 <- dygraph(pb_con_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_con_18_pct4_50_to_75_2001_period2 <- dygraph(pb_con_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_con_18_pct4_a75_2001_period2 <- dygraph(pb_con_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dpb_con_18_pct4_a75_2001_period2
+
+dpb_con_18_pct4_50_to_75_2001_period2
+
+dpb_con_18_pct4_25_to_50_2001_period2
+
+dpb_con_18_pct4_b25_2001_period2
 
 ```
 
@@ -4642,12 +4867,89 @@ exp_10_ppales <- cs_x_m_10_ppales %>%
            str_replace_all("NA", ""))
   
 exp_10_ppales_by_iso <- exp_10_ppales %>% 
-  group_by(iso3c, year) %>% 
+  mutate(year_as_date = as.Date(as.character(year), format = "%Y")) %>% 
+  group_by(iso3c, year_as_date) %>% 
   summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
-  arrange(iso3c, year)
+  arrange(iso3c, year_as_date)  
+    
 
 
 ```
+
+
+### Latin America {.tabset}
+
+
+
+```{r hx_make_dfs_18, include=TRUE}
+hx_18 <- exp_10_ppales_by_iso%>% 
+  filter(iso3c %in% coi_18)
+
+hx_18_xts <- cate_gen_to_xts_wide(hx_18 %>% select(iso3c, year_as_date, concentracion),
+                                  value_col_name = "concentracion",
+                                  is_full = TRUE, is_med = FALSE,
+                                  dating_col_name = "year_as_date")
+
+hx_18_class_pct4_1990_2001_2015 <- cate_gen(hx_18 %>% 
+    select(iso3c, year_as_date, concentracion), value_col_name = "concentracion", time_breaks = default_time_break, is_med = FALSE, is_pct3 = FALSE, is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+hx_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(hx_18_class_pct4_1990_2001_2015[[2]], 
+    value_col_name = "concentracion", is_med = FALSE, is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+```
+
+#### All (18) countries
+```{r hx_make_dygraph_18}
+#using dygraph
+dhx_title_18 <- "Export concentration, Herfindahl index (E18)"
+
+dhx_18 <- dygraph(hx_18_xts, main = dhx_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dhx_18
+```
+
+#### Countries sorted into quartiles of the Y-axis variable
+
+
+```{r hx_make_dygraph_18_2001_pct25_50_75_period2}
+dhx_18_pct4_b25_2001_period2 <- dygraph(
+  hx_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dhx_18_pct4_25_to_50_2001_period2 <- dygraph(hx_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dhx_18_pct4_50_to_75_2001_period2 <- dygraph(hx_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dhx_18_pct4_a75_2001_period2 <- dygraph(hx_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dhx_18_pct4_a75_2001_period2
+
+dhx_18_pct4_50_to_75_2001_period2
+
+dhx_18_pct4_25_to_50_2001_period2
+
+dhx_18_pct4_b25_2001_period2
+
+```
+
 
 ## Shares en exportaciones de 3 categorías a priori
 
