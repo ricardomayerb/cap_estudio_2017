@@ -1312,11 +1312,11 @@ gspnf_deuda_pib <- sp_deuda_porc_pib %>%
 gobcen_deuda_18 <- gcentral_deuda_pib %>% 
   filter(iso3c %in% coi_18)
 
-gobcen_deuda_tot_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, total_p), is_full = TRUE, is_med = FALSE, value_col_name = "total_p")
+gobcen_deuda_tot_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, total_p), is_full = TRUE, is_med = FALSE, value_col_name = "total_p")
 
-gobcen_deuda_dom_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, interna_p), is_full = TRUE, is_med = FALSE, value_col_name = "interna_p")
+gobcen_deuda_dom_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, interna_p), is_full = TRUE, is_med = FALSE, value_col_name = "interna_p")
 
-gobcen_deuda_ext_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, externa_p), is_full = TRUE, is_med = FALSE, value_col_name = "externa_p")
+gobcen_deuda_ext_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, externa_p), is_full = TRUE, is_med = FALSE, value_col_name = "externa_p")
 
 # dext_to_gdp_18_m_bmv <- dext_to_gdp_18 %>% 
 #   filter(iso3c %in% coi_18_minus_br_mx_ven)
@@ -1374,88 +1374,216 @@ gobcen_deuda_ext_18_class_med_1990_2001_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
   value_col_name = "externa_p", time_breaks = 2001)
 
-dext_18_class_pct3_1990_2001_2015 <- cate_dext(dext_to_gdp_18, 
-                                               time_breaks = 2001,
-                                               is_med = FALSE,
+gobcen_deuda_tot_18_class_pct3_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
                                                is_pct3 = TRUE)
 
+gobcen_deuda_dom_18_class_pct3_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+                                               is_pct3 = TRUE)
 
-dext_18_class_pct4_1990_2001_2015 <- cate_dext(dext_to_gdp_18,
-                                               time_breaks = 2001,
-                                               is_med = FALSE, is_pct3 = FALSE,
+gobcen_deuda_ext_18_class_pct3_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+                                               is_pct3 = TRUE)
+
+gobcen_deuda_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", time_breaks = 2001, is_med = FALSE,
                                                is_pct4 = TRUE)
 
-dext_18_med_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_med_1990_2015)
-dext_18_pct3_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2015,
-                                                      is_med = FALSE,
-                                                      is_pct3 = TRUE)
-dext_18_pct4_1990_2015_xts <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2015,
-                                                      is_med = FALSE,
-                                                      is_pct3 = FALSE,
-                                                      is_pct4 = TRUE)
+gobcen_deuda_dom_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", time_breaks = 2001, is_med = FALSE,
+                                               is_pct4 = TRUE)
 
-dext_18_med_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015[[1]])
-dext_18_med_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_med_1990_2001_2015[[2]])
+gobcen_deuda_ext_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", time_breaks = 2001, is_med = FALSE,
+                                               is_pct4 = TRUE)
 
 
-dext_18_pct3_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015[[1]],
-                                                      is_med = FALSE,
-                                                      is_pct3 = TRUE)
-dext_18_pct3_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_pct3_1990_2001_2015[[2]],
-                                                      is_med = FALSE,
-                                                      is_pct3 = TRUE)
+
+gobcen_deuda_tot_18_med_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_tot_18_class_med_1990_2015, value_col_name = "total_p")
+
+gobcen_deuda_dom_18_med_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_dom_18_class_med_1990_2015, value_col_name = "interna_p")
+
+gobcen_deuda_ext_18_med_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_ext_18_class_med_1990_2015, value_col_name = "externa_p")
+
+gobcen_deuda_tot_18_pct3_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_tot_18_class_pct3_1990_2015,
+  value_col_name = "total_p", is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_dom_18_pct3_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_dom_18_class_pct3_1990_2015,
+  value_col_name = "interna_p", is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_ext_18_pct3_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_ext_18_class_pct3_1990_2015,
+  value_col_name = "externa_p", is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_tot_18_class_pct4_1990_2015,
+  value_col_name = "total_p", is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_dom_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_dom_18_class_pct4_1990_2015,
+  value_col_name = "interna_p", is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_ext_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_ext_18_class_pct4_1990_2015,
+  value_col_name = "externa_p", is_med = FALSE, is_pct4 = TRUE)
 
 
-dext_18_pct4_1990_2001_2015_xts_1 <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015[[2]],
-                                                      is_med = FALSE,
-                                                      is_pct3 = FALSE,
-                                                      is_pct4 = TRUE)
-dext_18_pct4_1990_2001_2015_xts_2 <- cate_dext_to_xts_wide(dext_18_class_pct4_1990_2001_2015[[2]],
-                                                      is_med = FALSE,
-                                                      is_pct3 = FALSE,
-                                                      is_pct4 = TRUE)
+gobcen_deuda_tot_18_med_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_med_1990_2001_2015[[1]], 
+                    value_col_name = "total_p")
+
+gobcen_deuda_tot_18_med_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_med_1990_2001_2015[[2]], 
+                    value_col_name = "total_p")
+
+gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_pct3_1990_2001_2015[[1]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_pct3_1990_2001_2015[[2]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_dom_18_med_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_med_1990_2001_2015[[1]], 
+                    value_col_name = "interna_p")
+
+gobcen_deuda_dom_18_med_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_med_1990_2001_2015[[2]], 
+                    value_col_name = "interna_p")
+
+gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_pct3_1990_2001_2015[[1]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_pct3_1990_2001_2015[[2]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_dom_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_ext_18_med_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_med_1990_2001_2015[[1]], 
+                    value_col_name = "externa_p")
+
+gobcen_deuda_ext_18_med_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_med_1990_2001_2015[[2]], 
+                    value_col_name = "externa_p")
+
+gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_pct3_1990_2001_2015[[1]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_pct3_1990_2001_2015[[2]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct3 = TRUE)
+
+gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct4 = TRUE)
 
 ```
 
 #### All (18) countries
-```{r ext_debt_make_dygraph_18}
+```{r gobcen_debt_make_dygraph_18}
 #using dygraph
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+dgcd_tot_title_18 <- "(Gross) Total Public Debt, as % of GDP"
 
-dg_18 <- dygraph(dext_to_gdp_18_xts, main = dext_title_18) %>%
+dgcd_tot_18 <- dygraph(gobcen_deuda_tot_18_xts, main = dgcd_tot_title_18) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
-dg_18
+dgcd_tot_18
+
+dgcd_dom_title_18 <- "(Gross) Domestic Public Debt, as % of GDP"
+
+dgcd_dom_18 <- dygraph(gobcen_deuda_dom_18_xts, main = dgcd_dom_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgcd_dom_18
+
+dgcd_ext_title_18 <- "(Gross) External Public Debt, as % of GDP"
+
+dgcd_ext_18 <- dygraph(gobcen_deuda_ext_18_xts, main = dgcd_ext_title_18) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgcd_ext_18
 
 ```
 
 #### Country debt above and below group median
 
-
 ##### Based on 1990-2015 values
 
-```{r ext_debt_make_dygraph_18_pct50}
-#using dygraph
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+```{r gobcen_debt_make_dygraph_18_pct50}
 
-dg_18_med_a <- dygraph(dext_18_med_1990_2015_xts[["above_median"]]) %>%
+dgcd_tot_18_med_a <- dygraph(gobcen_deuda_tot_18_med_1990_2015_xts[["above_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_med_b <- dygraph(dext_18_med_1990_2015_xts[["below_median"]]) %>%
+dgcd_tot_18_med_b <- dygraph(gobcen_deuda_tot_18_med_1990_2015_xts[["below_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
-dg_18_med_a
 
-dg_18_med_b
+dgcd_tot_18_med_a
+
+dgcd_tot_18_med_b
+
+
+dgcd_dom_18_med_a <- dygraph(gobcen_deuda_dom_18_med_1990_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_b <- dygraph(gobcen_deuda_dom_18_med_1990_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_a
+
+dgcd_dom_18_med_b
+
+
+
+dgcd_ext_18_med_a <- dygraph(gobcen_deuda_ext_18_med_1990_2015_xts[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_b <- dygraph(gobcen_deuda_ext_18_med_1990_2015_xts[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_a
+
+dgcd_ext_18_med_b
 
 ```
 
@@ -1463,79 +1591,197 @@ dg_18_med_b
 
 Period: 1990 - 2001
 
-```{r ext_debt_make_dygraph_18_pct50_2001_period1}
+```{r gobcen_debt_make_dygraph_18_pct50_2001_period1}
 
-dg_18_med_2001_a_period1 <- dygraph(dext_18_med_1990_2001_2015_xts_1[["above_median"]]) %>%
+dgcd_tot_18_med_2001_a_period1 <- dygraph(gobcen_deuda_tot_18_med_1990_2001_2015_xts_1[["above_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_med_2001_b_period1 <- dygraph(dext_18_med_1990_2001_2015_xts_1[["below_median"]]) %>%
+dgcd_tot_18_med_2001_b_period1 <- dygraph(gobcen_deuda_tot_18_med_1990_2001_2015_xts_1[["below_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
-dg_18_med_2001_a_period1
 
-dg_18_med_2001_b_period1
+dgcd_tot_18_med_2001_a_period1
+
+dgcd_tot_18_med_2001_b_period1
+
+
+dgcd_dom_18_med_2001_a_period1 <- dygraph(gobcen_deuda_dom_18_med_1990_2001_2015_xts_1[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_2001_b_period1 <- dygraph(gobcen_deuda_dom_18_med_1990_2001_2015_xts_1[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_2001_a_period1
+
+dgcd_dom_18_med_2001_b_period1
+
+
+dgcd_ext_18_med_2001_a_period1 <- dygraph(gobcen_deuda_ext_18_med_1990_2001_2015_xts_1[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_2001_b_period1 <- dygraph(gobcen_deuda_ext_18_med_1990_2001_2015_xts_1[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_2001_a_period1
+
+dgcd_ext_18_med_2001_b_period1
 
 ```
 
 Period: 2002-2015
 
-```{r ext_debt_make_dygraph_18_pct50_2001_period2}
 
-dg_18_med_2001_a_period2 <- dygraph(dext_18_med_1990_2001_2015_xts_2[["above_median"]]) %>%
+```{r gobcen_debt_make_dygraph_18_pct50_2001_period2}
+
+dgcd_tot_18_med_2001_a_period2 <- dygraph(gobcen_deuda_tot_18_med_1990_2001_2015_xts_2[["above_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_med_2001_b_period2 <- dygraph(dext_18_med_1990_2001_2015_xts_2[["below_median"]]) %>%
+dgcd_tot_18_med_2001_b_period2 <- dygraph(gobcen_deuda_tot_18_med_1990_2001_2015_xts_2[["below_median"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
-dg_18_med_2001_a_period2
 
-dg_18_med_2001_b_period2
+dgcd_tot_18_med_2001_a_period2
+
+dgcd_tot_18_med_2001_b_period2
+
+
+dgcd_dom_18_med_2001_a_period2 <- dygraph(gobcen_deuda_dom_18_med_1990_2001_2015_xts_2[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_2001_b_period2 <- dygraph(gobcen_deuda_dom_18_med_1990_2001_2015_xts_2[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_med_2001_a_period2
+
+dgcd_dom_18_med_2001_b_period2
+
+
+dgcd_ext_18_med_2001_a_period2 <- dygraph(gobcen_deuda_ext_18_med_1990_2001_2015_xts_2[["above_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_2001_b_period2 <- dygraph(gobcen_deuda_ext_18_med_1990_2001_2015_xts_2[["below_median"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_med_2001_a_period2
+
+dgcd_ext_18_med_2001_b_period2
 
 ```
-
 
 #### Country debt above and below percentiles 33 and 66
 
 ##### Based on 1990-2015 values
 
-```{r ext_debt_make_dygraph_18_pct33_66}
-#using dygraph
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+```{r gobcen_debt_make_dygraph_18_pct33_66}
 
-dg_18_pct3_b33 <- dygraph(dext_18_pct3_1990_2015_xts[["below_p33"]]) %>%
+dgcd_tot_18_pct3_b33 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2015_xts[["below_p33"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_33_to_66 <- dygraph(dext_18_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+dgcd_tot_18_pct3_33_to_66 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2015_xts[["p33_to_66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66 <- dygraph(dext_18_pct3_1990_2015_xts[["above_p66"]]) %>%
+dgcd_tot_18_pct3_a66 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2015_xts[["above_p66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66
+dgcd_tot_18_pct3_a66
 
-dg_18_pct3_33_to_66
+dgcd_tot_18_pct3_33_to_66
 
-dg_18_pct3_b33
+dgcd_tot_18_pct3_b33
+
+
+dgcd_dom_18_pct3_b33 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_33_to_66 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66
+
+dgcd_dom_18_pct3_33_to_66
+
+dgcd_dom_18_pct3_b33
+
+
+dgcd_ext_18_pct3_b33 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2015_xts[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_33_to_66 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2015_xts[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2015_xts[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66
+
+dgcd_ext_18_pct3_33_to_66
+
+dgcd_ext_18_pct3_b33
+
 ```
 
 
@@ -1543,103 +1789,266 @@ dg_18_pct3_b33
 
 Period: 1990 - 2001
 
-```{r ext_debt_make_dygraph_18_pct33_66_2001_period1}
-dg_18_pct3_b33_2001_period1 <- dygraph(dext_18_pct3_1990_2001_2015_xts_1[["below_p33"]]) %>%
+```{r gobcen_debt_make_dygraph_18_pct33_66_2001_period1}
+dgcd_tot_18_pct3_b33_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_1[["below_p33"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_33_to_66_2001_period1 <- dygraph(dext_18_pct3_1990_2001_2015_xts_1[["p33_to_66"]]) %>%
+dgcd_tot_18_pct3_33_to_66_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_1[["p33_to_66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66_2001_period1 <- dygraph(dext_18_pct3_1990_2001_2015_xts_1[["above_p66"]]) %>%
+dgcd_tot_18_pct3_a66_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_1[["above_p66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66_2001_period1
+dgcd_tot_18_pct3_a66_2001_period1
 
-dg_18_pct3_33_to_66_2001_period1
+dgcd_tot_18_pct3_33_to_66_2001_period1
 
-dg_18_pct3_b33_2001_period1
+dgcd_tot_18_pct3_b33_2001_period1
+
+
+dgcd_dom_18_pct3_b33_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_1[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_33_to_66_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_1[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_1[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66_2001_period1
+
+dgcd_dom_18_pct3_33_to_66_2001_period1
+
+dgcd_dom_18_pct3_b33_2001_period1
+
+dgcd_ext_18_pct3_b33_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_1[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_33_to_66_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_1[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_1[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66_2001_period1
+
+dgcd_ext_18_pct3_33_to_66_2001_period1
+
+dgcd_ext_18_pct3_b33_2001_period1
 
 ```
 
 Period: 2002 - 2015
 
-```{r ext_debt_make_dygraph_18_pct33_66_2001_period2}
-
-dg_18_pct3_b33_2001_period2 <- dygraph(dext_18_pct3_1990_2001_2015_xts_2[["below_p33"]]) %>%
+```{r gobcen_debt_make_dygraph_18_pct33_66_2001_period2}
+dgcd_tot_18_pct3_b33_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_2[["below_p33"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_33_to_66_2001_period2 <- dygraph(dext_18_pct3_1990_2001_2015_xts_2[["p33_to_66"]]) %>%
+dgcd_tot_18_pct3_33_to_66_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_2[["p33_to_66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66_2001_period2 <- dygraph(dext_18_pct3_1990_2001_2015_xts_2[["above_p66"]]) %>%
+dgcd_tot_18_pct3_a66_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct3_1990_2001_2015_xts_2[["above_p66"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct3_a66_2001_period2
+dgcd_tot_18_pct3_a66_2001_period2
 
-dg_18_pct3_33_to_66_2001_period2
+dgcd_tot_18_pct3_33_to_66_2001_period2
 
-dg_18_pct3_b33_2001_period2
+dgcd_tot_18_pct3_b33_2001_period2
+
+
+dgcd_dom_18_pct3_b33_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_2[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_33_to_66_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_2[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct3_1990_2001_2015_xts_2[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct3_a66_2001_period2
+
+dgcd_dom_18_pct3_33_to_66_2001_period2
+
+dgcd_dom_18_pct3_b33_2001_period2
+
+dgcd_ext_18_pct3_b33_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_2[["below_p33"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_33_to_66_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_2[["p33_to_66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct3_1990_2001_2015_xts_2[["above_p66"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct3_a66_2001_period2
+
+dgcd_ext_18_pct3_33_to_66_2001_period2
+
+dgcd_ext_18_pct3_b33_2001_period2
 
 ```
+
 
 #### Country debt above and below percentiles 25, 50 and 75
 
 ##### Based on 1990-2015 values
 
-```{r ext_debt_make_dygraph_18_pct25_50_75}
-#using dygraph
-dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
-dext_title_18mbmv <- "(Gross) External debt, as % of GDP (E18mBMV)"
+```{r gobcen_debt_make_dygraph_18_pct25_50_75}
 
-dg_18_pct4_b25 <- dygraph(dext_18_pct4_1990_2015_xts[["below_p25"]]) %>%
+dgcd_tot_18_pct4_b25 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2015_xts[["below_p25"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_25_to_50 <- dygraph(dext_18_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+dgcd_tot_18_pct4_25_to_50 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2015_xts[["p25_to_50"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_50_to_75 <- dygraph(dext_18_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+dgcd_tot_18_pct4_50_to_75 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2015_xts[["p50_to_75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75 <- dygraph(dext_18_pct4_1990_2015_xts[["above_p75"]]) %>%
+dgcd_tot_18_pct4_a75 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2015_xts[["above_p75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75
+dgcd_tot_18_pct4_a75
 
-dg_18_pct4_50_to_75
+dgcd_tot_18_pct4_50_to_75
 
-dg_18_pct4_25_to_50
+dgcd_tot_18_pct4_25_to_50
 
-dg_18_pct4_b25
+dgcd_tot_18_pct4_b25
+
+
+
+dgcd_dom_18_pct4_b25 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct4_25_to_50 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct4_50_to_75 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct4_a75 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_dom_18_pct4_a75
+
+dgcd_dom_18_pct4_50_to_75
+
+dgcd_dom_18_pct4_25_to_50
+
+dgcd_dom_18_pct4_b25
+
+
+
+dgcd_ext_18_pct4_b25 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2015_xts[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct4_25_to_50 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2015_xts[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct4_50_to_75 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2015_xts[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct4_a75 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2015_xts[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcd_ext_18_pct4_a75
+
+dgcd_ext_18_pct4_50_to_75
+
+dgcd_ext_18_pct4_25_to_50
+
+dgcd_ext_18_pct4_b25
 
 ```
 
@@ -1648,77 +2057,212 @@ dg_18_pct4_b25
 Period 1990 - 2001
 
 ```{r ext_debt_make_dygraph_18_2001_pct25_50_75_period1}
-dg_18_pct4_b25_2001_period1 <- dygraph(dext_18_pct4_1990_2001_2015_xts_1[["below_p25"]]) %>%
+dgcg_tot_18_pct4_b25_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1[["below_p25"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_25_to_50_2001_period1 <- dygraph(dext_18_pct4_1990_2001_2015_xts_1[["p25_to_50"]]) %>%
+dgcg_tot_18_pct4_25_to_50_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1[["p25_to_50"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_50_to_75_2001_period1 <- dygraph(dext_18_pct4_1990_2001_2015_xts_1[["p50_to_75"]]) %>%
+dgcg_tot_18_pct4_50_to_75_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1[["p50_to_75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75_2001_period1 <- dygraph(dext_18_pct4_1990_2001_2015_xts_1[["above_p75"]]) %>%
+dgcg_tot_18_pct4_a75_2001_period1 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1[["above_p75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75_2001_period1
+dgcg_tot_18_pct4_a75_2001_period1
 
-dg_18_pct4_50_to_75_2001_period1
+dgcg_tot_18_pct4_50_to_75_2001_period1
 
-dg_18_pct4_25_to_50_2001_period1
+dgcg_tot_18_pct4_25_to_50_2001_period1
 
-dg_18_pct4_b25_2001_period1
+dgcg_tot_18_pct4_b25_2001_period1
+
+
+dgcg_dom_18_pct4_b25_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_1[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_25_to_50_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_1[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_50_to_75_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_1[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_a75_2001_period1 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_1[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_a75_2001_period1
+
+dgcg_dom_18_pct4_50_to_75_2001_period1
+
+dgcg_dom_18_pct4_25_to_50_2001_period1
+
+dgcg_dom_18_pct4_b25_2001_period1
+
+dgcg_ext_18_pct4_b25_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_25_to_50_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_50_to_75_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_a75_2001_period1 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_a75_2001_period1
+
+dgcg_ext_18_pct4_50_to_75_2001_period1
+
+dgcg_ext_18_pct4_25_to_50_2001_period1
+
+dgcg_ext_18_pct4_b25_2001_period1
+
 ```
 
 Period: 2002-2015
 
 
 ```{r ext_debt_make_dygraph_18_2001_pct25_50_75_period2}
-
-dg_18_pct4_b25_2001_period2 <- dygraph(dext_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+dgcg_tot_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_25_to_50_2001_period2 <- dygraph(dext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+dgcg_tot_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_50_to_75_2001_period2 <- dygraph(dext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+dgcg_tot_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75_2001_period2 <- dygraph(dext_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+dgcg_tot_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dg_18_pct4_a75_2001_period2
+dgcg_tot_18_pct4_a75_2001_period2
 
-dg_18_pct4_50_to_75_2001_period2
+dgcg_tot_18_pct4_50_to_75_2001_period2
 
-dg_18_pct4_25_to_50_2001_period2
+dgcg_tot_18_pct4_25_to_50_2001_period2
 
-dg_18_pct4_b25_2001_period2
+dgcg_tot_18_pct4_b25_2001_period2
+
+
+dgcg_dom_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_dom_18_pct4_a75_2001_period2
+
+dgcg_dom_18_pct4_50_to_75_2001_period2
+
+dgcg_dom_18_pct4_25_to_50_2001_period2
+
+dgcg_dom_18_pct4_b25_2001_period2
+
+dgcg_ext_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["below_p25"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]]) %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_18_pct4_a75_2001_period2
+
+dgcg_ext_18_pct4_50_to_75_2001_period2
+
+dgcg_ext_18_pct4_25_to_50_2001_period2
+
+dgcg_ext_18_pct4_b25_2001_period2
 
 ```
+
+
+
+
+
 
 
 
