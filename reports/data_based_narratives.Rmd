@@ -41,7 +41,7 @@ library(lubridate)
 library(ineq)
 library(knitr)
 library(xts)
-library(purrr)
+# library(purrr)
 
 library(xtable)
 options(xtable.floating = FALSE)
@@ -54,41 +54,14 @@ default_time_break <- as.Date("2001-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
-```
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
-
-
-```{r source_dext_funcs, warning=FALSE}
-# print(getwd())
-# source(file = "../functions/cate_dext.R")
-# source('~/GitHub/cap_estudio_2017/functions/cate_dext.R')
-source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R')
-# source(paste0(pre_path, "functions/cate_dext.R"))
-
-```
-
-```{r loading_country_dicts}
+source(paste0(pre_path, "functions/cate_dext.R"))
 
 load(paste0(pre_path, "produced_data/cepal_19_countries"))
 load(paste0(pre_path, "produced_data/cepal_33_countries"))
 
-
-# load("./produced_data/cepal_19_countries")
-# load("./produced_data/cepal_33_countries")
-# load("../produced_data/cepal_19_countries")
-# load("../produced_data/cepal_33_countries")
-
-# load("~/GitHub/cap_estudio_2017/produced_data/cepal_19_countries")
-# load("~/GitHub/cap_estudio_2017/produced_data/cepal_33_countries")
-
-# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_19_countries")
-# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_33_countries")
-
-```
-
-```{r define_ALC_groups}
 coi_19 <- cepal_19_countries$iso3c
 coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))]
 coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
@@ -98,7 +71,56 @@ coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
 coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))]
 
 coi <- coi_sa_minus_BRA_VEN
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto"))
+
 ```
+
+
+
+<!-- ```{r source_dext_funcs, warning=FALSE} -->
+<!-- # print(getwd()) -->
+<!-- # source(file = "../functions/cate_dext.R") -->
+<!-- # source('~/GitHub/cap_estudio_2017/functions/cate_dext.R') -->
+<!-- # source('V:/USR/RMAYER/cw/cap_estudio_2017/functions/cate_dext.R') -->
+<!-- source(paste0(pre_path, "functions/cate_dext.R")) -->
+
+<!-- ``` -->
+
+<!-- ```{r loading_country_dicts} -->
+
+<!-- load(paste0(pre_path, "produced_data/cepal_19_countries")) -->
+<!-- load(paste0(pre_path, "produced_data/cepal_33_countries")) -->
+
+
+<!-- # load("./produced_data/cepal_19_countries") -->
+<!-- # load("./produced_data/cepal_33_countries") -->
+<!-- # load("../produced_data/cepal_19_countries") -->
+<!-- # load("../produced_data/cepal_33_countries") -->
+
+<!-- # load("~/GitHub/cap_estudio_2017/produced_data/cepal_19_countries") -->
+<!-- # load("~/GitHub/cap_estudio_2017/produced_data/cepal_33_countries") -->
+
+<!-- # load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_19_countries") -->
+<!-- # load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/cepal_33_countries") -->
+
+<!-- ``` -->
+
+<!-- ```{r define_ALC_groups} -->
+<!-- coi_19 <- cepal_19_countries$iso3c -->
+<!-- coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))] -->
+<!-- coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))] -->
+<!-- coi_sa <-  c("ARG", "BOL" ,"BRA", "CHL", "COL", "ECU",  "PER", "PRY", "URY", "VEN") -->
+<!-- coi_sa_minus_BRA_VEN <- coi_sa[-which(coi_sa %in% c("BRA","VEN"))] -->
+<!-- coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX") -->
+<!-- coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))] -->
+
+<!-- coi <- coi_sa_minus_BRA_VEN -->
+<!-- ``` -->
 
 
 # Debt
@@ -4195,11 +4217,7 @@ dgcg_ext_ca_pct4_b25_2001_period2
 # load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
 # load("./produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto")
 
-load(paste0(pre_path, 
-            "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
 
-load(paste0(pre_path, 
-            "produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto"))
 
 cv_december <- cartera_vencida_33_tidy %>% 
   filter(iso3c %in% coi) %>% 
@@ -4310,7 +4328,7 @@ dcv_18_pct4_b25_2001_period2
 ```{r credito_interno_make_dfs}
 
 credito_interno_qtr <- cs_gdp_currentlc_q_gasto %>% 
-  select(-c(iso3c, nombre_pais, Rubro, year)) %>% 
+  select(-iso3c, -nombre_pais, -Rubro, -year) %>% 
   left_join( credito_interno_33_tidy ,  by = c("iso2c", "date")) %>% 
   filter( !is.na(total) ) %>% 
   mutate(total_to_gdp_seas = total/gdp_sa_seas,
