@@ -61,8 +61,8 @@ default_time_break <- as.Date("2007-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/cate_dext.R"))
 
@@ -85,20 +85,18 @@ load(paste0(pre_path,
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto"))
 
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_deuda_externa"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_sector_publico"))
+
 ```
 
 
 
 # Debt
 ## Total external debt 
-
-```{r load_ext_debt_data}
-# load("./produced_data/data_with_basic_wrangling/cs_deuda_externa")
-# load('V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_deuda_externa')
-
-load(paste0(pre_path, 
-            "produced_data/data_with_basic_wrangling/cs_deuda_externa"))
-```
 
 ```{r ext_debt_make_dfs, echo=FALSE}
 # make tibble for future tables and plots
@@ -179,7 +177,7 @@ dext_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(dext_18_class_pct4_199
                                             dating_col_name = "year")
 ```
 
-#### All (18) countries
+#### All countries
 
 ```{r ext_debt_make_dygraph_18, eval=params$dygraphs_plots}
 dext_title_18 <- "(Gross) External debt, as % of GDP (E18)"
@@ -274,13 +272,6 @@ multiplot(plotlist = plots_gen_group$gruplot, cols = 2)
 
 ## Public debt, domestic and external:
 
-```{r load_public_debt_data}
-# load("./produced_data/data_with_basic_wrangling/cs_sector_publico")
-# load("V:/USR/RMAYER/cw/cap_estudio_2017/produced_data/data_with_basic_wrangling/cs_sector_publico")
-
-load(paste0(pre_path, 
-            "produced_data/data_with_basic_wrangling/cs_sector_publico"))
-```
 
 ```{r secpub_debt_make_dfs, echo=FALSE }
 # sp_data <- cs_sector_publico %>% 
@@ -309,7 +300,8 @@ sp_deuda_porc_pib <- cs_sector_publico %>%
 
 gcentral_deuda_pib <- sp_deuda_porc_pib %>% 
   filter(cobertura == "Gobierno central"  ) %>% 
-  select(iso3c, year, externa_p, interna_p, total_p)
+  select(iso3c, year, externa_p, interna_p, total_p) %>% 
+  mutate(ext_2_total_p = externa_p/total_p)
 
 sectorpublico_deuda_pib <- sp_deuda_porc_pib %>% 
   filter(cobertura == "Sector público") %>% 
@@ -321,13 +313,30 @@ gsubnac_deuda_pib <- sp_deuda_porc_pib %>%
 
 gspnf_deuda_pib <- sp_deuda_porc_pib %>% 
   filter(cobertura == "Sector público no financiero") %>% 
-  select(iso3c, year, externa_p, interna_p, total_p)
+  select(iso3c, year, externa_p, interna_p, total_p)%>% 
+  mutate(ext_2_total_p = externa_p/total_p)
 
 ```
 
 
 
-### Latin America {.tabset}
+### Latin America, Central Goverment {.tabset}
+
+
+Salient features:
+
++  En términos generales, el perfil temporal de la deuda total de los Gobiernos Centrales 
+es similar al del país en su conjunto, visto en la sección anterior: muestra cuerta covergencia hacia el final de }la muestra, con un alza en mucho pasíses entre 1998 y el 2005, más o menos.
+
++  Lo que parece más interesante de comentar en esta sección es el alza absoluta y relativa de la deuda doméstica 
+de los gobiernos centrales, que se puede apreciar tanto el gráfico que muestra la deuda doméstica del gobierno como porcentaje del pib, como en el cuarto gráfico donde se observa una declinación del componente externo de la deuda de los gobiernos
+
++ En este último punto, es notorio como en 1990 sólo en un país, Chile, tenía una composición mayoritariamente doméstica del la deuda pública (y probablemente también Brasil, pero no existen datos 
+previos a 1998), mientras que en el 2015 ya son 7 los países donde menos de la mitad de la deuda pública es externa.
+Sólo Nicaragua y Boliva han incrementado notoriamente la proporción de deuda externa dentro de la deuda del gobierno central en los últimos años.
+
++ Para el año 2015, la deuda pública externa es un cuarto o menos de la deuda total en Colombia, Costa Rica, Chile y Brasil. 
+
 
 
 ```{r gobcen_debt_make_dfs_18, include=TRUE}
@@ -339,6 +348,8 @@ gobcen_deuda_tot_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c
 gobcen_deuda_dom_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, interna_p), is_full = TRUE, is_med = FALSE, value_col_name = "interna_p")
 
 gobcen_deuda_ext_18_xts <- cate_gen_to_xts_wide(gobcen_deuda_18 %>% select(iso3c, year, externa_p), is_full = TRUE, is_med = FALSE, value_col_name = "externa_p")
+
+gobcen_deuda_ext_2_tot_18_xts <- gobcen_deuda_ext_18_xts/gobcen_deuda_tot_18_xts
 
 
 gobcen_deuda_tot_18_class_pct4_1990_2015 <- cate_gen(
@@ -352,6 +363,10 @@ gobcen_deuda_dom_18_class_pct4_1990_2015 <- cate_gen(
 gobcen_deuda_ext_18_class_pct4_1990_2015 <- cate_gen(
   df = gobcen_deuda_18 %>% select(iso3c, year, externa_p),
   value_col_name = "externa_p", is_med = FALSE,  is_pct4 = TRUE)
+
+gobcen_deuda_ext_2_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, ext_2_total_p),
+  value_col_name = "ext_2_total_p", is_med = FALSE,  is_pct4 = TRUE)
 
 
 gobcen_deuda_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
@@ -369,6 +384,11 @@ gobcen_deuda_ext_18_class_pct4_1990_2001_2015 <- cate_gen(
   value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
                                                is_pct4 = TRUE)
 
+gobcen_deuda_ext_2_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = gobcen_deuda_18 %>% select(iso3c, year, ext_2_total_p),
+  value_col_name = "ext_2_total_p", time_breaks = default_time_break, is_med = FALSE,
+                                               is_pct4 = TRUE)
+
 
 gobcen_deuda_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
   gobcen_deuda_tot_18_class_pct4_1990_2015,
@@ -381,6 +401,10 @@ gobcen_deuda_dom_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
 gobcen_deuda_ext_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
   gobcen_deuda_ext_18_class_pct4_1990_2015,
   value_col_name = "externa_p", is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_ext_2_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  gobcen_deuda_ext_2_tot_18_class_pct4_1990_2015,
+  value_col_name = "ext_2_total_p", is_med = FALSE, is_pct4 = TRUE)
 
 
 gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_tot_18_class_pct4_1990_2001_2015[[1]], 
@@ -401,70 +425,88 @@ gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deu
 gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_ext_18_class_pct4_1990_2001_2015[[2]], 
                     value_col_name = "externa_p",is_med = FALSE, is_pct4 = TRUE)
 
+
+gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(gobcen_deuda_ext_2_tot_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "ext_2_total_p",is_med = FALSE, is_pct4 = TRUE)
+
+gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(gobcen_deuda_ext_2_tot_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "ext_2_total_p",is_med = FALSE, is_pct4 = TRUE)
+
 ```
 
-#### All (18) countries
+#### All  countries
 ```{r gobcen_debt_make_dygraph_18, eval=params$dygraphs_plots}
 #using dygraph
-dgcd_tot_title_18 <- "(Gross) Total Public Debt, as % of GDP"
+dgcd_tot_title_18 <- "(Gross) Total Central Gov. Debt, as % of GDP"
 
-dgcd_tot_18 <- dygraph(gobcen_deuda_tot_18_xts, main = dgcd_tot_title_18) %>%
+dgcd_tot_18 <- dygraph(gobcen_deuda_tot_18_xts, main = dgcd_tot_title_18, group = "public") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 dgcd_tot_18
 
-dgcd_dom_title_18 <- "(Gross) Domestic Public Debt, as % of GDP"
+dgcd_dom_title_18 <- "(Gross) Domestic Central Gov. Debt, as % of GDP"
 
-dgcd_dom_18 <- dygraph(gobcen_deuda_dom_18_xts, main = dgcd_dom_title_18) %>%
+dgcd_dom_18 <- dygraph(gobcen_deuda_dom_18_xts, main = dgcd_dom_title_18, group = "public") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 dgcd_dom_18
 
-dgcd_ext_title_18 <- "(Gross) External Public Debt, as % of GDP"
+dgcd_ext_title_18 <- "(Gross) External Central Gov. Debt, as % of GDP"
 
-dgcd_ext_18 <- dygraph(gobcen_deuda_ext_18_xts, main = dgcd_ext_title_18) %>%
+dgcd_ext_18 <- dygraph(gobcen_deuda_ext_18_xts, main = dgcd_ext_title_18, group = "public") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 dgcd_ext_18
 
+
+dgcd_ext_2_tot_title_18 <- "Central Gov. Debt: external as % of total"
+
+dgcd_ext_2_tot_18 <- dygraph(gobcen_deuda_ext_2_tot_18_xts, main = dgcd_ext_2_tot_title_18, group = "public") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgcd_ext_2_tot_18
+
+
+
 ```
 
-#### Countries sorted into quartiles of the Y-axis variable
+#### Countries sorted into quartiles of the Y-axis variable  {.tabset}
 
 
+##### Total 
 
-
-```{r gobcen_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
-
-dgcd_tot_title_18_1 <- "(Gross) Total Public Debt, Quartile 1 (lowest)"
-dgcg_tot_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_tot_title_18_1) %>%
+```{r gobcen_tot_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgcd_tot_title_18_1 <- "(Gross) Total Central Gov. Debt, Quartile 1 (lowest)"
+dgcg_tot_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_tot_title_18_1, group = "total") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcd_tot_title_18_2 <- "(Gross) Total Public Debt, Quartile 2"
-dgcg_tot_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_tot_title_18_2) %>%
+dgcd_tot_title_18_2 <- "(Gross) Total Central Gov. Debt, Quartile 2"
+dgcg_tot_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_tot_title_18_2, group = "total") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcd_tot_title_18_3 <- "(Gross) Total Public Debt, Quartile 3"
-dgcg_tot_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_tot_title_18_3) %>%
+dgcd_tot_title_18_3 <- "(Gross) Total Central Gov. Debt, Quartile 3"
+dgcg_tot_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_tot_title_18_3, group = "total") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcd_tot_title_18_4 <- "(Gross) Total Public Debt, Quartile 4"
-dgcg_tot_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_tot_title_18_4) %>%
+dgcd_tot_title_18_4 <- "(Gross) Total Central Gov. Debt, Quartile 4"
+dgcg_tot_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_tot_title_18_4, group = "total") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
@@ -478,31 +520,35 @@ dgcg_tot_18_pct4_25_to_50_2001_period2
 
 dgcg_tot_18_pct4_b25_2001_period2
 
+```
 
-dgcd_dom_title_18_1 <- "(Gross) Domestic Public Debt, Quartile 1 (lowest)"
-dgcd_dom_title_18_2 <- "(Gross) Domestic Public Debt, Quartile 2 "
-dgcd_dom_title_18_3 <- "(Gross) Domestic Public Debt, Quartile 3 "
-dgcd_dom_title_18_4 <- "(Gross) Domestic Public Debt, Quartile 4 (highest)"
+##### Domestic
 
-dgcg_dom_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_dom_title_18_1) %>%
+```{r gobcen_dom_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgcd_dom_title_18_1 <- "(Gross) Domestic Central Gov. Debt, Quartile 1 (lowest)"
+dgcd_dom_title_18_2 <- "(Gross) Domestic Central Gov. Debt, Quartile 2 "
+dgcd_dom_title_18_3 <- "(Gross) Domestic Central Gov. Debt, Quartile 3 "
+dgcd_dom_title_18_4 <- "(Gross) Domestic Central Gov. Debt, Quartile 4 (highest)"
+
+dgcg_dom_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_dom_title_18_1, group = "domestic") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_dom_title_18_2) %>%
+dgcg_dom_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_dom_title_18_2, group = "domestic") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_dom_title_18_3) %>%
+dgcg_dom_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_dom_title_18_3, group = "domestic") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_dom_title_18_4) %>%
+dgcg_dom_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_dom_title_18_4, group = "domestic") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
@@ -517,30 +563,37 @@ dgcg_dom_18_pct4_25_to_50_2001_period2
 dgcg_dom_18_pct4_b25_2001_period2
 
 
-dgcd_ext_title_18_1 <- "(Gross) External Public Debt, Quartile 1 (lowest)"
-dgcd_ext_title_18_2 <- "(Gross) External Public Debt, Quartile 2 "
-dgcd_ext_title_18_3 <- "(Gross) External Public Debt, Quartile 3 "
-dgcd_ext_title_18_4 <- "(Gross) External Public Debt, Quartile 4 (highest)"
 
-dgcg_ext_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_ext_title_18_1) %>%
+```
+
+
+##### External
+
+```{r gobcen_ext_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgcd_ext_title_18_1 <- "(Gross) External Central Gov. Debt, Quartile 1 (lowest)"
+dgcd_ext_title_18_2 <- "(Gross) External Central Gov. Debt, Quartile 2 "
+dgcd_ext_title_18_3 <- "(Gross) External Central Gov. Debt, Quartile 3 "
+dgcd_ext_title_18_4 <- "(Gross) External Central Gov. Debt, Quartile 4 (highest)"
+
+dgcg_ext_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_ext_title_18_1, group = "external") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_ext_title_18_2) %>%
+dgcg_ext_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_ext_title_18_2, group = "external") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_ext_title_18_3) %>%
+dgcg_ext_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_ext_title_18_3, group = "external") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_ext_title_18_4) %>%
+dgcg_ext_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_ext_title_18_4, group = "external") %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
@@ -554,17 +607,395 @@ dgcg_ext_18_pct4_25_to_50_2001_period2
 
 dgcg_ext_18_pct4_b25_2001_period2
 
+
 ```
+
+##### External/Total
+
+
+```{r gobcen_ext_2_tot_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+
+dgcd_ext_2_tot_title_18_1 <- "Central Gov.,External as % of Total, Quartile 1 (lowest)"
+dgcd_ext_2_tot_title_18_2 <- "Central Gov.,External as % of Total, Quartile 2 "
+dgcd_ext_2_tot_title_18_3 <- "Central Gov.,External as % of Total, Quartile 3 "
+dgcd_ext_2_tot_title_18_4 <- "Central Gov.,External as % of Total, Quartile 4 (highest)"
+
+
+dgcg_ext_2_tot_18_pct4_b25_2001_period2 <- dygraph(gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgcd_ext_2_tot_title_18_1, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_2_tot_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_ext_2_tot_title_18_2, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_2_tot_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_ext_2_tot_title_18_3, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_2_tot_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_ext_2_tot_title_18_4, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgcg_ext_2_tot_18_pct4_a75_2001_period2
+
+dgcg_ext_2_tot_18_pct4_50_to_75_2001_period2
+
+dgcg_ext_2_tot_18_pct4_25_to_50_2001_period2
+
+dgcg_ext_2_tot_18_pct4_b25_2001_period2
+
+```
+
+
+
+
+
+
+
+
+
+
+### Latin America, Non Financial Public Sector {.tabset}
+
+
+Salient features:
+
++  
+
+
+```{r spnf_debt_make_dfs_18, include=TRUE}
+spnf_deuda_18 <- gspnf_deuda_pib %>% 
+  filter(iso3c %in% coi_18)
+
+spnf_deuda_tot_18_xts <- cate_gen_to_xts_wide(spnf_deuda_18 %>% select(iso3c, year, total_p), is_full = TRUE, is_med = FALSE, value_col_name = "total_p")
+
+spnf_deuda_dom_18_xts <- cate_gen_to_xts_wide(spnf_deuda_18 %>% select(iso3c, year, interna_p), is_full = TRUE, is_med = FALSE, value_col_name = "interna_p")
+
+spnf_deuda_ext_18_xts <- cate_gen_to_xts_wide(spnf_deuda_18 %>% select(iso3c, year, externa_p), is_full = TRUE, is_med = FALSE, value_col_name = "externa_p")
+
+spnf_deuda_ext_2_tot_18_xts <- cate_gen_to_xts_wide(spnf_deuda_18 %>% select(iso3c, year, ext_2_total_p), is_full = TRUE, is_med = FALSE, value_col_name = "ext_2_total_p")
+
+
+spnf_deuda_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", is_med = FALSE,  is_pct4 = TRUE)
+
+spnf_deuda_dom_18_class_pct4_1990_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", is_med = FALSE,  is_pct4 = TRUE)
+
+spnf_deuda_ext_18_class_pct4_1990_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", is_med = FALSE,  is_pct4 = TRUE)
+
+spnf_deuda_ext_2_tot_18_class_pct4_1990_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, ext_2_total_p),
+  value_col_name = "ext_2_total_p", is_med = FALSE,  is_pct4 = TRUE)
+
+
+spnf_deuda_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, total_p),
+  value_col_name = "total_p", time_breaks = default_time_break, is_med = FALSE,
+                                               is_pct4 = TRUE)
+
+spnf_deuda_dom_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, interna_p),
+  value_col_name = "interna_p", time_breaks = default_time_break, is_med = FALSE,
+                                               is_pct4 = TRUE)
+
+spnf_deuda_ext_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, externa_p),
+  value_col_name = "externa_p", time_breaks = default_time_break, is_med = FALSE,
+                                               is_pct4 = TRUE)
+
+spnf_deuda_ext_2_tot_18_class_pct4_1990_2001_2015 <- cate_gen(
+  df = spnf_deuda_18 %>% select(iso3c, year, ext_2_total_p),
+  value_col_name = "ext_2_total_p", time_breaks = default_time_break, is_med = FALSE,
+                                               is_pct4 = TRUE)
+
+
+spnf_deuda_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  spnf_deuda_tot_18_class_pct4_1990_2015,
+  value_col_name = "total_p", is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_dom_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  spnf_deuda_dom_18_class_pct4_1990_2015,
+  value_col_name = "interna_p", is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_ext_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  spnf_deuda_ext_18_class_pct4_1990_2015,
+  value_col_name = "externa_p", is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_ext_2_tot_18_pct4_1990_2015_xts <- cate_gen_to_xts_wide(
+  spnf_deuda_ext_2_tot_18_class_pct4_1990_2015,
+  value_col_name = "ext_2_total_p", is_med = FALSE, is_pct4 = TRUE)
+
+
+spnf_deuda_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(spnf_deuda_tot_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(spnf_deuda_tot_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "total_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_dom_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(spnf_deuda_dom_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_dom_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(spnf_deuda_dom_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "interna_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_ext_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(spnf_deuda_ext_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_ext_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(spnf_deuda_ext_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "externa_p",is_med = FALSE, is_pct4 = TRUE)
+
+
+spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_1 <- cate_gen_to_xts_wide(spnf_deuda_ext_2_tot_18_class_pct4_1990_2001_2015[[1]], 
+                    value_col_name = "ext_2_total_p",is_med = FALSE, is_pct4 = TRUE)
+
+spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(spnf_deuda_ext_2_tot_18_class_pct4_1990_2001_2015[[2]], 
+                    value_col_name = "ext_2_total_p",is_med = FALSE, is_pct4 = TRUE)
+
+```
+
+#### All  countries
+```{r spnf_debt_make_dygraph_18, eval=params$dygraphs_plots}
+#using dygraph
+dgspnf_tot_title_18 <- "(Gross) Total NFSP Debt, as % of GDP"
+
+dgspnf_tot_18 <- dygraph(spnf_deuda_tot_18_xts, main = dgspnf_tot_title_18, group = "public") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgspnf_tot_18
+
+dgspnf_dom_title_18 <- "(Gross) Domestic NFSP Debt, as % of GDP"
+
+dgspnf_dom_18 <- dygraph(spnf_deuda_dom_18_xts, main = dgspnf_dom_title_18, group = "public") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgspnf_dom_18
+
+dgspnf_ext_title_18 <- "(Gross) External NFSP Debt, as % of GDP"
+
+dgspnf_ext_18 <- dygraph(spnf_deuda_ext_18_xts, main = dgspnf_ext_title_18, group = "public") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgspnf_ext_18
+
+
+dgspnf_ext_2_tot_title_18 <- "NFSP Debt: external as % of total"
+
+dgspnf_ext_2_tot_18 <- dygraph(spnf_deuda_ext_2_tot_18_xts, main = dgspnf_ext_2_tot_title_18, group = "public") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+dgspnf_ext_2_tot_18
+
+
+
+```
+
+#### Countries sorted into quartiles of the Y-axis variable  {.tabset}
+
+
+##### Total 
+
+```{r spnf_tot_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgspnf_tot_title_18_1 <- "(Gross) Total NFSP Debt, Quartile 1 (lowest)"
+dgspnf_tot_18_pct4_b25_2001_period2 <- dygraph(spnf_deuda_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgspnf_tot_title_18_1, group = "total") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_tot_title_18_2 <- "(Gross) Total NFSP Debt, Quartile 2"
+dgspnf_tot_18_pct4_25_to_50_2001_period2 <- dygraph(spnf_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgspnf_tot_title_18_2, group = "total") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_tot_title_18_3 <- "(Gross) Total NFSP Debt, Quartile 3"
+dgspnf_tot_18_pct4_50_to_75_2001_period2 <- dygraph(spnf_deuda_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgspnf_tot_title_18_3, group = "total") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_tot_title_18_4 <- "(Gross) Total NFSP Debt, Quartile 4"
+dgspnf_tot_18_pct4_a75_2001_period2 <- dygraph(spnf_deuda_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgspnf_tot_title_18_4, group = "total") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_tot_18_pct4_a75_2001_period2
+
+dgspnf_tot_18_pct4_50_to_75_2001_period2
+
+dgspnf_tot_18_pct4_25_to_50_2001_period2
+
+dgspnf_tot_18_pct4_b25_2001_period2
+
+```
+
+##### Domestic
+
+```{r spnf_dom_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgspnf_dom_title_18_1 <- "(Gross) Domestic NFSP Debt, Quartile 1 (lowest)"
+dgspnf_dom_title_18_2 <- "(Gross) Domestic NFSP Debt, Quartile 2 "
+dgspnf_dom_title_18_3 <- "(Gross) Domestic NFSP Debt, Quartile 3 "
+dgspnf_dom_title_18_4 <- "(Gross) Domestic NFSP Debt, Quartile 4 (highest)"
+
+dgspnf_dom_18_pct4_b25_2001_period2 <- dygraph(spnf_deuda_dom_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgspnf_dom_title_18_1, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_dom_18_pct4_25_to_50_2001_period2 <- dygraph(spnf_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgspnf_dom_title_18_2, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_dom_18_pct4_50_to_75_2001_period2 <- dygraph(spnf_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgspnf_dom_title_18_3, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_dom_18_pct4_a75_2001_period2 <- dygraph(spnf_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgspnf_dom_title_18_4, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_dom_18_pct4_a75_2001_period2
+
+dgspnf_dom_18_pct4_50_to_75_2001_period2
+
+dgspnf_dom_18_pct4_25_to_50_2001_period2
+
+dgspnf_dom_18_pct4_b25_2001_period2
+
+
+
+```
+
+
+##### External
+
+```{r spnf_ext_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+dgspnf_ext_title_18_1 <- "(Gross) External NFSP Debt, Quartile 1 (lowest)"
+dgspnf_ext_title_18_2 <- "(Gross) External NFSP Debt, Quartile 2 "
+dgspnf_ext_title_18_3 <- "(Gross) External NFSP Debt, Quartile 3 "
+dgspnf_ext_title_18_4 <- "(Gross) External NFSP Debt, Quartile 4 (highest)"
+
+dgspnf_ext_18_pct4_b25_2001_period2 <- dygraph(spnf_deuda_ext_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgspnf_ext_title_18_1, group = "external") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_18_pct4_25_to_50_2001_period2 <- dygraph(spnf_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgspnf_ext_title_18_2, group = "external") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_18_pct4_50_to_75_2001_period2 <- dygraph(spnf_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgspnf_ext_title_18_3, group = "external") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_18_pct4_a75_2001_period2 <- dygraph(spnf_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgspnf_ext_title_18_4, group = "external") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_18_pct4_a75_2001_period2
+
+dgspnf_ext_18_pct4_50_to_75_2001_period2
+
+dgspnf_ext_18_pct4_25_to_50_2001_period2
+
+dgspnf_ext_18_pct4_b25_2001_period2
+
+
+```
+
+##### External/Total
+
+
+```{r spnf_ext_2_tot_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
+
+dgspnf_ext_2_tot_title_18_1 <- "NFSP: External as % of Total, Quartile 1 (lowest)"
+dgspnf_ext_2_tot_title_18_2 <- "NFSP: External as % of Total, Quartile 2 "
+dgspnf_ext_2_tot_title_18_3 <- "NFSP: External as % of Total, Quartile 3 "
+dgspnf_ext_2_tot_title_18_4 <- "NFSP: External as % of Total, Quartile 4 (highest)"
+
+dgspnf_ext_2_tot_18_pct4_b25_2001_period2 <- dygraph(spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["below_p25"]], main = dgspnf_ext_2_tot_title_18_1, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_2_tot_18_pct4_25_to_50_2001_period2 <- dygraph(spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgspnf_ext_2_tot_title_18_2, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_2_tot_18_pct4_50_to_75_2001_period2 <- dygraph(spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgspnf_ext_2_tot_title_18_3, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_2_tot_18_pct4_a75_2001_period2 <- dygraph(spnf_deuda_ext_2_tot_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgspnf_ext_2_tot_title_18_4, group = "domestic") %>%
+  dyRangeSelector() %>%
+dyHighlight(highlightCircleSize = 4,
+            highlightSeriesBackgroundAlpha = 0.3,
+            hideOnMouseOut = FALSE)
+
+dgspnf_ext_2_tot_18_pct4_a75_2001_period2
+
+dgspnf_ext_2_tot_18_pct4_50_to_75_2001_period2
+
+dgspnf_ext_2_tot_18_pct4_25_to_50_2001_period2
+
+dgspnf_ext_2_tot_18_pct4_b25_2001_period2
+
+```
+
+
+
+
 
 
 
 ## Cartera vencida 
 
 ```{r cartera_vencida_make}
-# load("./produced_data/data_with_basic_wrangling/monetary_fin_tidy")
-# load("./produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto")
-
-
 
 cv_december <- cartera_vencida_33_tidy %>% 
   filter(iso3c %in% coi) %>% 
