@@ -61,8 +61,8 @@ default_time_break <- as.Date("2007-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/cate_dext.R"))
 
@@ -208,7 +208,7 @@ con los promedios del resto de los países. Ordene a los países en cuartiles, d
 
 
 
-```{r ext_debt_make_dygraph_18_2001_pct25_50_75_period2, eval=params$dygraphs_plots}
+```{r ext_debt_make_dygraph_18_pct4_period2, eval=params$dygraphs_plots}
 
 dg_title_quartile_1  <- "Primer cuartil de Deuda/PIB (el más bajo)"
 dg_title_quartile_2  <- "Segundo cuartil de Deuda/PIB"
@@ -254,7 +254,7 @@ dg_18_pct4_b25_2001_period2
 Same plots, in a 2x2 array
 
 
-```{r  ext_debt_make_ggplot_18_2001_pct25_50_75_period2, eval=params$ggplot2_plots}
+```{r ext_debt_make_ggplot_18_pct4_period2, echo=FALSE}
 
 by_gen_groups <- dext_18_class_pct4_1990_2001_2015[[2]] %>% 
   arrange(desc(avg_value)) %>% 
@@ -262,11 +262,12 @@ by_gen_groups <- dext_18_class_pct4_1990_2001_2015[[2]] %>%
   nest() 
 
 plots_gen_group <- by_gen_groups %>% 
-  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=year, y=deuda_ext_porc_pib, col=iso3c)) + 
-                               geom_line()  ))
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=year, y=deuda_ext_porc_pib, col=iso3c)) +  geom_line()  ))
 
-grid.arrange(grobs=plots_gen_group$gruplot, ncol=2, main="Quartiles of external debt/gdp")
+# all_plots <- grid.arrange(grobs = plots_gen_group$gruplot, ncol = 2,
+#                           main = "Quartiles of external debt/gdp")
 
+multiplot(plotlist = plots_gen_group$gruplot, cols = 2)
 ```
 
 
@@ -489,19 +490,19 @@ dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_dom_title_18_1) %>%
+dgcg_dom_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_dom_title_18_2) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_dom_title_18_1) %>%
+dgcg_dom_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_dom_title_18_3) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_dom_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_dom_title_18_1) %>%
+dgcg_dom_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_dom_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_dom_title_18_4) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
@@ -527,19 +528,19 @@ dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_ext_title_18_1) %>%
+dgcg_ext_18_pct4_25_to_50_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p25_to_50"]], main = dgcd_ext_title_18_2) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_ext_title_18_1) %>%
+dgcg_ext_18_pct4_50_to_75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["p50_to_75"]], main = dgcd_ext_title_18_3) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
             hideOnMouseOut = FALSE)
 
-dgcg_ext_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_ext_title_18_1) %>%
+dgcg_ext_18_pct4_a75_2001_period2 <- dygraph(gobcen_deuda_ext_18_pct4_1990_2001_2015_xts_2[["above_p75"]], main = dgcd_ext_title_18_4) %>%
   dyRangeSelector() %>%
 dyHighlight(highlightCircleSize = 4,
             highlightSeriesBackgroundAlpha = 0.3,
@@ -554,18 +555,6 @@ dgcg_ext_18_pct4_25_to_50_2001_period2
 dgcg_ext_18_pct4_b25_2001_period2
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
