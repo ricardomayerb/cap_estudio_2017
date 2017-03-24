@@ -61,8 +61,8 @@ default_time_break <- as.Date("2007-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/cate_dext.R"))
 
@@ -95,7 +95,11 @@ load(paste0(pre_path,
 
 
 
-# Debt
+# Financial conditions and world shocks to LAC
+
+
+# Data review 
+
 ## Total external debt 
 
 ```{r ext_debt_make_dfs, echo=FALSE}
