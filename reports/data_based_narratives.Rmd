@@ -61,8 +61,8 @@ default_time_break <- as.Date("2007-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/cate_dext.R"))
 
@@ -1509,7 +1509,7 @@ pb_con_18_pct4_1990_2001_2015_xts_2 <- cate_gen_to_xts_wide(
 #### All (18) countries together
 ```{r pb_make_dygraph_18}
 #using dygraph
-pb_tot_title_18 <- "Domestic credit, as % of GDP"
+pb_tot_title_18 <- "Bank loans, as % of GDP"
 
 pb_tot_18 <- dygraph(pb_tot_18_xts, main = pb_tot_title_18) %>%
   dyRangeSelector() %>%
@@ -1518,7 +1518,7 @@ dyHighlight(highlightCircleSize = 4,
             hideOnMouseOut = FALSE)
 pb_tot_18
 
-pb_hip_title_18 <- "Domestic credit to public sector, as % of GDP"
+pb_hip_title_18 <- "Bank loans to public sector, as % of GDP"
 
 pb_hip_18 <- dygraph(pb_hip_18_xts, main = pb_hip_title_18) %>%
   dyRangeSelector() %>%
@@ -1527,7 +1527,7 @@ dyHighlight(highlightCircleSize = 4,
             hideOnMouseOut = FALSE)
 pb_hip_18
 
-pb_con_title_18 <- "Domestic credit to private sector, as % of GDP"
+pb_con_title_18 <- "Bank loans to private sector, as % of GDP"
 
 pb_con_18 <- dygraph(pb_con_18_xts, main = pb_con_title_18) %>%
   dyRangeSelector() %>%
