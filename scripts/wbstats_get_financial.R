@@ -2,7 +2,7 @@ library(wbstats)
 library(tidyverse)
 load("./produced_data/cepal_33_countries")
 
-# wb_cachelist = wbcache()
+wb_cachelist = wbcache()
 
 wb_credit_list = wbsearch(pattern = "credit")
 
@@ -127,3 +127,10 @@ save(interest_rate_spread,
 # terms_of_trade_idx = wb(country = cepal_33_countries[["iso3c"]],
 #                     indicator = "NE.TRM.TRAD.XN")
 
+wb_commodities_list = wbsearch(pattern = "commod")
+
+prod_exp_diver_idx <- wb(country = cepal_33_countries[["iso3c"]],
+                                         indicator = "TX.DVR.PROD.XQ")
+
+prod_exp_conc_idx <- wb(country = cepal_33_countries[["iso3c"]],
+                         indicator = "TX.CONC.IND.XQ")
