@@ -1,6 +1,7 @@
 library(wbstats)
 library(tidyverse)
 load("./produced_data/cepal_33_countries")
+source("./functions/add_iso.R")
 
 wb_cachelist = wbcache()
 
@@ -38,7 +39,8 @@ gross_gengov_ext_to_gdp <- wb(country = cepal_33_countries[["iso3c"]],
 gross_gengov_ext_to_gdp <- wb(country = cepal_33_countries[["iso3c"]],
                        indicator = "DP.DOD.DECD.CR.CG.Z1")
 
-
+nplns_to_total <- wb(country = cepal_33_countries[["iso3c"]],
+                     indicator = "FB.AST.NPER.ZS")
 
 
 
@@ -85,6 +87,7 @@ save(tot_reserves_w_gold_to_gdp,
      short_term_debt_to_reserves,
      bank_liq_res_to_bank_ass,
      bank_liq_res_to_bank_ass,
+     nplns_to_total,
      file = "./produced_data/data_with_basic_wrangling/wb_reservish_dfs")
      
 
@@ -134,3 +137,35 @@ prod_exp_diver_idx <- wb(country = cepal_33_countries[["iso3c"]],
 
 prod_exp_conc_idx <- wb(country = cepal_33_countries[["iso3c"]],
                          indicator = "TX.CONC.IND.XQ")
+
+
+library(readr)
+IDS_Data <- read_csv("./raw_data/IDS_Data.csv", col_types = 
+                     cols(default = col_double(),
+                          `Country Name` = col_character(),
+                          `Country Code` = col_character(),
+                          `Indicator Name` = col_character(),
+                          `Indicator Code` = col_character()
+                          )
+                    )
+
+IDS_Data$X59 <- NULL 
+
+IDS_Data_33 <-  IDS_Data %>% 
+  filter(`Country Code` %in% cepal_33_countries[["iso3c"]])
+
+IDS_Data_33_tidy <- IDS_Data_33
+
+names(IDS_Data_33_tidy)[[1]] <- "country_name"
+names(IDS_Data_33_tidy)[[2]] <- "iso3c"
+names(IDS_Data_33_tidy)[[3]] <- "indicator_name"
+names(IDS_Data_33_tidy)[[4]] <- "indicator_code"
+
+IDS_Data_33_tidy$iso2c <- countrycode::countrycode(IDS_Data_33_tidy$iso3c,
+                                              "iso3c", "iso2c")
+
+save(IDS_Data_33_tidy, 
+     file = "./produced_data/data_with_basic_wrangling/IDS_Data")
+
+
+

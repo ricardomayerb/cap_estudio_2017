@@ -9,7 +9,7 @@ library(stringr)
 add_iso <- function(df, names_col, dict, lang="es", rm_nf = FALSE) {
   
 
-  if (any(str_detect("Años", names(cepalstat_sector_real_dolares_completo)))) {
+  if (any(str_detect("Años", names(df)))) {
 
     names(df) <- str_replace_all(names(df), "Años","year")
 
