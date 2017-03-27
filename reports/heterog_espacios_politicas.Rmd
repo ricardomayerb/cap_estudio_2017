@@ -1,0 +1,39 @@
+---
+title: "Hetoregenidad en los espacios de política"
+author: "Ricardo Mayer"
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  pdf_document: default
+  word_document: default
+params:
+  end_year: 2015
+  start_year: 1990
+  is_html: TRUE
+  dygraphs_plots: TRUE
+  ggplot2_plots: TRUE
+always_allow_html: yes
+---
+
+
+```{r knit_config, include=FALSE}
+
+knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+
+# Espacios de política y vulnerabilidades macroeconómicas
+
+## Choques financieros y comerciales
+
+
+
+
+
+
