@@ -1,21 +1,21 @@
 ---
 title: "Agrupando condiciones macro en AL"
 author: "Ricardo Mayer"
-date: "`r format(Sys.time(), '%Y-%m-%d')`"
+
 output:
+  pdf_document: default
   html_document:
     code_folding: hide
     number_sections: yes
     toc: yes
     toc_depth: 3
-  pdf_document: default
   word_document: default
 params:
+  dygraphs_plots: yes
   end_year: 2015
+  ggplot2_plots: yes
+  is_html: yes
   start_year: 1990
-  is_html: TRUE
-  dygraphs_plots: TRUE
-  ggplot2_plots: TRUE
 always_allow_html: yes
 ---
 

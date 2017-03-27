@@ -275,7 +275,7 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
              expr = {
   if (is.null(time_breaks)) {
     if (is_med == TRUE) {
-      new_df <- df %>% arrange(iso3c, year) %>% 
+      new_df <- df %>% arrange(iso3c, date_col) %>% 
         mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
         group_by(iso3c) %>% 
         mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
@@ -284,7 +284,7 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
       return(new_df)
     } else {
       if (is_pct3) {
-        new_df <- df  %>% arrange(iso3c, year) %>% 
+        new_df <- df  %>% arrange(iso3c, date_col) %>% 
           mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
                                          na.rm = TRUE),
                  pct66_of_avg = quantile(value_col, probs = 0.66,
@@ -301,7 +301,7 @@ cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL
           )
         return(new_df)
       } else {
-        new_df <- df %>% 
+        new_df <- df %>% arrange(iso3c, date_col) %>% 
           mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
                                          na.rm = TRUE),
                  pct50_of_avg = quantile(value_col, probs = 0.50,

@@ -17,6 +17,8 @@ c_g_qs_long <- gather(c_gaps1612_qs, key = code, value, -Period) %>%
              "country.name.en")
          )
 
+
+
 dsr_qs_long <- gather(dsr_qs, key = code, value, -Period) %>% 
   rename(date = Period) %>% 
   mutate(country_name = 
@@ -39,7 +41,7 @@ tc_qs_long <- gather(totcredit_qs, key = code, value, -Period) %>%
 
 save(c_gaps1612_content, c_gaps1612_documentation, 
      dsr_content, dsr_documentation, totcredit_content, totcredit_documentation,
-     c_g_qs_long, dsr_qs_long, tc_qs_long, file = "./produced_data/bis_tidy")
+     c_g_qs_long, dsr_qs_long, tc_qs_long, file = "./produced_data/data_with_basic_wrangling/bis_tidy")
 
 # foo <- dsr_documentation$Code
 # str_extract(foo, "(?<=:).*?(?=:)" )

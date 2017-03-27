@@ -1,7 +1,7 @@
 ---
 title: "Hetoregenidad en los espacios de política"
 author: "Ricardo Mayer"
-date: "`r format(Sys.time(), '%Y-%m-%d')`"
+
 output:
   html_document:
     code_folding: hide
@@ -27,10 +27,519 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
+```{r libs_dicts_country_sel, message=FALSE, warning=FALSE, include=FALSE}
+library(printr)
+# library(plotly)
+# library(dygraphs)
+library(tidyr)
+library(dplyr)
+library(tibble)
+library(ggplot2)
+library(gridBase)
+library(gridExtra)
+library(stringr)
+library(stringi)
+# library(DT)
+library(lubridate)
+library(ineq)
+library(knitr)
+library(xts)
+library(countrycode)
+# library(purrr)
+
+library(xtable)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+options(width = 60)
+options(digits = 3)
+mr_year <- params$end_year
+
+default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d") 
+
+# time_breaks = 2001
+
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+
+source(paste0(pre_path, "functions/cate_dext.R"))
+
+load(paste0(pre_path, "produced_data/cepal_19_countries"))
+load(paste0(pre_path, "produced_data/cepal_33_countries"))
+
+coi_19 <- cepal_19_countries$iso3c
+coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))]
+coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
+coi_sa <-  c("ARG", "BOL" ,"BRA", "CHL", "COL", "ECU",  "PER", "PRY", "URY", "VEN")
+coi_sa_minus_BRA_VEN <- coi_sa[-which(coi_sa %in% c("BRA","VEN"))]
+coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
+coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))]
+
+coi <- coi_sa_minus_BRA_VEN
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_gdp_currentlc_q_gasto"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_deuda_externa"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_sector_publico"))
+
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/WDI_Data_19_tidy"))
+
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/wb_credit_to_gdp_dfs"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/wb_reservish_dfs"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/wb_interests_dfs"))
+
+
+```
+
 
 # Espacios de política y vulnerabilidades macroeconómicas
 
-## Choques financieros y comerciales
+<!-- +  Relación entre deuda pública y PIB -->
+<!-- +  Dolarización de los pasivos públicos y privados -->
+<!-- +  Grado de apertura comercial y financiera -->
+<!-- +  Alta proporción de colateral no transable -->
+<!-- +  Duración de los contratos financieros -->
+<!-- +  Debilidad del sistema bancario -->
+<!-- +  Régimen de cambio fijo -->
+<!-- +  Relación de reservas internacionales a deuda de corto plazo en moneda extranjera -->
+<!-- +  Concentación del comercio exterior a nivel de destinos y de productos -->
+<!-- +  Inflexibilidad de precios -->
+<!-- +  Deterioro del crecimiento tendencial -->
+<!-- +  Aumento de la inflación de tendencia -->
+<!-- +  Sobreedeudamiento de las familias y las empresas -->
+
+## Factores relacionados con el sistema financiero
+
++  Relación entre deuda pública y PIB
++  Dolarización de los pasivos públicos y privados
++  Duración de los contratos financieros
++  Sobreedeudamiento de las familias y las empresas
++  Relación de reservas internacionales a deuda de corto plazo en moneda extranjera
++  Grado de apertura financiera
+
+
+### Un boom de crédito? Dónde?
+
+
+```{r domestic_cred_by_fin_sec}
+
+dcfinsec_to_gdp_19 <- dom_cred_providd_by_finsec_to_gdp %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c")) %>% 
+  mutate(date = as.Date(as.character(date), format = "%Y"))
+
+
+
+dcfinsec_to_gdp_19_pct4 <- cate_gen(dcfinsec_to_gdp_19,
+                                               time_breaks = default_time_break,
+                                               is_med = FALSE, 
+                                               is_pct4 = TRUE,
+                                            value_col_name = "value",
+                                            dating_col_name = "date")
+
+```
+
+```{r domestic_cred_by_fin_sec_ggplot}
+by_gen_groups <- dcfinsec_to_gdp_19_pct4[[2]] %>% 
+  arrange(desc(avg_value)) %>% 
+  group_by(gen_group) %>% 
+  nest() 
+
+plots_dc_finsec_pct4 <- by_gen_groups %>% 
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date, y=value, col=iso3c)) +  geom_line() + 
+  ggtitle("Domestic credit to private sector", subtitle = "By the financial sector, as % of GDP"))) 
+
+multiplot(plotlist = plots_dc_finsec_pct4$gruplot, cols = 2)
+
+```
+
+
+```{r credit_gdp_gap}
+load(paste0(pre_path,
+            "produced_data/data_with_basic_wrangling/bis_tidy"))
+
+cred_gap_19 <- c_g_qs_long %>%
+    filter(country_name %in% cepal_19_countries[["country.name.en"]]) %>%
+  mutate(iso3c = countrycode(country_name, "country.name.en", "iso3c")) %>%
+  filter(date > as.Date("1999-12-31", format = "%Y-%m-%d")) %>%
+  filter(str_detect(code, ":C$")) %>% 
+    arrange(iso3c, date)
+
+```
+
+
+```{r credit_gdp_gap_ggplot, warning=FALSE}
+ plots_cred_gap_19 <- cred_gap_19 %>%
+    ggplot(aes(x=date, y=value, col=iso3c)) +  geom_line() +
+   ggtitle("Credit-to-GDP gap", subtitle = "Deviation from long-run trend, quarterly data")
+
+
+ plots_cred_gap_19
+
+```
+
+
+
+
+
+
+
+### Salud del sistema financiero
+
+Cuán apalancados están los bancos?
+
+
+```{r  banks_cap_ass}
+banks_c_a_19 <- bank_liq_res_to_bank_ass %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c")) %>% 
+  mutate(date = as.Date(as.character(date), format = "%Y"))
+
+
+banks_c_a_19_pct4 <- cate_gen(banks_c_a_19,
+                                               time_breaks = default_time_break,
+                                               is_med = FALSE, 
+                                               is_pct4 = TRUE,
+                                            value_col_name = "value",
+                                            dating_col_name = "date")
+
+```
+
+
+```{r  banks_cap_ass_ggplot}
+by_gen_groups <- banks_c_a_19_pct4[[2]] %>% 
+  arrange(desc(avg_value)) %>% 
+  group_by(gen_group) %>% 
+  nest() 
+
+plots_banks_c_a_19_pct4 <- by_gen_groups %>% 
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date, y=value, col=iso3c)) +  geom_line() + 
+  ggtitle("Bank capital to asset ratio"))) 
+
+multiplot(plotlist = plots_banks_c_a_19_pct4$gruplot, cols = 2)
+
+```
+
+
+
+#### Cómo es el nivel de deuda de corto plazo comparado con las reservas internacionales?
+
+```{r short_to_res}
+
+short_to_res_19 <- short_term_debt_to_reserves %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c")) %>% 
+  mutate(date = as.Date(as.character(date), format = "%Y")) %>% 
+  filter(iso3c != "PAN")
+  
+
+short_to_res_19_pct4 <- cate_gen(short_to_res_19,
+                                               time_breaks = default_time_break,
+                                               is_med = FALSE, 
+                                               is_pct4 = TRUE,
+                                            value_col_name = "value",
+                                            dating_col_name = "date")
+
+```
+
+```{r short_to_res_ggplot}
+by_gen_groups <- short_to_res_19_pct4[[2]] %>% 
+  arrange(desc(avg_value)) %>% 
+  group_by(gen_group) %>% 
+  nest() 
+
+plots_short_res_pct4 <- by_gen_groups %>% 
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date, y=value, col=iso3c)) +  geom_line() + 
+  ggtitle("Short-term debt, % of total reserves"))) 
+
+multiplot(plotlist = plots_short_res_pct4$gruplot, cols = 2)
+
+
+```
+
+
+
+
+#### Cómo es el horizonte temporal de los compromisos financieros?
+
+```{r avg_maturities}
+
+maturities_avg_off_19 <- avg_maturity_new_debt_to_gdp %>% 
+  filter(value != 0) %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  filter(str_detect(indicator, "official")) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c")) %>% 
+  mutate(date = as.Date(as.character(date), format = "%Y"))
+  
+maturities_avg_priv_19 <- avg_maturity_new_debt_to_gdp %>% 
+  filter(value != 0) %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  filter(str_detect(indicator, "private")) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c")) %>% 
+  mutate(date = as.Date(as.character(date), format = "%Y"))
+
+
+maturit_off_19_pct4 <- cate_gen(maturities_avg_off_19,
+                                               time_breaks = default_time_break,
+                                               is_med = FALSE, 
+                                               is_pct4 = TRUE,
+                                            value_col_name = "value",
+                                            dating_col_name = "date")
+
+maturit_priv_19_pct4 <- cate_gen(maturities_avg_priv_19,
+                                               time_breaks = default_time_break,
+                                               is_med = FALSE, 
+                                               is_pct4 = TRUE,
+                                            value_col_name = "value",
+                                            dating_col_name = "date")
+
+```
+
+
+```{r avg_maturities_off_ggplot}
+by_gen_groups <- maturit_off_19_pct4[[2]] %>% 
+  arrange(desc(avg_value)) %>% 
+  group_by(gen_group) %>% 
+  nest() 
+
+plots_matur_off_pct4 <- by_gen_groups %>% 
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date, y=value, col=iso3c)) +  geom_line() + 
+  ggtitle("Avg maturity of new ext. debt", subtitle = "Official debt, in years"))) 
+
+multiplot(plotlist = plots_matur_off_pct4$gruplot, cols = 2)
+
+```
+
+
+<!-- ```{r avg_maturities_priv_ggplot} -->
+<!-- by_gen_groups <- maturit_priv_19_pct4[[2]] %>%  -->
+<!--   arrange(desc(avg_value)) %>%  -->
+<!--   group_by(gen_group) %>%  -->
+<!--   nest()  -->
+
+<!-- plots_matur_priv_pct4 <- by_gen_groups %>%  -->
+<!--   mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date, y=value, col=iso3c)) +  geom_line() +  -->
+<!--   ggtitle("Avg maturity of new ext. debt", subtitle = "Private debt, in years")))  -->
+
+<!-- multiplot(plotlist = plots_matur_priv_pct4$gruplot, cols = 2) -->
+
+<!-- ``` -->
+
+
+
+
+## Factores relacionados con el comercio exterior
++  Concentación del comercio exterior a nivel de destinos y de productos
++  Régimen de cambio fijo
++  Grado de apertura comercial 
+
+
+
+Índice de Herfindahl, concentración al interior de los 10 principales productos 
+de cada país, en cada año.
+
+```{r exp_imp_make_dfs}
+# load("./produced_data/data_with_basic_wrangling/cs_x_m_10_ppales")
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_x_m_10_ppales"))
+
+
+exp_10_ppales <- cs_x_m_10_ppales %>%
+  unite(productos_principales,  starts_with("Produ")) %>% 
+  mutate(productos_principales = str_replace_all(productos_principales,
+                                                 "_", "") %>% 
+           str_replace_all("n/a", "") %>% 
+           str_replace_all("NA", ""))
+  
+exp_10_ppales_by_iso <- exp_10_ppales %>% 
+  mutate(year_as_date = as.Date(as.character(year), format = "%Y")) %>% 
+  group_by(iso3c, year_as_date) %>% 
+  summarise(concentracion = conc(valor, type = "Herfindahl")) %>% 
+  arrange(iso3c, year_as_date)  
+    
+
+
+```
+
+
+```{r hx_make_dfs_18, include=TRUE}
+hx_19 <- exp_10_ppales_by_iso %>% 
+  filter(iso3c %in% coi_19)
+
+hx_time_break <- as.Date("1979-12-31", format = "%Y-%m-%d")
+
+hx_19_class_pct4 <- cate_gen(hx_19 %>% 
+    select(iso3c, year_as_date, concentracion), value_col_name = "concentracion", time_breaks = hx_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+
+```
+
+
+```{r hx_ggplot}
+by_gen_groups <- hx_19_class_pct4[[2]] %>% 
+  arrange(desc(avg_value)) %>% 
+  group_by(gen_group) %>% 
+  nest() 
+
+plots_hx_19_pct4 <- by_gen_groups %>% 
+  mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=year_as_date, y=concentracion, col=iso3c)) +  geom_line() + 
+  ggtitle("Exports, product concentration", subtitle = "HH index of 10 principal products"))) 
+
+multiplot(plotlist = plots_hx_19_pct4$gruplot, cols = 2)
+```
+
+
+
+
+
+Shares en exportaciones de 3 categorías a priori
+
+Datos mensuales, promediados por año
+
+```{r shares_exp_3_cat}
+# load("./produced_data/data_with_basic_wrangling/x_m_locations_products_tidy")
+load(paste0(pre_path,
+            "produced_data/data_with_basic_wrangling/x_m_locations_products_tidy"))
+
+imp_by_prod_to_join <- imp_by_prod_tidy %>%
+   filter(iso3c %in% coi) %>%
+  rename(producto_m = producto)
+
+exp_by_prod_to_join <- exp_by_prod_tidy %>%
+   filter(iso3c %in% coi) %>%
+  rename(producto_x = producto) %>%
+  mutate(producto_x = stri_trans_general(producto_x, "Latin-ASCII") %>%
+           str_to_lower() %>% str_replace_all(" ", "_"))
+
+exp_by_prod_wide <- exp_by_prod_to_join %>%
+   filter(iso3c %in% coi) %>%
+  spread(producto_x, value) %>%
+  mutate(agro_agropec_share = productos_agricolas_y_agropecuarios/total,
+         mineria_y_petro_share = mineria_y_petroleo/total,
+         manufacturas_share = manufacturas/total) %>%
+  select(-c(productos_agricolas_y_agropecuarios,mineria_y_petroleo,
+            manufacturas))
+
+exp_by_prod_wide_anual <- exp_by_prod_wide %>%
+  mutate(year = year(date)) %>%
+  group_by(iso3c, year) %>%
+  mutate(avg_share_agr = mean(agro_agropec_share, rm.na = TRUE),
+         avg_share_min_pet = mean(mineria_y_petro_share, rm.na = TRUE),
+         avg_share_manuf = mean(manufacturas_share, rm.na = TRUE)) %>%
+  arrange(year, desc(avg_share_min_pet))
+
+
+exp_by_prod_shares <- exp_by_prod_wide_anual %>%
+  rename(agro_pec=agro_agropec_share, mineria_y_petro=mineria_y_petro_share,
+         manuf=manufacturas_share) %>%
+  gather(key = product, value = share, agro_pec, mineria_y_petro, manuf ) %>%
+  select(-c(avg_share_agr, avg_share_min_pet, avg_share_manuf, total)) %>%
+  arrange(iso3c, year, product)
+
+exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>%
+  mutate(year_as_date = as.Date(as.character(year), format = "%Y")) %>%
+  group_by(iso3c, year_as_date, product) %>%
+  summarise(share_anual = mean(share, rm.na=TRUE))
+
+exp_agro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>%
+  filter(product == "agro_pec")
+
+
+exp_manuf_shares_anual_avg <- exp_by_prod_shares_anual_avg %>%
+  filter(product == "manuf")
+
+exp_mineria_y_petro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>%
+  filter(product == "mineria_y_petro")
+
+```
+
+```{r xshares_make_dfs_18, include=TRUE}
+minsh_18 <- exp_mineria_y_petro_pec_shares_anual_avg  %>%
+  filter(iso3c %in% coi_18)
+
+
+minsh_18_class_pct4 <- cate_gen(minsh_18 %>%
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+hi_minsh <- minsh_18_class_pct4[[2]] %>%
+  filter(gen_group == "above_pct75" | gen_group ==  "pct50_to_75")
+
+
+manush_18 <- exp_manuf_shares_anual_avg  %>%
+  filter(iso3c %in% coi_18)
+
+
+manush_18_class_pct4 <- cate_gen(manush_18 %>%
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+hi_manush <- manush_18_class_pct4[[2]] %>%
+  filter(gen_group == "above_pct75" | gen_group ==  "pct50_to_75")
+
+
+agropec_18 <- exp_agro_pec_shares_anual_avg %>%
+  filter(iso3c %in% coi_18)
+
+
+agropec_18_class_pct4 <- cate_gen(agropec_18 %>%
+    select(iso3c, year_as_date, share_anual), value_col_name = "share_anual",
+    time_breaks = default_time_break, is_med = FALSE,  is_pct4 = TRUE, dating_col_name = "year_as_date")
+
+
+hi_agropec <- agropec_18_class_pct4[[2]] %>%
+  filter(gen_group == "above_pct75" | gen_group ==  "pct50_to_75")
+
+
+```
+
+```{r top_man_min_agr_ggplot}
+
+hi_minsh_plot <- ggplot(data = hi_minsh, aes(x = year_as_date, y = share_anual, col = iso3c)) + 
+                          geom_line() + ggtitle("X-shares más altas en minería y petróleo", 
+                                                subtitle = "no data for Venezuela")
+
+hi_agropec_plot <- ggplot(data = hi_agropec, aes(x = year_as_date, y = share_anual, col = iso3c)) + 
+                          geom_line() + ggtitle("X-shares más altas en agro y agropec")                        
+hi_manuf_plot <- ggplot(data = hi_manush, aes(x = year_as_date, y = share_anual, col = iso3c)) + 
+                          geom_line() + ggtitle("X-shares más altas en manufacturas")   
+
+multiplot(hi_minsh_plot, hi_agropec_plot, hi_manuf_plot, cols=2)
+
+```
+
+
+
+
+## Posición fiscal y monetaria
+
++  Inflexibilidad de precios
++  Aumento de la inflación de tendencia
++  Ingresos fiscales derivados de transables y no transables
+
+
+
+
+
 
 
 
