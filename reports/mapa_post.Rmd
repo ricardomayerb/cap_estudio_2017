@@ -1,0 +1,50 @@
+---
+title: "Mapa de ALC post todo"
+author: "Ricardo Mayer"
+
+output:
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  pdf_document: default
+  word_document: default
+  
+params:
+  end_year: 2015
+  start_year: 1990
+  is_html: TRUE
+  dygraphs_plots: TRUE
+  ggplot2_plots: TRUE
+  path_prefix: 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+
+---
+
+
+```{r knit_config, include=FALSE}
+
+# knitr::opts_knit$set(root.dir = "./../")
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+```{r setup, echo=FALSE}
+knitr::read_chunk("./scripts/financial_script_alc.R")
+```
+
+
+```{r libraries}
+```
+
+
+```{r constants_and_functions}
+```
+
+
+
+
+
+
+
+

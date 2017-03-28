@@ -1,0 +1,34 @@
+---
+title: "Hetoregenidad en los espacios de política"
+author: "Ricardo Mayer"
+
+output: html_notebook
+---
+
+
+<!-- ```{r knit_config, include=FALSE} -->
+<!-- knitr::opts_knit$set(root.dir = "./../") -->
+<!-- knitr::opts_chunk$set(echo = FALSE) -->
+<!-- ``` -->
+
+
+```{r setup, echo=FALSE}
+print(getwd())
+knitr::read_chunk("./scripts/financial_script_alc.R")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r libraries}
+```
+
+
+```{r constants_and_functions}
+```
+
+
+```{r load_data_sets}
+```
+
+```{r credit_to_private_sector}
+```
