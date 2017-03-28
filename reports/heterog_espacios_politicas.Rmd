@@ -10,13 +10,14 @@ output:
     toc_depth: 3
   pdf_document: default
   word_document: default
+  
 params:
   end_year: 2015
   start_year: 1990
   is_html: TRUE
   dygraphs_plots: TRUE
   ggplot2_plots: TRUE
-always_allow_html: yes
+
 ---
 
 
@@ -58,8 +59,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # time_breaks = 2001
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/cate_dext.R"))
 
@@ -89,9 +90,9 @@ load(paste0(pre_path,
             "produced_data/data_with_basic_wrangling/cs_sector_publico"))
 
 
-load(paste0(pre_path, 
-            "produced_data/data_with_basic_wrangling/WDI_Data_19_tidy"))
-
+# load(paste0(pre_path, 
+#             "produced_data/data_with_basic_wrangling/WDI_Data_19_tidy"))
+# 
 
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/wb_credit_to_gdp_dfs"))
@@ -108,19 +109,6 @@ load(paste0(pre_path,
 
 # Espacios de política y vulnerabilidades macroeconómicas
 
-<!-- +  Relación entre deuda pública y PIB -->
-<!-- +  Dolarización de los pasivos públicos y privados -->
-<!-- +  Grado de apertura comercial y financiera -->
-<!-- +  Alta proporción de colateral no transable -->
-<!-- +  Duración de los contratos financieros -->
-<!-- +  Debilidad del sistema bancario -->
-<!-- +  Régimen de cambio fijo -->
-<!-- +  Relación de reservas internacionales a deuda de corto plazo en moneda extranjera -->
-<!-- +  Concentación del comercio exterior a nivel de destinos y de productos -->
-<!-- +  Inflexibilidad de precios -->
-<!-- +  Deterioro del crecimiento tendencial -->
-<!-- +  Aumento de la inflación de tendencia -->
-<!-- +  Sobreedeudamiento de las familias y las empresas -->
 
 ## Factores relacionados con el sistema financiero
 
