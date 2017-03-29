@@ -14,7 +14,7 @@ output: html_notebook
 
 ```{r setup, echo=FALSE}
 print(getwd())
-knitr::read_chunk("./scripts/financial_script_alc.R")
+knitr::read_chunk("./../scripts/financial_script_alc.R")
 knitr::opts_chunk$set(echo = FALSE)
 ```
 

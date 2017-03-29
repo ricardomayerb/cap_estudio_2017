@@ -2,40 +2,6 @@
 
 
 # temporary place for functions
-add_baselines <- function(df, value_colname = "value", date_colname = "date",
-                          init_date = as.Date("2007", format = "%Y"),
-                          final_date = as.Date("2016", format = "%Y"),
-                          init_window = 3, final_window = 3) {
-  
-  wrapr::let(alias = list(value_col = value_colname, date_col = date_colname),
-             expr = {
-    
-               in_win = year(init_date) - init_window + 1
-               fi_win = year(final_date) - final_window + 1
-               
-               print(in_win)
-               print(fi_win)
-                          
-    df_init <- df %>%
-      filter(year(date_col) >= in_win & year(date_col) <= year(init_date)) %>% 
-      group_by(iso3c) %>% 
-      summarise(init_avg = mean(value, na.rm = TRUE),
-                init_val = dplyr::last(value))
-    
-    df_final <- df %>%
-      filter(year(date_col) >= fi_win & year(date_col) <= year(final_date)) %>% 
-      group_by(iso3c) %>% 
-      summarise(final_avg = mean(value, na.rm = TRUE),
-                final_val = dplyr::last(value))
-    
-    df_infi <- left_join(df_init, df_final, by = "iso3c") %>% 
-      mutate(dif_values = final_val - init_val,
-             dif_avgs = final_avg - init_avg)
-               
-             })
-  
-}
-
 
 
 
@@ -69,10 +35,10 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
-source(paste0(pre_path, "functions/cate_dext.R"))
+source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
 load(paste0(pre_path, "produced_data/cepal_19_countries"))
 load(paste0(pre_path, "produced_data/cepal_33_countries"))
@@ -130,37 +96,14 @@ dcfinsec_to_gdp <- dom_cred_providd_by_finsec_to_gdp %>%
 
 
 dcfinsec_to_gdp_pct4 <- cate_gen(dcfinsec_to_gdp,
-                                    time_breaks = default_time_break,
-                                    is_med = FALSE, 
-                                    is_pct4 = TRUE,
-                                    value_col_name = "value",
-                                    dating_col_name = "date")
+                            time_breaks = default_time_break,
+                            is_med = FALSE, is_pct4 = TRUE,
+                            value_col_name = "value", dating_col_name = "date")
+
+dcfinsec_to_gdp_infi <- add_baselines(dcfinsec_to_gdp)
 
 
-dcfinsec_to_gdp_init <- dcfinsec_to_gdp %>% 
-  filter(year(date) > 2004 & year(date) < 2008) %>% 
-  group_by(iso3c) %>% 
-  summarise(init_avg = mean(value, na.rm = TRUE),
-            init_val = dplyr::last(value))
-
-
-dcfinsec_to_gdp_final <- dcfinsec_to_gdp %>% 
-  filter(year(date) > (2016-3+1) & year(date) < 2016) %>% 
-  group_by(iso3c) %>% 
-  summarise(final_avg = mean(value, na.rm = TRUE),
-            final_val = dplyr::last(value))
-
-
-dcfinsec_to_gdp_infi <- left_join(dcfinsec_to_gdp_init,
-                                  dcfinsec_to_gdp_final,
-                                  by = "iso3c") %>% 
-  mutate(dif_values = final_val - init_val,
-         dif_avgs = final_avg - init_avg)
-
-foo <- dcfinsec_to_gdp_infi
-moo <- add_baselines(dcfinsec_to_gdp)
-
-
+  
 
 
 
