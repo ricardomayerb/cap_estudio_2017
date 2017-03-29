@@ -3,6 +3,29 @@ library(tidyr)
 library(xts)
 library(replyr)
 library(wrapr)
+library(mFilter)
+
+add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
+                           hp_type = "lambda", hp_freq = 1){
+  
+  df$hp_cycle <- NA
+  df$hp_trend <- NA
+  
+  for(co in unique(df$iso3c)){
+    co_data = df[df$iso3c == co, ]
+    co_xts = xts(co_data[[value_colname]], order.by = co_data[[date_colname]])
+    
+    co_hp = hpfilter(co_xts,  type = "lambda", freq = 1)
+    # co_bkfix = bkfilter(co_xts, pl=2, pu=40, type = "fixed") 
+    # co_bkvar = bkfilter(co_xts, pl=2, pu=40, type = "variable") 
+    
+    df$hp_cycle[df$iso3c == co] <- co_hp$cycle
+    df$hp_trend[df$iso3c == co] <- co_hp$trend
+  }
+  
+  return(df)
+}
+
 
 add_baselines <- function(df, value_colname = "value", date_colname = "date",
                           init_date = as.Date("2007", format = "%Y"),
@@ -24,15 +47,19 @@ add_baselines <- function(df, value_colname = "value", date_colname = "date",
                df_final <- df %>%
                  filter(year(date_col) >= fi_win & year(date_col) <= year(final_date)) %>% 
                  group_by(iso3c) %>% 
-                 summarise(final_avg = mean(value, na.rm = TRUE),
-                           final_val = dplyr::last(value))
+                 summarise(final_avg = mean(value_col, na.rm = TRUE),
+                           final_val = dplyr::last(value_col))
                
                df_infi <- left_join(df_init, df_final, by = "iso3c") %>% 
                  mutate(dif_values = final_val - init_val,
                         dif_avgs = final_avg - init_avg) %>% 
                  arrange(iso3c)
                
-               augmented_df <- full_join(df, df_infi, by = "iso3c")
+               joined_df <- full_join(df, df_infi, by = "iso3c")
+               
+               augmented_df <- joined_df %>% 
+                 mutate(value_m_val = value_col - init_val,
+                        value_m_avg = value_col - init_avg)
                
                return(augmented_df)
              })

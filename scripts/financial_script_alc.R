@@ -4,7 +4,6 @@
 # temporary place for functions
 
 
-
 # preliminary chunks --------------------------------------------------------
 
 ## ---- libraries
@@ -35,8 +34,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -102,8 +101,25 @@ dcfinsec_to_gdp_pct4 <- cate_gen(dcfinsec_to_gdp,
 
 dcfinsec_to_gdp_infi <- add_baselines(dcfinsec_to_gdp)
 
+dcfinsec_to_gdp_bf <- add_ts_filters(dcfinsec_to_gdp_infi)
 
+dcfinsec_to_gdp_dini_bf <- add_ts_filters(dcfinsec_to_gdp_infi,
+value_colname = "value_m_val")
+
+dcfinsec_to_gdp_diniavg_bf <- add_ts_filters(dcfinsec_to_gdp_infi,
+                                                value_colname = "value_m_avg")
+
+gdcfs <- ggplot(data = dcfinsec_to_gdp_dini_bf,
+                aes(x = date, y = value_m_val, col = iso3c)) +  geom_line()
+
+print(gdcfs)
+
+xtimelim = c(as.Date("2007", format = "%Y"), as.Date("2016", format = "%Y"))
+ylimc = c(-5, 120)
   
+  
+gdcfs_z <- gdcfs + coord_cartesian(xlim = xtimelim, ylim = ylimc)
 
+print(gdcfs_z)
 
 
