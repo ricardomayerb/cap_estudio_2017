@@ -35,8 +35,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -86,7 +86,7 @@ load(paste0(pre_path,
 
 
 # credit related chunks ------------------------------------------------------
-## ---- credit_to_private_sector_by_the_financial_sector_dfs
+## ---- credit_by_the_financial_sector_dfs
 dcfs_gdp <- dom_cred_providd_by_finsec_to_gdp %>% 
   filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
   arrange(iso2c, date) %>% 
@@ -106,14 +106,33 @@ dcfs_gdp_pct4 <- cate_gen(dcfs_gdp,
   arrange(desc(final_avg))
 
 
+## ---- credit_to_private_sector_by_banks_dfs
+dcpsb_gdp <- dom_credit_to_priv_sec_by_banks_to_gdp %>% 
+  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+  arrange(iso2c, date) %>% 
+  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
+         date = as.Date(as.character(date), format = "%Y")) %>% 
+  mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
+                        ordered = TRUE))
 
-## ---- cprisfs_plots
-by_gen_groups <- dcfs_gdp_pct4 %>% 
+dcpsb_gdp <- add_baselines(dcpsb_gdp)
+dcpsb_gdp <- add_ts_filters(dcpsb_gdp)
+
+dcpsb_gdp_pct4 <- cate_gen(dcpsb_gdp,
+                          is_med = FALSE, is_pct4 = TRUE,
+                          value_col_name = "final_avg",
+                          dating_col_name = "date") %>% 
+  filter(!is.na(gen_group)) %>% 
+  arrange(desc(final_avg))
+
+
+## ---- cprisbks_plots
+by_gen_groups <- dcpsb_gdp_pct4 %>% 
   arrange(desc(final_avg)) %>% 
   group_by(gen_group) %>% 
   nest() 
 
-plots_dcfs_pct4 <- by_gen_groups %>% 
+plots_dcpsb_pct4 <- by_gen_groups %>% 
   mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date,
                                               y=value, col=iso3c)) +
                       geom_line()  + theme_tufte() + 
@@ -121,14 +140,14 @@ plots_dcfs_pct4 <- by_gen_groups %>%
                       ggtitle("Domestic credit to private sector",
                       subtitle = "By the financial sector, as % of GDP"))) 
 
-multiplot(plotlist = plots_dcfs_pct4$gruplot, cols = 2)
+multiplot(plotlist = plots_dcpsb_pct4$gruplot, cols = 2)
 
 
 
 xtimelim = c(as.Date("2005", format = "%Y"), as.Date("2016", format = "%Y"))
 ylimc = c(-25, 30)
 
-plots_dcfs_pct4_m2007 <- by_gen_groups %>% 
+plots_dcpsb_pct4_m2007 <- by_gen_groups %>% 
   mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date,
                                                             y=value_m_val, col=iso3c)) +
                                 geom_line()  + theme_tufte() + 
@@ -137,17 +156,17 @@ plots_dcfs_pct4_m2007 <- by_gen_groups %>%
                                 ggtitle("Domestic credit to private sector",
                                         subtitle = "By the financial sector, as % of GDP"))) 
 
-multiplot(plotlist = plots_dcfs_pct4_m2007$gruplot, cols = 2)
+multiplot(plotlist = plots_dcpsb_pct4_m2007$gruplot, cols = 2)
 
 
-p_hpc <- ggplot(dcfs_gdp, aes(x=date, y=hp_cycle, col = iso3c)) + 
+p_hpc <- ggplot(dcpsb_gdp, aes(x=date, y=hp_cycle, col = iso3c)) + 
   theme_tufte() + geom_hline(yintercept = 0) +
 geom_line() + coord_cartesian(xlim = xtimelim, ylim = c(-10, 25)) 
 p_hpc
 
 
 ylimc = c(-6, 10)
-plots_dc_finsec_pct4_bf <- by_gen_groups %>% 
+plots_dcpsb_pct4_bf <- by_gen_groups %>% 
   mutate(gruplot = purrr::map(data , ~ ggplot(data = ., aes(x=date,
                                        y=hp_cycle, col=iso3c)) +
                         geom_line() +  theme_tufte() +
@@ -157,11 +176,11 @@ plots_dc_finsec_pct4_bf <- by_gen_groups %>%
                           subtitle = "By the financial sector, as % of GDP"))) 
 
 
-multiplot(plotlist = plots_dc_finsec_pct4_bf$gruplot, cols = 2)
+multiplot(plotlist = plots_dcpsb_pct4_bf$gruplot, cols = 2)
 
 
 # credit related chunks ------------------------------------------------------
-## ---- credit_to_private_sector_by_the_financial_sector_dfs
+## ---- credit_to_private_sector_dfs
 
 dcps_gdp <- dom_credit_to_priv_sec_to_gdp %>% 
   filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
