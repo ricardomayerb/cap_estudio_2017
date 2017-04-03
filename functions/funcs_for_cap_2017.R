@@ -11,7 +11,7 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
   df$hp_cycle <- NA
   df$hp_trend <- NA
   
-  for(co in unique(df$iso3c)){
+  for (co in unique(df$iso3c)) {
     co_data = df[df$iso3c == co, ]
     co_xts = xts(co_data[[value_colname]], order.by = co_data[[date_colname]])
     
@@ -41,8 +41,9 @@ add_baselines <- function(df, value_colname = "value", date_colname = "date",
                df_init <- df %>%
                  filter(year(date_col) >= in_win & year(date_col) <= year(init_date)) %>% 
                  group_by(iso3c) %>% 
-                 summarise(init_avg = mean(value, na.rm = TRUE),
-                           init_val = dplyr::last(value))
+                 summarise(init_avg = mean(value_col, na.rm = TRUE),
+                           init_val = dplyr::last(value_col))
+               
                
                df_final <- df %>%
                  filter(year(date_col) >= fi_win & year(date_col) <= year(final_date)) %>% 
@@ -55,8 +56,9 @@ add_baselines <- function(df, value_colname = "value", date_colname = "date",
                         dif_avgs = final_avg - init_avg) %>% 
                  arrange(iso3c)
                
-               joined_df <- full_join(df, df_infi, by = "iso3c")
                
+               joined_df <- full_join(df, df_infi, by = "iso3c")
+             
                augmented_df <- joined_df %>% 
                  mutate(value_m_val = value_col - init_val,
                         value_m_avg = value_col - init_avg)
