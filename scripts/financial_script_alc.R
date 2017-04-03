@@ -44,8 +44,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -78,8 +78,8 @@ load(paste0(pre_path,
             "produced_data/data_with_basic_wrangling/cs_sector_publico"))
 
 
-# load(paste0(pre_path,
-#             "produced_data/data_with_basic_wrangling/WDI_Data_19_tidy"))
+load(paste0(pre_path,
+             "produced_data/data_with_basic_wrangling/WDI_33_selected_all"))
 
 
 load(paste0(pre_path, 
