@@ -35,8 +35,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -45,13 +45,14 @@ load(paste0(pre_path, "produced_data/cepal_33_countries"))
 
 coi_19 <- cepal_19_countries$iso3c
 coi_18 <- coi_19[-which(coi_19 %in% c("CUB"))]
-coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
-coi_sa <-  c("ARG", "BOL" ,"BRA", "CHL", "COL", "ECU",  "PER", "PRY", "URY", "VEN")
-coi_sa_minus_BRA_VEN <- coi_sa[-which(coi_sa %in% c("BRA","VEN"))]
+# coi_18_minus_br_mx_ven <-  coi_18[-which(coi_18 %in% c("BRA", "MEX", "VEN"))]
+coi_sa <-  c("ARG", "BOL" ,"BRA", "CHL", "COL", "ECU",
+             "PER", "PRY", "URY", "VEN")
+# coi_sa_minus_BRA_VEN <- coi_sa[-which(coi_sa %in% c("BRA","VEN"))]
 coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
-coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))]
+# coi_ca_minus_mex <- coi_ca[-which(coi_ca %in% c("MEX"))]
 
-coi <- coi_sa_minus_BRA_VEN
+# coi <- coi_sa_minus_BRA_VEN
 
 
 
@@ -158,17 +159,19 @@ dcfs_gdp <- dom_cred_providd_by_finsec_to_gdp %>%
   mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
                         ordered = TRUE))
 
-dcfs_gdp <- add_baselines(dcfs_gdp)
+dcfs_gdp <- add_diffrank(dcfs_gdp)
+
+
 dcfs_gdp <- add_ts_filters(dcfs_gdp)
 
-dcfs_gdp_pct4 <- cate_gen(dcfs_gdp,
-                          is_med = FALSE, is_pct4 = TRUE,
-                          value_col_name = "final_avg",
-                          dating_col_name = "date") %>% 
-  filter(!is.na(gen_group)) %>% 
-  arrange(desc(final_avg))
-
-dcfs_gdp_pct4_countries = make_country_lists_by_quant(dcfs_gdp_pct4)
+# dcfs_gdp <- add_baselines(dcfs_gdp)
+# dcfs_gdp_pct4 <- cate_gen(dcfs_gdp,
+#                           is_med = FALSE, is_pct4 = TRUE,
+#                           value_col_name = "final_avg",
+#                           dating_col_name = "date") %>% 
+#   filter(!is.na(gen_group)) %>% 
+#   arrange(desc(final_avg))
+# dcfs_gdp_pct4_countries = make_country_lists_by_quant(dcfs_gdp_pct4)
 
 
 ## ---- credit_to_private_sector_by_banks_dfs
@@ -215,22 +218,65 @@ dcps_gdp_pct4 <- cate_gen(dcps_gdp,
 dcps_gdp_pct4_countries = make_country_lists_by_quant(dcps_gdp_pct4)
 
 
+## ---- credit_reporting_text
 
-print(as.vector(dcps_gdp_pct4_countries[["q_4"]]$iso3c))
-print(as.vector(dcpsbk_gdp_pct4_countries[["q_4"]]$iso3c))
-print(as.vector(dcfs_gdp_pct4_countries[["q_4"]]$iso3c))
+tq4 <- "4th quartile: "
+tq3 <- "3rd quartile: "
+tq2 <- "2nd quartile: "
+tq1 <- "1st quartile: "
 
-print(as.vector(dcps_gdp_pct4_countries[["q_3"]]$iso3c))
-print(as.vector(dcpsbk_gdp_pct4_countries[["q_3"]]$iso3c))
-print(as.vector(dcfs_gdp_pct4_countries[["q_3"]]$iso3c))
 
-print(as.vector(dcps_gdp_pct4_countries[["q_2"]]$iso3c)) 
-print(as.vector(dcpsbk_gdp_pct4_countries[["q_2"]]$iso3c))
-print(as.vector(dcfs_gdp_pct4_countries[["q_2"]]$iso3c))
-
-print(as.vector(dcps_gdp_pct4_countries[["q_1"]]$iso3c))
-print(as.vector(dcpsbk_gdp_pct4_countries[["q_1"]]$iso3c))
-print(as.vector(dcfs_gdp_pct4_countries[["q_1"]]$iso3c))
+# tq4_dcprisec <- paste("Domestic credit to private sector,", tq4,"\n")
+# cat(tq4_dcprisec)
+# cat(as.vector(dcps_gdp_pct4_countries[["q_4"]]$iso3c))
+# 
+# tq4_cprisecbk <- paste("\nCredit to private sector by banks,", tq4,"\n")
+# cat(tq4_cprisecbk)
+# cat(as.vector(dcpsbk_gdp_pct4_countries[["q_4"]]$iso3c))
+# 
+# tq4_dcfs <- paste("\nDomestic credit by Financial Sector ,", tq4,"\n")
+# cat(tq4_dcfs)
+# cat(as.vector(dcfs_gdp_pct4_countries[["q_4"]]$iso3c))
+# 
+# 
+# tq3_dcprisec <- paste("\n\nDomestic credit to private sector,", tq3,"\n")
+# cat(tq3_dcprisec)
+# cat(as.vector(dcps_gdp_pct4_countries[["q_3"]]$iso3c))
+# 
+# tq3_cprisecbk <- paste("\nCredit to private sector by banks,", tq3,"\n")
+# cat(tq3_cprisecbk)
+# cat(as.vector(dcpsbk_gdp_pct4_countries[["q_3"]]$iso3c))
+# 
+# tq3_dcfs <- paste("\nDomestic credit by Financial Sector ,", tq3,"\n")
+# cat(tq3_dcfs)
+# cat(as.vector(dcfs_gdp_pct4_countries[["q_3"]]$iso3c))
+# 
+# 
+# tq2_dcprisec <- paste("\n\nDomestic credit to private sector,", tq2,"\n")
+# cat(tq2_dcprisec)
+# cat(as.vector(dcps_gdp_pct4_countries[["q_2"]]$iso3c))
+# 
+# tq2_cprisecbk <- paste("\nCredit to private sector by banks,", tq2,"\n")
+# cat(tq2_cprisecbk)
+# cat(as.vector(dcpsbk_gdp_pct4_countries[["q_2"]]$iso3c))
+# 
+# tq2_dcfs <- paste("\nDomestic credit by Financial Sector ,", tq2,"\n")
+# cat(tq2_dcfs)
+# cat(as.vector(dcfs_gdp_pct4_countries[["q_2"]]$iso3c))
+# 
+# 
+# tq1_dcprisec <- paste("\n\nDomestic credit to private sector,", tq1,"\n")
+# cat(tq1_dcprisec)
+# cat(as.vector(dcps_gdp_pct4_countries[["q_1"]]$iso3c))
+# 
+# tq1_cprisecbk <- paste("\nCredit to private sector by banks,", tq1,"\n")
+# cat(tq1_cprisecbk)
+# cat(as.vector(dcpsbk_gdp_pct4_countries[["q_1"]]$iso3c))
+# 
+# tq1_dcfs <- paste("\nDomestic credit by Financial Sector ,", tq1,"\n")
+# cat(tq1_dcfs)
+# cat(as.vector(dcfs_gdp_pct4_countries[["q_1"]]$iso3c))
+# 
 
 
 
@@ -292,6 +338,16 @@ multiplot(plotlist = plots_pb_hip_pct4$gruplot, cols = 2)
 
 
 ## ---- cprisbks_plots
+p <- ggplot(data = soo %>% filter(year(date) > 1998))
+p <- p + aes(x = date, y = ranking, col = iso3c)
+p <- p + geom_line()
+p <- p + facet_wrap( ~ iso3c , ncol = 3)
+p
+
+
+
+
+
 by_gen_groups <- dcpsb_gdp_pct4 %>% 
   arrange(desc(final_avg)) %>% 
   group_by(gen_group) %>% 
@@ -364,7 +420,6 @@ multiplot(plotlist = plots_dcps_pct4$gruplot, cols = 2)
 
 
 ## ---- comparison_fin_vs_tot
-
 
 plot_ps_bk_fs <- function(iso3country) {
   co_cp <- dcps_gdp %>% filter(iso3c == iso3country) %>% arrange(date)

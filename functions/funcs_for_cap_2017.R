@@ -5,6 +5,39 @@ library(replyr)
 library(wrapr)
 library(mFilter)
 
+
+add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
+  wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 
+             expr = {
+               df_with_ranking <-  df %>% 
+                 group_by(datecol) %>% 
+                 arrange(desc(valuecol)) %>%
+                 mutate(ranking = dense_rank(desc(valuecol)),
+                        quartile = ntile(desc(valuecol), 4),
+                        half = ntile(desc(valuecol), 2)
+                 ) %>%
+                 ungroup() %>% 
+                 arrange(datecol, iso3c)
+               
+               df_rdiff <- df_with_ranking %>%
+                 group_by(iso3c) %>% 
+                 arrange(datecol) %>% 
+                 mutate(diff_lastval = dplyr::last(valuecol) - valuecol,
+                        diff_avg3 = mean( c(
+                          dplyr::last(valuecol),
+                          lag(dplyr::last(valuecol)),
+                          lag(dplyr::last(valuecol), 2)
+                        ),na.rm = TRUE
+                        ) - 
+                          mean(c(valuecol, lag(valuecol), lag(valuecol, 2)),
+                               na.rm = TRUE)  ) %>% 
+                 ungroup() %>% 
+                 arrange(iso3c, datecol)
+             })
+  
+} 
+
+
 make_country_lists_by_quant <- function(df) {
   q_all = df %>% select(iso3c, gen_group) %>% distinct(.keep_all = TRUE)
   
@@ -40,7 +73,7 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
 
 
 add_baselines <- function(df, value_colname = "value", date_colname = "date",
-                          init_date = as.Date("2007", format = "%Y"),
+                          init_date = as.Date("2006", format = "%Y"),
                           final_date = as.Date("2016", format = "%Y"),
                           init_window = 3, final_window = 3) {
   

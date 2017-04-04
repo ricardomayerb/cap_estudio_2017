@@ -30,7 +30,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r setup, echo=FALSE}
-knitr::read_chunk("./scripts/financial_script_alc.R")
+knitr::opts_chunk$set(message = FALSE)
+knitr::read_chunk("./../scripts/financial_script_alc.R")
 ```
 
 
@@ -38,13 +39,39 @@ knitr::read_chunk("./scripts/financial_script_alc.R")
 ```
 
 
-```{r constants_and_functions}
+```{r constants_and_functions, message=FALSE}
 ```
 
 
+```{r load_data_sets}
+
+```
+
+
+```{r bk_loans_consum_dfs}
+```
+
+```{r credit_by_the_financial_sector_dfs}
+```
+
+```{r credit_to_private_sector_by_banks_dfs}
+```
+
+```{r credit_to_private_sector_dfs}
+```
+
+
+```{r credit_reporting_text}
+```
+
+
+```{r create_better_reporting_text}
+
+make_ctables <- function(df) {
+  df_pct4 <- 1
+}
 
 
 
-
-
+```
 
