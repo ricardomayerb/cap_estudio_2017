@@ -5,6 +5,18 @@ library(replyr)
 library(wrapr)
 library(mFilter)
 
+make_country_lists_by_quant <- function(df) {
+  q_all = df %>% select(iso3c, gen_group) %>% distinct(.keep_all = TRUE)
+  
+  q_4 = q_all %>% filter(gen_group == "above_pct75") %>% select(iso3c)
+  q_3 = q_all %>% filter(gen_group == "pct50_to_75") %>% select(iso3c)
+  q_2 = q_all %>% filter(gen_group == "pct25_to_50") %>% select(iso3c)
+  q_1 = q_all %>% filter(gen_group == "below_pct25") %>% select(iso3c)
+  
+  return(list(q_1 = q_1, q_2 = q_2, q_3 = q_3, q_4 = q_4, q_all = q_all))
+}
+
+
 add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
                            hp_type = "lambda", hp_freq = 1){
   

@@ -24,13 +24,14 @@ params:
 
 ```{r knit_config, include=FALSE}
 
-# knitr::opts_knit$set(root.dir = "./../")
+# knitr::opts_knit$set(root.dir = "./")
 knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
 ```{r setup, echo=FALSE}
-knitr::read_chunk("./scripts/financial_script_alc.R")
+
+knitr::read_chunk("./../scripts/financial_script_alc.R")
 ```
 
 

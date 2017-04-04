@@ -2,16 +2,7 @@
 
 
 # temporary place for functions
-make_country_lists_by_quant <- function(df) {
-  q_all = df %>% select(iso3c, gen_group) %>% distinct(.keep_all = TRUE)
-  
-  q_4 = q_all %>% filter(gen_group == "above_pct75") %>% select(iso3c)
-  q_3 = q_all %>% filter(gen_group == "pct50_to_75") %>% select(iso3c)
-  q_2 = q_all %>% filter(gen_group == "pct25_to_50") %>% select(iso3c)
-  q_1 = q_all %>% filter(gen_group == "below_pct25") %>% select(iso3c)
-  
-  return(list(q_1 = q_1, q_2 = q_2, q_3 = q_3, q_4 = q_4, q_all = q_all))
-}
+
 
 # preliminary chunks --------------------------------------------------------
 
@@ -44,8 +35,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
