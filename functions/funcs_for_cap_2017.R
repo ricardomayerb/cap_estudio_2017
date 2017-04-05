@@ -55,6 +55,7 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
   
   df$hp_cycle <- NA
   df$hp_trend <- NA
+  df$hp_cycle_pct <- NA
   
   for (co in unique(df$iso3c)) {
     co_data = df[df$iso3c == co, ]
@@ -66,6 +67,8 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
     
     df$hp_cycle[df$iso3c == co] <- co_hp$cycle
     df$hp_trend[df$iso3c == co] <- co_hp$trend
+    df$hp_cycle_pct[df$iso3c == co] <- 100 * co_hp$cycle/co_hp$trend
+    
   }
   
   return(df)

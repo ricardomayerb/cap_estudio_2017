@@ -83,7 +83,8 @@ load(paste0(pre_path,
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/wb_interests_dfs"))
 
-
+load(paste0(pre_path, 
+            "produced_data/peak_trough_dates"))
 
 
 # credit related chunks dfs ----------------------------------------------------
@@ -99,53 +100,61 @@ prestamos_bancarios_qtr <- cs_gdp_currentlc_q_gasto %>%
          industrial_gdp_seas = industrial/gdp_sa_seas,
          comercial_gdp_seas = comercial/gdp_sa_seas)
 
-
-
-tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>% 
-  group_by(iso2c, year) %>%
-  filter(iso2c != "CO") %>% 
-  summarise(nobs = n(), 
-            num_countries = length(unique(prestamos_bancarios_qtr$iso2c)),
-            avg_tot_to_gdp = mean(total_to_gdp_seas),
-            avg_hip_to_gdp = mean(hipotecario_gdp_seas, rm.na=TRUE),
-            avg_con_to_gdp = mean(consumo_gdp_seas, rm.na=TRUE),
-            n_hip_to_gdp = sum(!is.na(hipotecario_gdp_seas)),
-            n_con_to_gdp = sum(!is.na(consumo_gdp_seas))
-  )
-
-# pb_time_break <- as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
-
 pb <- prestamos_bancarios_qtr %>% 
   filter(iso3c %in% coi_18) %>% 
   filter( iso3c != "COL") # remove colombia until fix in ci or gdp data (ratio is off by 3 orders of magnitude)
 
-pb_tot <- pb %>% select(iso3c, date, total_to_gdp_seas) %>% 
-  add_baselines(value_colname = "total_to_gdp_seas")
+pb_tot <- pb %>% select(iso3c, date, total_to_gdp_seas)
+pb_tot <- add_diffrank(pb_tot, valuecol_name = "total_to_gdp_seas")
+pb_tot <- add_ts_filters(pb_tot, value_colname = "total_to_gdp_seas",
+                         hp_freq = 4)
 
 
-pb_hip <- pb %>% select(iso3c, date, hipotecario_gdp_seas) %>% 
-  add_baselines(value_colname = "hipotecario_gdp_seas")
+pb_hip <- pb %>% select(iso3c, date, hipotecario_gdp_seas) 
+pb_hip <- add_diffrank(pb_hip, valuecol_name = "hipotecario_gdp_seas")
+pb_hip <- add_ts_filters(pb_hip, value_colname = "hipotecario_gdp_seas",
+                         hp_freq = 4)
 
-pb_con <- pb %>% select(iso3c, date, consumo_gdp_seas) %>% 
-  add_baselines(value_colname = "consumo_gdp_seas")
+pb_con <- pb %>% select(iso3c, date, consumo_gdp_seas)
+pb_con <- add_diffrank(pb_con, valuecol_name = "consumo_gdp_seas")
+pb_con <- add_ts_filters(pb_con, value_colname = "consumo_gdp_seas",
+                         hp_freq = 4)
+
+
+# 
+# tab_pb_qtr <- prestamos_bancarios_qtr %>% group_by(iso2c, year) %>% 
+#   group_by(iso2c, year) %>%
+#   filter(iso2c != "CO") %>% 
+#   summarise(nobs = n(), 
+#             num_countries = length(unique(prestamos_bancarios_qtr$iso2c)),
+#             avg_tot_to_gdp = mean(total_to_gdp_seas),
+#             avg_hip_to_gdp = mean(hipotecario_gdp_seas, rm.na=TRUE),
+#             avg_con_to_gdp = mean(consumo_gdp_seas, rm.na=TRUE),
+#             n_hip_to_gdp = sum(!is.na(hipotecario_gdp_seas)),
+#             n_con_to_gdp = sum(!is.na(consumo_gdp_seas))
+#   )
+
+# pb_time_break <- as.Date("2004-10-01", format = "%Y-%m-%d") # 4th quarter of 2004
 
 
 
-pb_tot_pct4 <- cate_gen(df = pb_tot, value_col_name = "total_to_gdp_seas",
-                        dating_col_name = "date",
-                        is_med = FALSE,  is_pct4 = TRUE)
 
-pb_hip_pct4 <- cate_gen(df = pb_hip, value_col_name = "hipotecario_gdp_seas",
-                        dating_col_name = "date",
-                        is_med = FALSE,  is_pct4 = TRUE)
 
-pb_con_pct4 <- cate_gen(df = pb_con, value_col_name = "consumo_gdp_seas",
-                        dating_col_name = "date",
-                        is_med = FALSE,  is_pct4 = TRUE)
-
-pb_tot_pct4_countries = make_country_lists_by_quant(pb_tot_pct4)
-pb_hip_pct4_countries = make_country_lists_by_quant(pb_hip_pct4)
-pb_con_pct4_countries = make_country_lists_by_quant(pb_con_pct4)
+# pb_tot_pct4 <- cate_gen(df = pb_tot, value_col_name = "total_to_gdp_seas",
+#                         dating_col_name = "date",
+#                         is_med = FALSE,  is_pct4 = TRUE)
+# 
+# pb_hip_pct4 <- cate_gen(df = pb_hip, value_col_name = "hipotecario_gdp_seas",
+#                         dating_col_name = "date",
+#                         is_med = FALSE,  is_pct4 = TRUE)
+# 
+# pb_con_pct4 <- cate_gen(df = pb_con, value_col_name = "consumo_gdp_seas",
+#                         dating_col_name = "date",
+#                         is_med = FALSE,  is_pct4 = TRUE)
+# 
+# pb_tot_pct4_countries = make_country_lists_by_quant(pb_tot_pct4)
+# pb_hip_pct4_countries = make_country_lists_by_quant(pb_hip_pct4)
+# pb_con_pct4_countries = make_country_lists_by_quant(pb_con_pct4)
 
 
 
@@ -160,9 +169,9 @@ dcfs_gdp <- dom_cred_providd_by_finsec_to_gdp %>%
                         ordered = TRUE))
 
 dcfs_gdp <- add_diffrank(dcfs_gdp)
-
-
 dcfs_gdp <- add_ts_filters(dcfs_gdp)
+
+
 
 # dcfs_gdp <- add_baselines(dcfs_gdp)
 # dcfs_gdp_pct4 <- cate_gen(dcfs_gdp,
@@ -183,17 +192,17 @@ dcpsbk_gdp <- dom_credit_to_priv_sec_by_banks_to_gdp %>%
   mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
                         ordered = TRUE))
 
-dcpsbk_gdp <- add_baselines(dcpsbk_gdp)
+dcpsbk_gdp <- add_diffrank(dcpsbk_gdp)
 dcpsbk_gdp <- add_ts_filters(dcpsbk_gdp)
 
-dcpsbk_gdp_pct4 <- cate_gen(dcpsbk_gdp,
-                          is_med = FALSE, is_pct4 = TRUE,
-                          value_col_name = "final_avg",
-                          dating_col_name = "date") %>% 
-  filter(!is.na(gen_group)) %>% 
-  arrange(desc(final_avg))
-
-dcpsbk_gdp_pct4_countries = make_country_lists_by_quant(dcpsbk_gdp_pct4)
+# dcpsbk_gdp_pct4 <- cate_gen(dcpsbk_gdp,
+#                           is_med = FALSE, is_pct4 = TRUE,
+#                           value_col_name = "final_avg",
+#                           dating_col_name = "date") %>% 
+#   filter(!is.na(gen_group)) %>% 
+#   arrange(desc(final_avg))
+# 
+# dcpsbk_gdp_pct4_countries = make_country_lists_by_quant(dcpsbk_gdp_pct4)
 
 ## ---- credit_to_private_sector_dfs
 
@@ -205,17 +214,17 @@ dcps_gdp <- dom_credit_to_priv_sec_to_gdp %>%
   mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
                         ordered = TRUE))
 
-dcps_gdp <- add_baselines(dcps_gdp)
+dcps_gdp <- add_diffrank(dcps_gdp)
 dcps_gdp <- add_ts_filters(dcps_gdp)
 
-dcps_gdp_pct4 <- cate_gen(dcps_gdp,
-                          is_med = FALSE, is_pct4 = TRUE,
-                          value_col_name = "final_avg",
-                          dating_col_name = "date") %>% 
-  filter(!is.na(gen_group)) %>% 
-  arrange(desc(final_avg))
-
-dcps_gdp_pct4_countries = make_country_lists_by_quant(dcps_gdp_pct4)
+# dcps_gdp_pct4 <- cate_gen(dcps_gdp,
+#                           is_med = FALSE, is_pct4 = TRUE,
+#                           value_col_name = "final_avg",
+#                           dating_col_name = "date") %>% 
+#   filter(!is.na(gen_group)) %>% 
+#   arrange(desc(final_avg))
+# 
+# dcps_gdp_pct4_countries = make_country_lists_by_quant(dcps_gdp_pct4)
 
 
 ## ---- credit_reporting_text
@@ -281,6 +290,54 @@ tq1 <- "1st quartile: "
 
 
 # credit related chunks plots --------------------------------------------------
+
+## ---- combined_credit_rankings
+
+dcfs_gdp_tm <- dcfs_gdp %>% 
+  select(iso3c, date, value, ranking, quartile, half,
+         hp_cycle_pct, diff_lastval, diff_avg3) %>% 
+  rename(value_fs = value, ranking_fs = ranking, quartile_fs = quartile,
+         hp_cycle_pct_fs = hp_cycle_pct, diff_lastval_fs = diff_lastval,
+         diff_avg3_fs = diff_avg3)
+  
+dcps_gdp_tm <- dcps_gdp %>% 
+  select(iso3c, date, value, ranking, quartile, half,
+         hp_cycle_pct, diff_lastval, diff_avg3) %>% 
+  rename(value_ps = value, ranking_ps = ranking, quartile_ps = quartile,
+         hp_cycle_pct_ps = hp_cycle_pct, diff_lastval_ps = diff_lastval,
+         diff_avg3_ps = diff_avg3)
+
+dcpsbk_gdp_tm <- dcpsbk_gdp %>% 
+  select(iso3c, date, value, ranking, quartile, half,
+         hp_cycle_pct, diff_lastval, diff_avg3) %>% 
+  rename(value_psbk = value, ranking_psbk = ranking, quartile_psbk = quartile,
+         hp_cycle_pct_psbk = hp_cycle_pct, diff_lastval_psbk = diff_lastval,
+         diff_avg3_psbk = diff_avg3)
+
+credit_pspsbkfs <-  left_join(dcps_gdp_tm, dcpsbk_gdp_tm,
+                              by = c("iso3c", "date"))
+credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
+                             by = c("iso3c", "date"))
+
+credit_pspsbkfs_2006 <- credit_pspsbk %>% filter(year(date) == 2006) %>% 
+  arrange(ranking_ps)
+
+credit_pspsbkfs_2015 <- credit_pspsbk %>% filter(year(date) == 2015) %>% 
+  arrange(ranking_ps)
+
+g_credit_pspsbkfs_ranking <- ggplot(data = credit_pspsbkfs) + 
+  geom_line(aes(x = date, y = ranking_ps, col = "Dom cred to priv")) + 
+  geom_line(aes(x = date, y = ranking_psbk, col = "Dcps by banks")) + 
+  geom_line(aes(x = date, y = ranking_fs, col = "Dom cred by fin sec")) + 
+  geom_rect(data = fin_dates_df,
+            aes(xmin = fn_peak, xmax = fn_trough, ymin = -Inf, ymax = +Inf),
+            fill='pink', alpha=0.2) +
+  coord_cartesian(xlim = c(ymd("1989-12-31"), ymd("2015-12-31")) )  + 
+  facet_wrap( ~ iso3c, ncol = 3) 
+  
+g_credit_pspsbkfs_ranking
+
+
 
 ## ---- pb_plots
 
