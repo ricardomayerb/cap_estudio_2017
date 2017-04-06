@@ -35,8 +35,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -319,11 +319,19 @@ credit_pspsbkfs <-  left_join(dcps_gdp_tm, dcpsbk_gdp_tm,
 credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
                              by = c("iso3c", "date"))
 
-credit_pspsbkfs_2006 <- credit_pspsbk %>% filter(year(date) == 2006) %>% 
+credit_pspsbkfs_2006 <- credit_pspsbkfs %>% filter(year(date) == 2006) %>% 
   arrange(ranking_ps)
 
-credit_pspsbkfs_2015 <- credit_pspsbk %>% filter(year(date) == 2015) %>% 
+credit_pspsbkfs_2010 <- credit_pspsbkfs %>% filter(year(date) == 2010) %>% 
   arrange(ranking_ps)
+
+credit_pspsbkfs_2013 <- credit_pspsbkfs %>% filter(year(date) == 2013) %>% 
+  arrange(ranking_ps)
+
+credit_pspsbkfs_2015 <- credit_pspsbkfs %>% filter(year(date) == 2015) %>% 
+  arrange(ranking_ps)
+
+
 
 g_credit_pspsbkfs_ranking <- ggplot(data = credit_pspsbkfs) + 
   geom_line(aes(x = date, y = ranking_ps, col = "Dom cred to priv")) + 
@@ -337,9 +345,26 @@ g_credit_pspsbkfs_ranking <- ggplot(data = credit_pspsbkfs) +
   
 g_credit_pspsbkfs_ranking
 
+p_lastval <- ggplot(data = credit_pspsbkfs_2006, 
+                    aes(x = iso3c, y = diff_lastval_ps,
+                        label = format(diff_lastval_ps, digits = 1))) + 
+  geom_bar(aes(fill = diff_lastval_ps), stat = "identity") + 
+  geom_label(size=3, hjust = -0.5)  +
+  coord_flip()
+p_lastval
 
+library(scales)
 
-## ---- pb_plots
+p_lastavg <- ggplot(data = credit_pspsbkfs_2006,
+                    aes(x = iso3c, y = diff_avg3_ps,
+                        label = format(diff_avg3_ps, digits = 1 ))) + 
+  geom_bar(aes(fill = diff_avg3_ps),
+           stat = "identity") +  geom_label(size=3, hjust = -0.5)  +
+  coord_flip() 
+  
+p_lastavg
+
+## ---- pb_plots 
 
 ### total pb
 by_gen_groups <- pb_tot_pct4 %>% 
