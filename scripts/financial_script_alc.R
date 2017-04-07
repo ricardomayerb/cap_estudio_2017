@@ -232,6 +232,64 @@ bk_liqres_to_ass <- make_df_19_wbtype(bank_liq_res_to_bank_ass)
 bk_liqres_to_ass <- add_diffrank(bk_liqres_to_ass)
 bk_liqres_to_ass <- add_ts_filters(bk_liqres_to_ass)
 
+
+claims_on_gov <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FS.AST.CGOV.GD.ZS")
+  
+claims_on_otherdomestsec <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FS.AST.DOMO.GD.ZS")
+
+final_consum_households  <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.CON.PETC.ZS") # formerly private consumption
+
+gross_capital_form   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.GDI.TOTL.ZS")
+
+gross_fixed_capital_form   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.GDI.FTOT.ZS")
+
+gross_fixed_capital_form_priv_sect   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.GDI.FPRV.ZS")
+
+avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INR.OFFT")
+# DT.INR.PRVT
+
+avg_mat_new_extde_off    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.MAT.OFFT")
+# DT.MAT.PRVT
+
+# External debt stocks, short-term (DOD, current US$)
+# DT.DOD.DSTC.CD
+
+# Interest payments on external debt, short-term (INT, current US$)
+# DT.INT.DSTC.CD
+
+# Short-term debt (% of total external debt)
+# DT.DOD.DSTC.ZS
+
+# Short-term debt (% of total reserves)
+# DT.DOD.DSTC.IR.ZS
+
+# Debt service on external debt, total (TDS, current US$)
+# DT.TDS.DECT.CD
+
+# Trade (% of GDP)
+# NE.TRD.GNFS.ZS
+
+# Revenue, excluding grants (% of GDP)
+# GC.REV.XGRT.GD.ZS
+
+# Tax revenue (% of GDP)
+# GC.TAX.TOTL.GD.ZS
+
+# Total reserves (% of total external debt)
+# FI.RES.TOTL.DT.ZS
+
+# GDP growth (annual %)
+# NY.GDP.MKTP.KD.ZG
+
+
 # finance related chunks plots --------------------------------------------------
 
 ## plot function definitions  ----------------------
@@ -505,6 +563,63 @@ g_npl_lastavg_bar
 
 
 
-
-
+# 
+# varsinwdi33
+# [1] "Average interest on new external debt commitments (%)"                    
+# [2] "Average interest on new external debt commitments, official (%)"          
+# [3] "Average interest on new external debt commitments, private (%)"           
+# [4] "Average maturity on new external debt commitments (years)"                
+# [5] "Average maturity on new external debt commitments, official (years)"      
+# [6] "Average maturity on new external debt commitments, private (years)"       
+# [7] "Central government debt, total (% of GDP)"                                
+# [8] "Claims on central government, etc. (% GDP)"                               
+# [9] "Claims on other sectors of the domestic economy (% of GDP)"               
+# [10] "Current account balance (% of GDP)"                                       
+# [11] "Debt service on external debt, total (TDS, current US$)"                  
+# [12] "Domestic credit provided by financial sector (% of GDP)"                  
+# [13] "Domestic credit to private sector (% of GDP)"                             
+# [14] "Domestic credit to private sector by banks (% of GDP)"                    
+# [15] "Expense (% of GDP)"                                                       
+# [16] "Exports of goods and services (% of GDP)"                                 
+# [17] "External balance on goods and services (% of GDP)"                        
+# [18] "External debt stocks (% of exports of goods, services and primary income)"
+# [19] "External debt stocks (% of GNI)"                                          
+# [20] "External debt stocks, long-term (DOD, current US$)"                       
+# [21] "External debt stocks, short-term (DOD, current US$)"                      
+# [22] "External debt stocks, total (DOD, current US$)"                           
+# [23] "External debt stocks, variable rate (DOD, current US$)"                   
+# [24] "Final consumption expenditure, etc. (% of GDP)"                           
+# [25] "Foreign direct investment, net inflows (% of GDP)"                        
+# [26] "Foreign direct investment, net outflows (% of GDP)"                       
+# [27] "GDP (constant LCU)"                                                       
+# [28] "GDP (current LCU)"                                                        
+# [29] "GDP (current US$)"                                                        
+# [30] "GDP at market prices (constant 2010 US$)"                                 
+# [31] "GDP deflator (base year varies by country)"                               
+# [32] "GDP growth (annual %)"                                                    
+# [33] "General government final consumption expenditure (% of GDP)"              
+# [34] "Gross capital formation (% of GDP)"                                       
+# [35] "Gross domestic savings (% of GDP)"                                        
+# [36] "Gross fixed capital formation (% of GDP)"                                 
+# [37] "Gross fixed capital formation, private sector (% of GDP)"                 
+# [38] "Gross national expenditure (% of GDP)"                                    
+# [39] "Gross savings (% of GDP)"                                                 
+# [40] "Household final consumption expenditure, etc. (% of GDP)"                 
+# [41] "Imports of goods and services (% of GDP)"                                 
+# [42] "Interest payments on external debt, short-term (INT, current US$)"        
+# [43] "Interest payments on external debt, total (INT, current US$)"             
+# [44] "Merchandise trade (% of GDP)"                                             
+# [45] "Mineral rents (% of GDP)"                                                 
+# [46] "Natural gas rents (% of GDP)"                                             
+# [47] "Oil rents (% of GDP)"                                                     
+# [48] "Personal remittances, received (% of GDP)"                                
+# [49] "Revenue, excluding grants (% of GDP)"                                     
+# [50] "Short-term debt (% of exports of goods, services and primary income)"     
+# [51] "Short-term debt (% of total external debt)"                               
+# [52] "Short-term debt (% of total reserves)"                                    
+# [53] "Tax revenue (% of GDP)"                                                   
+# [54] "Total natural resources rents (% of GDP)"                                 
+# [55] "Total reserves (% of total external debt)"                                
+# [56] "Trade (% of GDP)"                                                         
+# [57] "Trade in services (% of GDP)"      
 
