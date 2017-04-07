@@ -59,8 +59,7 @@ sel_names = c(claims_in, debt_in, cred_in, gdp_in)
 
 
 WDI_33_selected_vars <-  WDI_Data_33_tidy %>% 
-  filter(indicator_code %in% sel_codes) %>% 
-  mutate(date = as.Date(as.character(year), format = "%Y"))
+  filter(indicator_code %in% sel_codes)
 
 save(WDI_33_selected_vars, 
      file = "./produced_data/data_with_basic_wrangling/WDI_33_selected_all")

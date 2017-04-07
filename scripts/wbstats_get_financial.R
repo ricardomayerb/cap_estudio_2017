@@ -86,7 +86,7 @@ save(tot_reserves_w_gold_to_gdp,
      tot_reserves_in_mo_imp_gds,
      short_term_debt_to_reserves,
      bank_liq_res_to_bank_ass,
-     bank_liq_res_to_bank_ass,
+     bank_cap_to_bank_ass,
      nplns_to_total,
      file = "./produced_data/data_with_basic_wrangling/wb_reservish_dfs")
      

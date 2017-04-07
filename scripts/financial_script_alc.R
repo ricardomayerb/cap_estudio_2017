@@ -234,36 +234,90 @@ bk_liqres_to_ass <- add_ts_filters(bk_liqres_to_ass)
 
 
 claims_on_gov <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "FS.AST.CGOV.GD.ZS")
+  filter(indicator_code ==  "FS.AST.CGOV.GD.ZS") %>% 
+  rename(date = year)
+claim_gov <- make_df_19_wbtype(claims_on_gov)
+claim_gov <- add_diffrank(claim_gov)
+claim_gov <- add_ts_filters(claim_gov)
+
   
 claims_on_otherdomestsec <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "FS.AST.DOMO.GD.ZS")
+  filter(indicator_code ==  "FS.AST.DOMO.GD.ZS") %>% 
+  rename(date = year)
+claim_other <- make_df_19_wbtype(claims_on_otherdomestsec)
+claim_other <- add_diffrank(claim_other)
+claim_other <- add_ts_filters(claim_other)
 
+# formerly private consumption
 final_consum_households  <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "NE.CON.PETC.ZS") # formerly private consumption
+  filter(indicator_code ==  "NE.CON.PETC.ZS") %>% 
+  rename(date = year)
+consum_hh <- make_df_19_wbtype(final_consum_households)
+consum_hh <- add_diffrank(consum_hh)
+consum_hh <- add_ts_filters(consum_hh)
 
 gross_capital_form   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "NE.GDI.TOTL.ZS")
+  filter(indicator_code ==  "NE.GDI.TOTL.ZS") %>% 
+  rename(date = year)
 
 gross_fixed_capital_form   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "NE.GDI.FTOT.ZS")
+  filter(indicator_code ==  "NE.GDI.FTOT.ZS") %>% 
+  rename(date = year)
 
 gross_fixed_capital_form_priv_sect   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "NE.GDI.FPRV.ZS")
+  filter(indicator_code ==  "NE.GDI.FPRV.ZS") %>% 
+  rename(date = year)
 
 avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.INR.OFFT")
-# DT.INR.PRVT
+  filter(indicator_code ==  "DT.INR.OFFT") %>% 
+  rename(date = year)
+
+avg_int_new_extde_priv    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INR.PRVT") %>% 
+  rename(date = year)
 
 avg_mat_new_extde_off    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.MAT.OFFT")
-# DT.MAT.PRVT
+  filter(indicator_code ==  "DT.MAT.OFFT") %>% 
+  rename(date = year)
+
+avg_mat_new_extde_priv    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.MAT.PRVT") %>% 
+  rename(date = year)
 
 # External debt stocks, short-term (DOD, current US$)
-# DT.DOD.DSTC.CD
+ext_debt_short_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.CD") %>% 
+  rename(date = year)
+
+# External debt stocks, long-term (DOD, current US$)
+ext_debt_long_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DLXF.CD") %>% 
+  rename(date = year)
+
+# External debt stocks, total (DOD, current US$)
+ext_debt_total_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DECT.CD") %>% 
+  rename(date = year)
+
+# External debt stocks, variable rate (DOD, current US$)
+ext_debt_total_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.VTOT.CD") %>% 
+  rename(date = year)
+
+
+# External debt stocks (% of GNI)
+ext_debt_total_gni   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
+  rename(date = year)
+
 
 # Interest payments on external debt, short-term (INT, current US$)
-# DT.INT.DSTC.CD
+int_payment_on_short_ext_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INT.DSTC.CD") %>% 
+  rename(date = year)
+
+
+# 
 
 # Short-term debt (% of total external debt)
 # DT.DOD.DSTC.ZS
