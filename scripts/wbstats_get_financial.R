@@ -76,7 +76,7 @@ short_term_debt_to_reserves <- wb(country = cepal_33_countries[["iso3c"]],
 bank_liq_res_to_bank_ass <- wb(country = cepal_33_countries[["iso3c"]],
                                indicator = "FD.RES.LIQU.AS.ZS")
 
-bank_liq_res_to_bank_ass <- wb(country = cepal_33_countries[["iso3c"]],
+bank_cap_to_bank_ass <- wb(country = cepal_33_countries[["iso3c"]],
                            indicator = "FB.BNK.CAPA.ZS")
 
 

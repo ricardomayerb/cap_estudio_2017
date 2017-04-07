@@ -14,7 +14,6 @@ cred <- WDI_Data_33_tidy %>%
 cred_ic <- cred$indicator_code[c(4,5,6)]
 cred_in <- cred$indicator_name[c(4,5,6)]
 
-
 claims <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "laims") ) %>% 
   select(indicator_name, indicator_code) %>% 

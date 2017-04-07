@@ -2,6 +2,15 @@
 
 
 # temporary place for functions
+make_df_19_wbtype <- function(df) {
+  df %>% 
+    filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+    arrange(iso2c, date) %>% 
+    mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
+           date = ymd(paste(date, "12", "31", sep = "-")) ) %>% 
+    mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
+                          ordered = TRUE))
+}
 
 
 # preliminary chunks --------------------------------------------------------
@@ -36,8 +45,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -88,7 +97,8 @@ load(paste0(pre_path,
             "produced_data/peak_trough_dates"))
 
 
-# credit related chunks dfs ----------------------------------------------------
+# financial related chunks dfs ----------------------------------------------------
+## prestamos bancarios dfs -----------------  
 
 ## ---- prestamos_bancarios_qtr_from_dde_dfs
 prestamos_bancarios_qtr <- cs_gdp_currentlc_q_gasto %>% 
@@ -152,40 +162,19 @@ bankloans_totconhip <-  left_join(pb_con_tm, pb_hip_tm,
 bankloans_totconhip <- left_join(bankloans_totconhip, pb_tot_tm,
                              by = c("iso3c", "date"))
 
+## domestic credit dfs -----------------  
 
 ## ---- dom_credit_dfs_anual_wb
-dcfs_gdp <- dom_cred_providd_by_finsec_to_gdp %>% 
-  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
-  arrange(iso2c, date) %>% 
-  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
-         date = as.Date(as.character(date), format = "%Y")) %>% 
-  mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
-                        ordered = TRUE))
 
+dcfs_gdp <- make_df_19_wbtype(dom_cred_providd_by_finsec_to_gdp)
 dcfs_gdp <- add_diffrank(dcfs_gdp)
 dcfs_gdp <- add_ts_filters(dcfs_gdp)
 
-
-dcpsbk_gdp <- dom_credit_to_priv_sec_by_banks_to_gdp %>% 
-  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
-  arrange(iso2c, date) %>% 
-  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
-         date = as.Date(as.character(date), format = "%Y")) %>% 
-  mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
-                        ordered = TRUE))
-
+dcpsbk_gdp <- make_df_19_wbtype(dom_credit_to_priv_sec_by_banks_to_gdp) 
 dcpsbk_gdp <- add_diffrank(dcpsbk_gdp)
 dcpsbk_gdp <- add_ts_filters(dcpsbk_gdp)
 
-
-dcps_gdp <- dom_credit_to_priv_sec_to_gdp %>% 
-  filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
-  arrange(iso2c, date) %>% 
-  mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
-         date = as.Date(as.character(date), format = "%Y")) %>% 
-  mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
-                        ordered = TRUE))
-
+dcps_gdp <- make_df_19_wbtype(dom_credit_to_priv_sec_to_gdp)
 dcps_gdp <- add_diffrank(dcps_gdp)
 dcps_gdp <- add_ts_filters(dcps_gdp)
 
@@ -219,19 +208,70 @@ credit_pspsbkfs <-  left_join(dcps_gdp_tm, dcpsbk_gdp_tm,
 credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
                              by = c("iso3c", "date"))
 
+## financial stress indicators ---- 
+
+## ---- NPL_make_dfs
+npl <- make_df_19_wbtype(nplns_to_total)
+npl <- add_diffrank(npl)
+npl <- add_ts_filters(npl)
+
+## ---- NPL_make_dfs
+bk_cap_to_ass <- make_df_19_wbtype(bank_cap_to_bank_ass)
+
+bksum <- bk_cap_to_ass %>% 
+  group_by(iso3c) %>% 
+  summarise(nobs = n())
+
+bk_cap_to_ass <- bk_cap_to_ass %>% 
+  filter(iso3c != "NIC") # get rid of NIC bc it has only 2 observations
+
+bk_cap_to_ass <- add_diffrank(bk_cap_to_ass)
+bk_cap_to_ass <- add_ts_filters(bk_cap_to_ass)
+
+bk_liqres_to_ass <- make_df_19_wbtype(bank_liq_res_to_bank_ass)
+bk_liqres_to_ass <- add_diffrank(bk_liqres_to_ass)
+bk_liqres_to_ass <- add_ts_filters(bk_liqres_to_ass)
+
+# finance related chunks plots --------------------------------------------------
+
+## plot function definitions  ----------------------
+## ---- plot_quick_dirty_fns
+plot_1_lines <- function(var1,
+                         le1 = "Dom cred to priv",
+                         main_data = "credit_pspsbkfs", 
+                         h_line_pos = 0, main = "", ylim= NULL,
+                         dxlim = c(ymd("1989-12-31"), ymd("2015-12-31")),
+                         coi = coi_18) {
+  
+  wrapr::let(alias = list(v1 = var1, pdata = main_data),
+             expr = {
+               ggplot(data = pdata %>% filter(iso3c %in% coi)) + 
+                 geom_line(aes(x = date, y = v1, col = le1)) + 
+                 geom_hline(yintercept = h_line_pos) + 
+                 geom_rect(data = fin_dates_df,
+                           aes(xmin = fn_peak, xmax = fn_trough, ymin = -Inf, ymax = +Inf),
+                           fill = 'pink', alpha = 0.2) +
+                 geom_rect(data = nber_dates_df,
+                           aes(xmin = nb_peak, xmax = nb_trough, ymin = -Inf, ymax = +Inf),
+                           fill = 'green', alpha = 0.1) +
+                 coord_cartesian(xlim = dxlim,  
+                                 ylim = ylim)   + 
+                 facet_wrap( ~ iso3c, ncol = 3) +
+                 ggtitle(main) + 
+                 theme_tufte() 
+             })
+  
+}
 
 
-# credit related chunks plots --------------------------------------------------
-
-## ---- combined_credit_plots_make
 
 plot_2_lines <- function(var1 , var2,
-                            le1 = "Dom cred to priv",
-                            le2 = "Dcps by banks",
-                            main_data = "credit_pspsbkfs", 
-                            h_line_pos = 0, main = "", ylim= NULL,
-                            dxlim = c(ymd("1989-12-31"), ymd("2015-12-31")),
-                            coi = coi_18) {
+                         le1 = "Dom cred to priv",
+                         le2 = "Dcps by banks",
+                         main_data = "credit_pspsbkfs", 
+                         h_line_pos = 0, main = "", ylim= NULL,
+                         dxlim = c(ymd("1989-12-31"), ymd("2015-12-31")),
+                         coi = coi_18) {
   
   wrapr::let(alias = list(v1 = var1, v2 = var2, pdata = main_data),
              expr = {
@@ -255,8 +295,6 @@ plot_2_lines <- function(var1 , var2,
 }
 
 
-
-
 plot_cred_lines <- function(var1 , var2 , var3,
                             le1 = "Dom cred to priv",
                             le2 = "Dcps by banks",
@@ -267,28 +305,29 @@ plot_cred_lines <- function(var1 , var2 , var3,
                             coi = coi_18) {
   
   wrapr::let(alias = list(v1 = var1, v2 = var2, v3 = var3, pdata = main_data),
-    expr = {
-    q_cred_lines <- ggplot(data = pdata %>% filter(iso3c %in% coi)) + 
-     geom_line(aes(x = date, y = v1, col = le1)) + 
-     geom_line(aes(x = date, y = v2, col = le2)) + 
-     geom_line(aes(x = date, y = v3, col = le3)) + 
-     geom_hline(yintercept = h_line_pos) + 
-     geom_rect(data = fin_dates_df,
-               aes(xmin = fn_peak, xmax = fn_trough, ymin = -Inf, ymax = +Inf),
-                   fill='pink', alpha=0.2) +
-     geom_rect(data = nber_dates_df,
-               aes(xmin = nb_peak, xmax = nb_trough, ymin = -Inf, ymax = +Inf),
-                   fill='green', alpha=0.1) +
-     coord_cartesian(xlim = dxlim,  
-                     ylim = ylim)   + 
-     facet_wrap( ~ iso3c, ncol = 3) +
-     ggtitle(main) + 
-     theme_tufte() 
+             expr = {
+               g_cred_lines <- ggplot(data = pdata %>% filter(iso3c %in% coi)) + 
+                 geom_line(aes(x = date, y = v1, col = le1)) + 
+                 geom_line(aes(x = date, y = v2, col = le2)) + 
+                 geom_line(aes(x = date, y = v3, col = le3)) + 
+                 geom_hline(yintercept = h_line_pos) + 
+                 geom_rect(data = fin_dates_df,
+                           aes(xmin = fn_peak, xmax = fn_trough, ymin = -Inf, ymax = +Inf),
+                           fill='pink', alpha=0.2) +
+                 geom_rect(data = nber_dates_df,
+                           aes(xmin = nb_peak, xmax = nb_trough, ymin = -Inf, ymax = +Inf),
+                           fill='green', alpha=0.1) +
+                 coord_cartesian(xlim = dxlim,  
+                                 ylim = ylim)   + 
+                 facet_wrap( ~ iso3c, ncol = 3) +
+                 ggtitle(main) + 
+                 theme_tufte() 
              })
-
+  
 }
 
-
+## create credit plots ------------
+## ---- combined_credit_plots_make
 g_credit_pspsbkfs_ranking <- plot_cred_lines("ranking_ps", "ranking_psbk",
                                              "ranking_fs", main = "ranking",
                                              h_line_pos = 9)
@@ -324,10 +363,10 @@ g_credit_lastavg_bar <- ggplot(data = credit_pspsbkfs %>% filter(year(date) == 2
                     aes(x = iso3c, y = diff_avg3_ps,
                         label = format(diff_avg3_ps, digits = 1 ))) + 
   geom_bar(aes(fill = diff_avg3_ps),
-           stat = "identity") +  geom_label(size=3, hjust = -0.5)  +
+           stat = "identity") +  geom_label(size = 3, hjust = -0.5)  +
   coord_flip() 
 
-
+## create bank loans plots ------------
 ## ---- pb_plots_make 
 
 g_pb_totconhip_ranking <- plot_2_lines(
@@ -365,15 +404,69 @@ g_pb_lastval_bar <- ggplot(data = bankloans_totconhip %>% filter(date == ymd("20
                                aes(x = iso3c, y = diff_lastval_con,
                                    label = format(diff_lastval_con, digits = 1))) + 
   geom_bar(aes(fill = diff_lastval_con), stat = "identity") + 
-  geom_label(size=3, hjust = -0.5)  +
+  geom_label(size = 3, hjust = -0.5)  +
   coord_flip()
 
 g_pb_lastavg_bar <- ggplot(data = bankloans_totconhip %>% filter(date == ymd("2006-10-01")),
                                aes(x = iso3c, y = diff_avg3_con,
                                    label = format(diff_avg3_con, digits = 1 ))) + 
   geom_bar(aes(fill = diff_avg3_con),
-           stat = "identity") +  geom_label(size=3, hjust = -0.5)  +
+           stat = "identity") +  geom_label(size = 3, hjust = -0.5)  +
   coord_flip() 
+
+
+
+## create npl plots -------------
+
+## ---- pb_plots_make 
+
+g_npl_rankings <- plot_1_lines(
+  "ranking", main = "ranking",
+  le1 = "NPL % of total loans",
+  h_line_pos = 9, main_data = "npl",
+  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")))
+
+g_npl_quartiles <- plot_1_lines(
+  "quartile", main = "quartiles",
+  le1 = "NPL % of total loans",
+  h_line_pos = 2.5, main_data = "npl",
+  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")))
+
+g_npl_halves <- plot_1_lines(
+  "half", main = "halves",
+  le1 = "NPL % of total loans",
+  h_line_pos = 1.5, main_data = "npl",
+  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")))
+
+
+g_npl_cycle_pct <- plot_1_lines(
+  "hp_cycle_pct", main = "Cycle %",
+  le1 = "NPL %",
+  h_line_pos = 0, main_data = "npl",
+  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+  ylim = c(-25, 25))
+
+g_npl_trend <- plot_1_lines(
+  "hp_trend", main = "trend (HP)",
+  le1 = "trend",
+  h_line_pos = 0, main_data = "npl",
+  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")) )
+
+g_npl_lastval_bar <- ggplot(data = npl %>% filter(date == ymd("2006-12-31")), 
+                           aes(x = iso3c, y = diff_lastval,
+                               label = format(diff_lastval, digits = 1))) + 
+  geom_bar(aes(fill = diff_lastval), stat = "identity") + 
+  geom_label(size = 3, hjust = -0.5)  +
+  coord_flip()
+
+g_npl_lastavg_bar <- ggplot(data = npl %>% filter(date == ymd("2006-12-31")),
+                           aes(x = iso3c, y = diff_avg3,
+                               label = format(diff_avg3, digits = 1 ))) + 
+  geom_bar(aes(fill = diff_avg3),
+           stat = "identity") +  geom_label(size = 3, hjust = -0.5)  +
+  coord_flip() 
+
+## print credit plots ----------
 
 ## ---- credit_plots_show
 
@@ -385,6 +478,8 @@ g_credit_pspsbkfs_trend
 g_credit_lastavg_bar
 g_credit_lastval_bar
 
+## print bank loans plots ----------
+
 ## ---- pb_plots_show
 
 g_pb_totconhip_ranking
@@ -395,47 +490,21 @@ g_pb_totconhip_trend
 g_pb_lastval_bar
 g_pb_lastavg_bar
 
-# 
-# ## ---- comparison_fin_vs_tot
 
-# plot_ps_bk_fs <- function(iso3country) {
-#   co_cp <- dcps_gdp %>% filter(iso3c == iso3country) %>% arrange(date)
-#   co_fs <- dcfs_gdp %>% filter(iso3c == iso3country) %>% arrange(date)
-#   co_cpbk <- dcpsbk_gdp %>% filter(iso3c == iso3country) %>% arrange(date)
-#   
-#   p_co <- ggplot(data = co_cp, aes(x = date, y = value, col = "to ps")) + 
-#     geom_line() + 
-#     geom_line(data = co_cpbk, 
-#               aes(x = date, y = value, col = "to ps, by banks" )) + 
-#     geom_line(data = co_fs, 
-#               aes(x = date, y = value, col = "by fin sec"))  +
-#     ggtitle(label = iso3country)
-#   p_co   
-# }
-# 
-# # p_chl <- plot_ps_bk_fs(iso3country = "CHL")
-# # p_chl
-# 
-# 
-# coi_pb <- unique(pb_tot$iso3c)
-# 
-# p_iso_list_cred = purrr::map(coi_18, plot_ps_bk_fs)
-# 
-# plot_pb_t_c_h <- function(iso3country) {
-#   co_t <- pb_tot %>% filter(iso3c == iso3country) %>% arrange(date)
-#   co_c <- pb_con %>% filter(iso3c == iso3country) %>% arrange(date)
-#   co_h <- pb_hip %>% filter(iso3c == iso3country) %>% arrange(date)
-#   
-#   p_co <- ggplot(data = co_t, aes(x = date, y = total_to_gdp_seas,
-#                                   col = "bk ln, total")) + geom_line() + 
-#     geom_line(data = co_c, 
-#               aes(x = date, y = consumo_gdp_seas, col = "bk ln, consum" )) + 
-#     geom_line(data = co_h, 
-#               aes(x = date, y = hipotecario_gdp_seas, col = "bk ln, mort"))  +
-#     ggtitle(label = iso3country)
-#   p_co   
-# }
-# 
-# p_iso_list_pb = purrr::map(coi_pb, plot_pb_t_c_h)
-# 
-# p_iso_list_pb
+
+## print non performing loans loans plots ----------
+## ---- npl_plots_show
+
+g_npl_rankings
+g_npl_quartiles
+g_npl_halves
+g_npl_cycle_pct
+g_npl_trend
+g_npl_lastval_bar
+g_npl_lastavg_bar
+
+
+
+
+
+
