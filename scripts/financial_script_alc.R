@@ -12,6 +12,11 @@ make_df_19_wbtype <- function(df) {
                           ordered = TRUE))
 }
 
+make_df_diff_hp <- function(df) {
+  new_df <- make_df_19_wbtype(df)
+  new_df <- add_diffrank(new_df)
+  new_df <- add_ts_filters(new_df)
+}
 
 # preliminary chunks --------------------------------------------------------
 
@@ -45,8 +50,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -82,7 +87,8 @@ load(paste0(pre_path,
 
 load(paste0(pre_path,
              "produced_data/data_with_basic_wrangling/WDI_33_selected_all"))
-
+wdi_indic <- WDI_33_selected_vars %>% 
+  select(indicator_name, indicator_code) %>% distinct()
 
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/wb_credit_to_gdp_dfs"))
@@ -210,138 +216,232 @@ credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
 
 ## financial stress indicators ---- 
 
-## ---- NPL_make_dfs
-npl <- make_df_19_wbtype(nplns_to_total)
-npl <- add_diffrank(npl)
-npl <- add_ts_filters(npl)
+## ---- NPL_bank_ratios_money_make_dfs
+npl <- make_df_diff_hp(nplns_to_total)
 
-## ---- NPL_make_dfs
-bk_cap_to_ass <- make_df_19_wbtype(bank_cap_to_bank_ass)
-
-bksum <- bk_cap_to_ass %>% 
-  group_by(iso3c) %>% 
+bksum <- bank_cap_to_bank_ass %>% 
+  group_by(iso2c) %>% 
   summarise(nobs = n())
 
-bk_cap_to_ass <- bk_cap_to_ass %>% 
-  filter(iso3c != "NIC") # get rid of NIC bc it has only 2 observations
+bk_cap_to_ass <- make_df_diff_hp(bank_cap_to_bank_ass %>% 
+                                   filter(iso2c != "NI"))
 
-bk_cap_to_ass <- add_diffrank(bk_cap_to_ass)
-bk_cap_to_ass <- add_ts_filters(bk_cap_to_ass)
+bk_liqres_to_ass <- make_df_diff_hp(bank_liq_res_to_bank_ass)
 
-bk_liqres_to_ass <- make_df_19_wbtype(bank_liq_res_to_bank_ass)
-bk_liqres_to_ass <- add_diffrank(bk_liqres_to_ass)
-bk_liqres_to_ass <- add_ts_filters(bk_liqres_to_ass)
 
+# Broad money growth (annual %), FM.LBL.BMNY.ZG
+broad_money_growth_annual <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FM.LBL.BMNY.ZG") %>% 
+  rename(date = year)
+b_money_growth_a <- make_df_diff_hp(broad_money_growth_annual)
 
 claims_on_gov <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "FS.AST.CGOV.GD.ZS") %>% 
   rename(date = year)
-claim_gov <- make_df_19_wbtype(claims_on_gov)
-claim_gov <- add_diffrank(claim_gov)
-claim_gov <- add_ts_filters(claim_gov)
+claim_gov <- make_df_diff_hp(claims_on_gov)
 
-  
+
 claims_on_otherdomestsec <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "FS.AST.DOMO.GD.ZS") %>% 
   rename(date = year)
-claim_other <- make_df_19_wbtype(claims_on_otherdomestsec)
-claim_other <- add_diffrank(claim_other)
-claim_other <- add_ts_filters(claim_other)
+claim_other <- make_df_diff_hp(claims_on_otherdomestsec)
+
+
+## ---- capital_formation_and_consumption_make_dfs
+
 
 # formerly private consumption
 final_consum_households  <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "NE.CON.PETC.ZS") %>% 
   rename(date = year)
-consum_hh <- make_df_19_wbtype(final_consum_households)
-consum_hh <- add_diffrank(consum_hh)
-consum_hh <- add_ts_filters(consum_hh)
+consum_hh <- make_df_diff_hp(final_consum_households)
 
-gross_capital_form   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "NE.GDI.TOTL.ZS") %>% 
+# Household final consumption expenditure, etc. (annual % growth) NE.CON.PETC.KD.ZG
+growth_final_consum_households  <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.CON.PETC.KD.ZG") %>% 
   rename(date = year)
+growth_consum_hh <- make_df_diff_hp(growth_final_consum_households)
+
+
+gross_capital_form   <- WDI_33_selected_vars %>%
+  filter(indicator_code ==  "NE.GDI.TOTL.ZS") %>%
+  rename(date = year)
+gcapf <- make_df_diff_hp(gross_capital_form)
+
+# Gross capital formation (annual % growth) NE.GDI.TOTL.KD.ZG  
+growth_gross_capital_form   <- WDI_33_selected_vars %>%
+  filter(indicator_code ==  "NE.GDI.TOTL.KD.ZG") %>%
+  rename(date = year)
+growth_gcapf <- make_df_diff_hp(growth_gross_capital_form)
+
 
 gross_fixed_capital_form   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "NE.GDI.FTOT.ZS") %>% 
   rename(date = year)
+gfixcapf <- make_df_diff_hp(gross_fixed_capital_form)
+
+# Gross fixed capital formation (annual % growth) NE.GDI.FTOT.KD.ZG
+growth_gross_fixed_capital_form   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.GDI.FTOT.KD.ZG") %>% 
+  rename(date = year)
+growth_gfixcapf <- make_df_diff_hp(growth_gross_fixed_capital_form)
+
+
 
 gross_fixed_capital_form_priv_sect   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "NE.GDI.FPRV.ZS") %>% 
   rename(date = year)
+gfixcapf_priv <- make_df_diff_hp(gross_fixed_capital_form_priv_sect)
+
+
+# Household final consumption expenditure (annual % growth)
+# NE.CON.PRVT.KD.ZG
+# 20
+# Household final consumption expenditure per capita growth (annual %)
+# NE.CON.PRVT.PC.KD.ZG
+# 21
+
+
+# GDP growth (annual %)
+# NY.GDP.MKTP.KD.ZG
+gdp_growth_annual   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NY.GDP.MKTP.KD.ZG") %>% 
+  rename(date = year)
+gdp_growth_annual_a <- make_df_diff_hp(gdp_growth_annual)
+
+
+## ---- external_debt_make_dfs
+
 
 avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.INR.OFFT") %>% 
   rename(date = year)
+int_new_extde_off <- make_df_diff_hp(avg_int_new_extde_off)
+
 
 avg_int_new_extde_priv    <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.INR.PRVT") %>% 
   rename(date = year)
+int_new_extde_priv <- make_df_diff_hp(avg_int_new_extde_priv)
+
+
 
 avg_mat_new_extde_off    <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.MAT.OFFT") %>% 
   rename(date = year)
+mat_new_extde_off <- make_df_diff_hp(avg_mat_new_extde_off)
+
 
 avg_mat_new_extde_priv    <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.MAT.PRVT") %>% 
   rename(date = year)
+mat_new_extde_priv <- make_df_diff_hp(avg_mat_new_extde_priv)
+
+
 
 # External debt stocks, short-term (DOD, current US$)
 ext_debt_short_usd   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.DOD.DSTC.CD") %>% 
   rename(date = year)
+edebt_short_usd <- make_df_diff_hp(ext_debt_short_usd)
+
 
 # External debt stocks, long-term (DOD, current US$)
 ext_debt_long_usd   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.DOD.DLXF.CD") %>% 
   rename(date = year)
+edebt_long_usd <- make_df_diff_hp(ext_debt_long_usd)
+
 
 # External debt stocks, total (DOD, current US$)
 ext_debt_total_usd   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.DOD.DECT.CD") %>% 
   rename(date = year)
+edebt_total_usd <- make_df_diff_hp(ext_debt_total_usd)
+
+
 
 # External debt stocks, variable rate (DOD, current US$)
-ext_debt_total_usd   <- WDI_33_selected_vars %>% 
+ext_debt_variable_usd   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.DOD.VTOT.CD") %>% 
   rename(date = year)
+edebt_variab_usd <- make_df_diff_hp(ext_debt_variable_usd)
+
 
 
 # External debt stocks (% of GNI)
 ext_debt_total_gni   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
   rename(date = year)
+edebt_total_gni <- make_df_diff_hp(ext_debt_total_gni)
 
 
 # Interest payments on external debt, short-term (INT, current US$)
 int_payment_on_short_ext_usd   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.INT.DSTC.CD") %>% 
   rename(date = year)
+int_pay_short_ext_usd <- make_df_diff_hp(int_payment_on_short_ext_usd)
+ 
 
-
-# 
 
 # Short-term debt (% of total external debt)
 # DT.DOD.DSTC.ZS
+ext_debt_short_to_total   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.ZS") %>% 
+  rename(date = year)
+edebt_short_to_total <- make_df_diff_hp(ext_debt_short_to_total)
 
 # Short-term debt (% of total reserves)
 # DT.DOD.DSTC.IR.ZS
+ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
+  rename(date = year)
+edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
 
 # Debt service on external debt, total (TDS, current US$)
 # DT.TDS.DECT.CD
-
-# Trade (% of GDP)
-# NE.TRD.GNFS.ZS
-
-# Revenue, excluding grants (% of GDP)
-# GC.REV.XGRT.GD.ZS
-
-# Tax revenue (% of GDP)
-# GC.TAX.TOTL.GD.ZS
+ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
+  rename(date = year)
+edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
 
 # Total reserves (% of total external debt)
 # FI.RES.TOTL.DT.ZS
+total_reserves_as_pct_total_ext_debt   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FI.RES.TOTL.DT.ZS") %>% 
+  rename(date = year)
+reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
 
-# GDP growth (annual %)
-# NY.GDP.MKTP.KD.ZG
+## ---- trade_make_dfs
+
+# Trade (% of GDP)
+# NE.TRD.GNFS.ZS
+trade_as_pct_of_gdp   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.TRD.GNFS.ZS") %>% 
+  rename(date = year)
+trade_to_gdp <- make_df_diff_hp(trade_as_pct_of_gdp)
+
+
+
+
+
+## ---- government_except_debt_dfs
+
+# Revenue, excluding grants (% of GDP)
+# GC.REV.XGRT.GD.ZS
+revenue_excluding_grants_pct_gdp   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "GC.REV.XGRT.GD.ZS") %>% 
+  rename(date = year)
+revenue_to_gdp <- make_df_diff_hp(revenue_excluding_grants_pct_gdp)
+
+# Tax revenue (% of GDP)
+# GC.TAX.TOTL.GD.ZS
+tax_revenue_as_pct_gdp   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "GC.TAX.TOTL.GD.ZS") %>% 
+  rename(date = year)
+tax_revenue_to_gdp <- make_df_diff_hp(tax_revenue_as_pct_gdp)
+
+
 
 
 # finance related chunks plots --------------------------------------------------

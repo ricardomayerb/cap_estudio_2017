@@ -6,6 +6,15 @@ library(lubridate)
 
 load("./produced_data/data_with_basic_wrangling/WDI_Data_33_tidy")
 
+
+growth <- WDI_Data_33_tidy %>% 
+  filter(str_detect(indicator_name, "rowth") ) %>% 
+  select(indicator_name, indicator_code) %>% 
+  distinct()
+growth_ic <- growth$indicator_code[c(6:24)]
+growth_in <- growth$indicator_name[c(6:24)]
+
+
 cred <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "redit") ) %>% 
   select(indicator_name, indicator_code) %>% 
@@ -36,16 +45,19 @@ debt_in <- debt$indicator_name[
   c(7, 8, 9, 10, 11, 12, 13, 34,
     41, 42, 44, 49, 50, 51, 57, 58, 81, 82, 83, 88)]
 
-
+final <- WDI_Data_33_tidy %>% 
+  filter(str_detect(indicator_name, "inal") ) %>% 
+  select(indicator_name, indicator_code) %>% 
+  distinct()
 
 gdp <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "GDP") ) %>% 
   select(indicator_name, indicator_code) %>% 
   distinct()
 gdp_ic <- gdp$indicator_code[
-  c(12, 20:25, 27:32, 45, 50:55, 59, 60, 65, 67, 68, 71, 72, 76, 79:82)]
+  c(12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
 gdp_in <- gdp$indicator_name[
-  c(12, 20:25, 27:32, 45, 50:55, 59, 60, 65, 67, 68, 71, 72, 76, 79:82)]
+  c(12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
 
 central <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "entral") ) %>% 
@@ -53,8 +65,8 @@ central <- WDI_Data_33_tidy %>%
   distinct()
 
   
-sel_codes = c(claims_ic, debt_ic, cred_ic, gdp_ic)
-sel_names = c(claims_in, debt_in, cred_in, gdp_in)
+sel_codes = c(claims_ic, debt_ic, cred_ic, gdp_ic, growth_ic)
+sel_names = c(claims_in, debt_in, cred_in, gdp_in, growth_in)
 
 
 
@@ -65,10 +77,16 @@ save(WDI_33_selected_vars,
      file = "./produced_data/data_with_basic_wrangling/WDI_33_selected_all")
 
 
-claims_on_cgov = WDI_33_selected_vars %>%
-  filter(indicator_code == "FS.AST.CGOV.GD.ZS")
+code_names_in_WDI_33_sel_vars <-  WDI_33_selected_vars %>% 
+  select(indicator_name, indicator_code) %>% 
+  distinct()
 
-claims_on_others = WDI_33_selected_vars %>%
-  filter(indicator_code == "FS.AST.DOMO.GD.ZS")
+iso2countries <- unique(WDI_33_selected_vars$iso2c)
+
+# # use code_names_in_WDI_33_selected_vars$indicator_code and 
+# # iso2countries to retrive updated versions of the data
+# 
+# fresh_download <- wb(country = iso2countries,
+#                      indicator = code_names_in_WDI_33_sel_vars$indicator_code)
 
 
