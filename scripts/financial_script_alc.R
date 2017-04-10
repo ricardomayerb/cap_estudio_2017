@@ -558,39 +558,39 @@ tax_revenue_to_gdp <- make_df_diff_hp(tax_revenue_as_pct_gdp)
 
 ingtrib_gdp <- cs_sector_publico %>% 
   filter(indicador == 
-           "Ingresos tributarios por tipo de impuestos en porcentajes del PIB (América latina)" ) %>% 
+           "ingresos_tributarios_por_tipo_de_impuestos_en_porcentajes_del_pib_america_latina" ) %>% 
   select(-c(6:13))
 
 ingtrib_gdp_gobcen <- ingtrib_gdp %>% 
-  filter(cobertura_institucional == "Gobierno central")
+  filter(cobertura_institucional == "gobierno_central")
 ingtrib_gdp_gobgen <- ingtrib_gdp %>%
-  filter(cobertura_institucional == "Gobierno general")
+  filter(cobertura_institucional == "gobierno_general")
 
 opegob_gdp <- cs_sector_publico %>% 
   filter(indicador == 
-           "Operaciones del gobierno (clasificación económica), en porcentajes del PIB" ) %>% 
+           "operaciones_del_gobierno_clasificacion_economica_en_porcentajes_del_pib" ) %>% 
   select(-c(3, 4, 6, 7, 8, 9, 12, 13))
 
 opegob_gdp_cen <- opegob_gdp %>% 
-  filter(cobertura_institucional_1 == "Gobierno central" )
+  filter(cobertura_institucional_1 == "gobierno_central" )
 
 opegob_gdp_gen <- opegob_gdp %>% 
-  filter(cobertura_institucional_1 == "Gobierno general" )
+  filter(cobertura_institucional_1 == "gobierno_general" )
   
 opegob_gdp_spnf <- opegob_gdp %>% 
-  filter(cobertura_institucional_1 == "Sector público no financiero" )
+  filter(cobertura_institucional_1 == "sector_publico_no_financiero" )
 
 pagos_int_gcen <- opegob_gdp_cen %>% 
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Pagos de intereses" )
+           "pagos_de_intereses" )
 
 pagos_int_ggen <- opegob_gdp_gen %>% 
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Pagos de intereses" )
+           "pagos_de_intereses" )
 
 pagos_int_spnf <- opegob_gdp_spnf %>% 
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Pagos de intereses"  )
+           "pagos_de_intereses"  )
 
 pay_int_gcen <- make_df_diff_hp(pagos_int_gcen, type = "cs")
 pay_int_ggen <- make_df_diff_hp(pagos_int_ggen, type = "cs")
@@ -598,15 +598,15 @@ pay_int_spnf <- make_df_diff_hp(pagos_int_spnf, type = "cs")
 
 resul_prim_gcen <- opegob_gdp_cen %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado primario" )
+           "resultado_primario" )
 
 resul_prim_ggen <- opegob_gdp_gen %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado primario" )
+           "resultado_primario" )
 
 resul_prim_spnf <- opegob_gdp_spnf %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado primario" )
+           "resultado_primario" )
 
 resul_prim_gcen <- make_df_diff_hp(resul_prim_gcen, type = "cs")
 resul_prim_ggen <- make_df_diff_hp(resul_prim_ggen, type = "cs")
@@ -614,15 +614,15 @@ resul_prim_spnf <- make_df_diff_hp(resul_prim_spnf, type = "cs")
 
 resul_global_gcen <- opegob_gdp_cen %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado global" )
+           "resultado_global" )
 
 resul_global_ggen <- opegob_gdp_gen %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado global" )
+           "resultado_global" )
 
 resul_global_spnf <- opegob_gdp_spnf %>%
   filter(clasificacion_economica_operaciones_del_gobierno ==
-           "Resultado global" )
+           "resultado_global" )
 
 resul_global_gcen <- make_df_diff_hp(resul_global_gcen, type = "cs")
 resul_global_ggen <- make_df_diff_hp(resul_global_ggen, type = "cs")
@@ -630,75 +630,51 @@ resul_global_spnf <- make_df_diff_hp(resul_global_spnf, type = "cs")
 #
 #
 saldo_deuda_pub <- cs_sector_publico %>%
-  filter(indicador == "Saldo de la deuda pública en porcentajes del PIB") %>%
+  filter(indicador == "saldo_de_la_deuda_publica_en_porcentajes_del_pib") %>%
   select(-c(3,4,6:11))
 #
 saldo_deuda_pub_cen <- saldo_deuda_pub %>%
-  filter(cobertura_institucional_2 == "Gobierno central" ) %>%
-  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
-           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
-           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
-  select(-clasificacion_deuda )
-is_total = str_detect(saldo_deuda_pub_cen$classification, "total")
-saldo_deuda_pub_cen$classification[is_total] <- "total_deuda_publica"
-#
+  filter(cobertura_institucional_2 == "gobierno_central" )
+
 saldo_deuda_pub_sp <- saldo_deuda_pub %>%
-  filter(cobertura_institucional_2 == "Sector público" ) %>%
-  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
-           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
-           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
-  select(-clasificacion_deuda )
-is_total = str_detect(saldo_deuda_pub_sp$classification, "total")
-saldo_deuda_pub_sp$classification[is_total] <- "total_deuda_publica"
-#
+  filter(cobertura_institucional_2 == "sector_publico" ) 
+
 saldo_deuda_pub_spnf <- saldo_deuda_pub %>%
-  filter(cobertura_institucional_2 == "Sector público no financiero" ) %>%
-  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
-           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
-           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
-  select(-clasificacion_deuda )
-is_total = str_detect(saldo_deuda_pub_spnf$classification, "total")
-saldo_deuda_pub_spnf$classification[is_total] <- "total_deuda_publica"
-#
+  filter(cobertura_institucional_2 == "sector_publico_no_financiero" )
+  
 saldo_deuda_pub_gsub <- saldo_deuda_pub %>%
-  filter(cobertura_institucional_2 == "Gobiernos subnacionales"  ) %>%
-  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
-           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
-           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
-  select(-clasificacion_deuda )
-is_total = str_detect(saldo_deuda_pub_gsub$classification, "total")
-saldo_deuda_pub_gsub$classification[is_total] <- "total_deuda_publica"
-#
+  filter(cobertura_institucional_2 == "gobiernos_subnacionales"  )
+
 saldo_deuda_pub_cen_tot <- saldo_deuda_pub_cen %>%
-  filter(classification == "total_deuda_publica")
+  filter(clasificacion_deuda == "total_deuda_publica_clasificacion_por_residencia")
 saldo_deuda_pub_cen_ext <- saldo_deuda_pub_cen %>%
-  filter(classification == "deuda_externa")
+  filter(clasificacion_deuda == "deuda_externa")
 saldo_deuda_pub_cen_dom <- saldo_deuda_pub_cen %>%
-  filter(classification == "deuda_interna")
+  filter(clasificacion_deuda == "deuda_interna")
 #
 #
 saldo_deuda_pub_sp_tot <- saldo_deuda_pub_sp %>%
-  filter(classification == "total_deuda_publica")
+  filter(clasificacion_deuda == "total_deuda_publica_clasificacion_por_residencia")
 saldo_deuda_pub_sp_ext <- saldo_deuda_pub_sp %>%
-  filter(classification == "deuda_externa")
+  filter(clasificacion_deuda == "deuda_externa")
 saldo_deuda_pub_sp_dom <- saldo_deuda_pub_sp %>%
-  filter(classification == "deuda_interna")
+  filter(clasificacion_deuda == "deuda_interna")
 #
 #
 saldo_deuda_pub_spnf_tot <- saldo_deuda_pub_spnf %>%
-  filter(classification == "total_deuda_publica")
+  filter(clasificacion_deuda == "total_deuda_publica_clasificacion_por_residencia")
 saldo_deuda_pub_spnf_ext <- saldo_deuda_pub_spnf %>%
-  filter(classification == "deuda_externa")
+  filter(clasificacion_deuda == "deuda_externa")
 saldo_deuda_pub_spnf_dom <- saldo_deuda_pub_spnf %>%
-  filter(classification == "deuda_interna")
+  filter(clasificacion_deuda == "deuda_interna")
 #
 #
 saldo_deuda_pub_gsub_tot <- saldo_deuda_pub_gsub %>%
-  filter(classification == "total_deuda_publica")
+  filter(clasificacion_deuda == "total_deuda_publica_clasificacion_por_residencia")
 saldo_deuda_pub_gsub_ext <- saldo_deuda_pub_gsub %>%
-  filter(classification == "deuda_externa")
+  filter(clasificacion_deuda == "deuda_externa")
 saldo_deuda_pub_gsub_dom <- saldo_deuda_pub_gsub %>%
-  filter(classification == "deuda_interna")
+  filter(clasificacion_deuda == "deuda_interna")
 
 deuda_pub_cen_tot <- make_df_diff_hp(saldo_deuda_pub_cen_tot, type = "cs")
 deuda_pub_cen_dom <- make_df_diff_hp(saldo_deuda_pub_cen_dom, type = "cs")
