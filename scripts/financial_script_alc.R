@@ -1,22 +1,6 @@
 # use read_chunk to insert this in a Rmd doc
 
 
-# temporary place for functions
-make_df_19_wbtype <- function(df) {
-  df %>% 
-    filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
-    arrange(iso2c, date) %>% 
-    mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
-           date = ymd(paste(date, "12", "31", sep = "-")) ) %>% 
-    mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
-                          ordered = TRUE))
-}
-
-make_df_diff_hp <- function(df) {
-  new_df <- make_df_19_wbtype(df)
-  new_df <- add_diffrank(new_df)
-  new_df <- add_ts_filters(new_df)
-}
 
 # preliminary chunks --------------------------------------------------------
 
@@ -50,8 +34,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -72,6 +56,9 @@ coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
 
 
 ## ---- load_data_sets
+load(paste0(pre_path, 
+            "produced_data/peak_trough_dates"))
+
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
 
@@ -100,10 +87,16 @@ load(paste0(pre_path,
             "produced_data/data_with_basic_wrangling/wb_interests_dfs"))
 
 load(paste0(pre_path, 
-            "produced_data/peak_trough_dates"))
+            "produced_data/data_with_basic_wrangling/cs_x_m_10_ppales"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/x_m_locations_products_tidy"))
+
+load(paste0(pre_path, 
+            "produced_data/data_with_basic_wrangling/cs_sector_publico_clean_names"))
 
 
-# financial related chunks dfs ----------------------------------------------------
+# financial related chunks dfs -----------------------------------------
 ## prestamos bancarios dfs -----------------  
 
 ## ---- prestamos_bancarios_qtr_from_dde_dfs
@@ -171,18 +164,9 @@ bankloans_totconhip <- left_join(bankloans_totconhip, pb_tot_tm,
 ## domestic credit dfs -----------------  
 
 ## ---- dom_credit_dfs_anual_wb
-
-dcfs_gdp <- make_df_19_wbtype(dom_cred_providd_by_finsec_to_gdp)
-dcfs_gdp <- add_diffrank(dcfs_gdp)
-dcfs_gdp <- add_ts_filters(dcfs_gdp)
-
-dcpsbk_gdp <- make_df_19_wbtype(dom_credit_to_priv_sec_by_banks_to_gdp) 
-dcpsbk_gdp <- add_diffrank(dcpsbk_gdp)
-dcpsbk_gdp <- add_ts_filters(dcpsbk_gdp)
-
-dcps_gdp <- make_df_19_wbtype(dom_credit_to_priv_sec_to_gdp)
-dcps_gdp <- add_diffrank(dcps_gdp)
-dcps_gdp <- add_ts_filters(dcps_gdp)
+dcfs_gdp <- make_df_diff_hp(dom_cred_providd_by_finsec_to_gdp)
+dcpsbk_gdp <- make_df_diff_hp(dom_credit_to_priv_sec_by_banks_to_gdp) 
+dcps_gdp <- make_df_diff_hp(dom_credit_to_priv_sec_to_gdp)
 
 # combine credit dfs
 dcfs_gdp_tm <- dcfs_gdp %>% 
@@ -214,7 +198,22 @@ credit_pspsbkfs <-  left_join(dcps_gdp_tm, dcpsbk_gdp_tm,
 credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
                              by = c("iso3c", "date"))
 
-## financial stress indicators ---- 
+
+## ---- claims_on_gov_and_other_sectors
+claims_on_gov <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FS.AST.CGOV.GD.ZS") %>% 
+  rename(date = year)
+claim_gov <- make_df_diff_hp(claims_on_gov)
+
+
+claims_on_otherdomestsec <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FS.AST.DOMO.GD.ZS") %>% 
+  rename(date = year)
+claim_other <- make_df_diff_hp(claims_on_otherdomestsec)
+
+
+
+### bank related indicators -------
 
 ## ---- NPL_bank_ratios_money_make_dfs
 npl <- make_df_diff_hp(nplns_to_total)
@@ -228,27 +227,124 @@ bk_cap_to_ass <- make_df_diff_hp(bank_cap_to_bank_ass %>%
 
 bk_liqres_to_ass <- make_df_diff_hp(bank_liq_res_to_bank_ass)
 
-
+## ---- broad_money_growth
 # Broad money growth (annual %), FM.LBL.BMNY.ZG
 broad_money_growth_annual <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "FM.LBL.BMNY.ZG") %>% 
   rename(date = year)
 b_money_growth_a <- make_df_diff_hp(broad_money_growth_annual)
 
-claims_on_gov <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "FS.AST.CGOV.GD.ZS") %>% 
+### external debt indicators dfs -----------
+
+## ---- new_external_debt_maturity_interests_dfs
+avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INR.OFFT") %>% 
   rename(date = year)
-claim_gov <- make_df_diff_hp(claims_on_gov)
+int_new_extde_off <- make_df_diff_hp(avg_int_new_extde_off)
 
 
-claims_on_otherdomestsec <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "FS.AST.DOMO.GD.ZS") %>% 
+avg_int_new_extde_priv    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INR.PRVT") %>% 
   rename(date = year)
-claim_other <- make_df_diff_hp(claims_on_otherdomestsec)
+int_new_extde_priv <- make_df_diff_hp(avg_int_new_extde_priv)
 
 
+avg_mat_new_extde_off    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.MAT.OFFT") %>% 
+  rename(date = year)
+mat_new_extde_off <- make_df_diff_hp(avg_mat_new_extde_off)
+
+
+avg_mat_new_extde_priv    <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.MAT.PRVT") %>% 
+  rename(date = year)
+mat_new_extde_priv <- make_df_diff_hp(avg_mat_new_extde_priv)
+
+
+## ---- composition_and_relative_size_ext_debt_dfs 
+# External debt stocks, short-term (DOD, current US$)
+ext_debt_short_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.CD") %>% 
+  rename(date = year)
+edebt_short_usd <- make_df_diff_hp(ext_debt_short_usd)
+
+
+# External debt stocks, long-term (DOD, current US$)
+ext_debt_long_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DLXF.CD") %>% 
+  rename(date = year)
+edebt_long_usd <- make_df_diff_hp(ext_debt_long_usd)
+
+
+# External debt stocks, total (DOD, current US$)
+ext_debt_total_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DECT.CD") %>% 
+  rename(date = year)
+edebt_total_usd <- make_df_diff_hp(ext_debt_total_usd)
+
+
+# External debt stocks, variable rate (DOD, current US$)
+ext_debt_variable_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.VTOT.CD") %>% 
+  rename(date = year)
+edebt_variab_usd <- make_df_diff_hp(ext_debt_variable_usd)
+
+
+# External debt stocks (% of GNI)
+ext_debt_total_gni   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
+  rename(date = year)
+edebt_total_gni <- make_df_diff_hp(ext_debt_total_gni)
+
+
+# Interest payments on external debt, short-term (INT, current US$)
+int_payment_on_short_ext_usd   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.INT.DSTC.CD") %>% 
+  rename(date = year)
+int_pay_short_ext_usd <- make_df_diff_hp(int_payment_on_short_ext_usd)
+
+
+# Short-term debt (% of total external debt)
+# DT.DOD.DSTC.ZS
+ext_debt_short_to_total   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.ZS") %>% 
+  rename(date = year)
+edebt_short_to_total <- make_df_diff_hp(ext_debt_short_to_total)
+
+# Short-term debt (% of total reserves)
+# DT.DOD.DSTC.IR.ZS
+ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
+  rename(date = year)
+edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
+
+
+# Short-term debt (% of exports of goods, services and primary income)
+# DT.DOD.DSTC.XP.ZS
+ext_debt_short_to_expo   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.XP.ZS") %>% 
+  rename(date = year)
+edebt_short_to_expo <- make_df_diff_hp(ext_debt_short_to_expo)
+
+
+# Debt service on external debt, total (TDS, current US$)
+# DT.TDS.DECT.CD
+ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
+  rename(date = year)
+edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
+
+# Total reserves (% of total external debt)
+# FI.RES.TOTL.DT.ZS
+total_reserves_as_pct_total_ext_debt   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FI.RES.TOTL.DT.ZS") %>% 
+  rename(date = year)
+reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
+
+# real sector variables dfs ----
+
+### consumption and investment dfs ---------
 ## ---- capital_formation_and_consumption_make_dfs
-
 
 # formerly private consumption
 final_consum_households  <- WDI_33_selected_vars %>% 
@@ -309,111 +405,9 @@ gdp_growth_annual   <- WDI_33_selected_vars %>%
   rename(date = year)
 gdp_growth_annual_a <- make_df_diff_hp(gdp_growth_annual)
 
+### trade dimensions -----------
 
-## ---- external_debt_make_dfs
-
-
-avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.INR.OFFT") %>% 
-  rename(date = year)
-int_new_extde_off <- make_df_diff_hp(avg_int_new_extde_off)
-
-
-avg_int_new_extde_priv    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.INR.PRVT") %>% 
-  rename(date = year)
-int_new_extde_priv <- make_df_diff_hp(avg_int_new_extde_priv)
-
-
-
-avg_mat_new_extde_off    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.MAT.OFFT") %>% 
-  rename(date = year)
-mat_new_extde_off <- make_df_diff_hp(avg_mat_new_extde_off)
-
-
-avg_mat_new_extde_priv    <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.MAT.PRVT") %>% 
-  rename(date = year)
-mat_new_extde_priv <- make_df_diff_hp(avg_mat_new_extde_priv)
-
-
-
-# External debt stocks, short-term (DOD, current US$)
-ext_debt_short_usd   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.CD") %>% 
-  rename(date = year)
-edebt_short_usd <- make_df_diff_hp(ext_debt_short_usd)
-
-
-# External debt stocks, long-term (DOD, current US$)
-ext_debt_long_usd   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DLXF.CD") %>% 
-  rename(date = year)
-edebt_long_usd <- make_df_diff_hp(ext_debt_long_usd)
-
-
-# External debt stocks, total (DOD, current US$)
-ext_debt_total_usd   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DECT.CD") %>% 
-  rename(date = year)
-edebt_total_usd <- make_df_diff_hp(ext_debt_total_usd)
-
-
-
-# External debt stocks, variable rate (DOD, current US$)
-ext_debt_variable_usd   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.VTOT.CD") %>% 
-  rename(date = year)
-edebt_variab_usd <- make_df_diff_hp(ext_debt_variable_usd)
-
-
-
-# External debt stocks (% of GNI)
-ext_debt_total_gni   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
-  rename(date = year)
-edebt_total_gni <- make_df_diff_hp(ext_debt_total_gni)
-
-
-# Interest payments on external debt, short-term (INT, current US$)
-int_payment_on_short_ext_usd   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.INT.DSTC.CD") %>% 
-  rename(date = year)
-int_pay_short_ext_usd <- make_df_diff_hp(int_payment_on_short_ext_usd)
- 
-
-
-# Short-term debt (% of total external debt)
-# DT.DOD.DSTC.ZS
-ext_debt_short_to_total   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.ZS") %>% 
-  rename(date = year)
-edebt_short_to_total <- make_df_diff_hp(ext_debt_short_to_total)
-
-# Short-term debt (% of total reserves)
-# DT.DOD.DSTC.IR.ZS
-ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
-  rename(date = year)
-edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
-
-# Debt service on external debt, total (TDS, current US$)
-# DT.TDS.DECT.CD
-ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
-  rename(date = year)
-edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
-
-# Total reserves (% of total external debt)
-# FI.RES.TOTL.DT.ZS
-total_reserves_as_pct_total_ext_debt   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "FI.RES.TOTL.DT.ZS") %>% 
-  rename(date = year)
-reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
-
-## ---- trade_make_dfs
-
+## ---- trade_share_of_gdp_make_dfs
 # Trade (% of GDP)
 # NE.TRD.GNFS.ZS
 trade_as_pct_of_gdp   <- WDI_33_selected_vars %>% 
@@ -421,11 +415,130 @@ trade_as_pct_of_gdp   <- WDI_33_selected_vars %>%
   rename(date = year)
 trade_to_gdp <- make_df_diff_hp(trade_as_pct_of_gdp)
 
+## ---- current_account_dfs
+current_account_balance_as_pct_of_gdp   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "BN.CAB.XOKA.GD.ZS") %>% 
+  rename(date = year)
+curr_acc_to_gdp <- make_df_diff_hp(current_account_balance_as_pct_of_gdp)
 
 
+## ---- trade_concentration_index_make_dfs
+cs_x_m_10_ppales_indiv <- cs_x_m_10_ppales %>%
+  filter(!str_detect(`Productos principales`, "Total")) %>%
+  filter(!str_detect(`Productos principales_1`, "Total")) %>%
+  filter(!str_detect(`Productos principales_2`, "Total")) %>%
+  filter(!str_detect(`Productos principales_3`, "Total")) %>%
+  filter(!str_detect(`Productos principales_4`, "Total")) %>%
+  filter(!str_detect(`Productos principales_5`, "Total")) %>%
+  filter(!str_detect(`Productos principales_6`, "Total")) %>%
+  filter(!str_detect(`Productos principales_7`, "Total")) %>%
+  filter(!str_detect(`Productos principales_8`, "Total")) %>%
+  filter(!str_detect(`Productos principales_9`, "Total")) %>%
+  filter(!str_detect(`Productos principales_10`, "Total")) %>%
+  filter(!str_detect(`Productos principales_11`, "Total")) %>%
+  filter(!str_detect(`Productos principales_12`, "Total")) %>%
+  filter(!str_detect(`Productos principales_13`, "Total")) %>%
+  filter(!str_detect(`Productos principales_14`, "Total")) %>%
+  filter(!str_detect(`Productos principales`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_1`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_2`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_3`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_4`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_5`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_6`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_7`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_8`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_9`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_10`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_11`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_12`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_13`, "Todos")) %>%
+  filter(!str_detect(`Productos principales_14`, "Todos")) 
 
 
-## ---- government_except_debt_dfs
+cs_x_m_10_concen <-  cs_x_m_10_ppales_indiv %>% 
+  group_by(iso3c, year) %>% 
+  summarise(value = conc(valor, type = "Herfindahl")
+  ) %>% 
+  mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c")) %>% 
+  rename(date = year) %>% 
+  ungroup()
+
+cs_x_m_10_herf <- make_df_diff_hp(cs_x_m_10_concen)
+
+
+## ---- trade_shares_3_places_3_categories_dfs
+imp_by_prod_to_join <- imp_by_prod_tidy %>% 
+  filter(iso3c %in% coi_18) %>% 
+  rename(producto_m = producto) 
+
+exp_by_prod_to_join <- exp_by_prod_tidy %>% 
+  filter(iso3c %in% coi_18) %>% 
+  rename(producto_x = producto) %>% 
+  mutate(producto_x = stri_trans_general(producto_x, "Latin-ASCII") %>% 
+           str_to_lower() %>% str_replace_all(" ", "_"))
+
+exp_by_prod_wide <- exp_by_prod_to_join %>% 
+  filter(iso3c %in% coi_18) %>% 
+  spread(producto_x, value) %>% 
+  mutate(agro_agropec_share = productos_agricolas_y_agropecuarios/total,
+         mineria_y_petro_share = mineria_y_petroleo/total,
+         manufacturas_share = manufacturas/total) %>% 
+  select(-c(productos_agricolas_y_agropecuarios,mineria_y_petroleo,
+            manufacturas))
+
+exp_by_prod_wide_anual <- exp_by_prod_wide %>% 
+  mutate(year = year(date)) %>% 
+  group_by(iso3c, year) %>% 
+  mutate(avg_share_agr = mean(agro_agropec_share, rm.na = TRUE),
+         avg_share_min_pet = mean(mineria_y_petro_share, rm.na = TRUE),
+         avg_share_manuf = mean(manufacturas_share, rm.na = TRUE)) %>% 
+  arrange(year, desc(avg_share_min_pet))
+
+
+exp_by_prod_shares <- exp_by_prod_wide_anual %>% 
+  rename(agro_pec=agro_agropec_share, mineria_y_petro=mineria_y_petro_share,
+         manuf=manufacturas_share) %>% 
+  gather(key = product, value = share, agro_pec, mineria_y_petro, manuf ) %>% 
+  select(-c(avg_share_agr, avg_share_min_pet, avg_share_manuf, total)) %>% 
+  arrange(iso3c, year, product)
+
+exp_by_prod_shares_anual_avg <- exp_by_prod_shares %>% 
+  mutate(year_as_date = as.Date(as.character(year), format = "%Y")) %>% 
+  group_by(iso3c, year_as_date, product) %>% 
+  summarise(share_anual = mean(share, rm.na=TRUE)) 
+
+exp_agro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "agro_pec") %>% 
+  mutate(date = year(year_as_date),
+         value = share_anual) %>% 
+  ungroup() %>% 
+  mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c")) %>% 
+  select(-year_as_date)
+exp_agro_pec_shares <- make_df_diff_hp(exp_agro_pec_shares_anual_avg)
+
+exp_manuf_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "manuf") %>% 
+  mutate(date = year(year_as_date),
+         value = share_anual) %>% 
+  ungroup() %>% 
+  mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c")) %>% 
+  select(-year_as_date)
+exp_manuf_shares <- make_df_diff_hp(exp_manuf_shares_anual_avg)
+
+exp_mineria_y_petro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>% 
+  filter(product == "mineria_y_petro") %>% 
+  mutate(date = year(year_as_date),
+         value = share_anual) %>% 
+  ungroup() %>% 
+  mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c")) %>% 
+  select(-year_as_date)
+exp_minepet_shares <- make_df_diff_hp(exp_mineria_y_petro_pec_shares_anual_avg)
+
+
+### government variables   ----------------
+
+## ---- government_operations_and_debt_dfs
 
 # Revenue, excluding grants (% of GDP)
 # GC.REV.XGRT.GD.ZS
@@ -440,6 +553,169 @@ tax_revenue_as_pct_gdp   <- WDI_33_selected_vars %>%
   filter(indicator_code ==  "GC.TAX.TOTL.GD.ZS") %>% 
   rename(date = year)
 tax_revenue_to_gdp <- make_df_diff_hp(tax_revenue_as_pct_gdp)
+
+
+
+ingtrib_gdp <- cs_sector_publico %>% 
+  filter(indicador == 
+           "Ingresos tributarios por tipo de impuestos en porcentajes del PIB (América latina)" ) %>% 
+  select(-c(6:13))
+
+ingtrib_gdp_gobcen <- ingtrib_gdp %>% 
+  filter(cobertura_institucional == "Gobierno central")
+ingtrib_gdp_gobgen <- ingtrib_gdp %>%
+  filter(cobertura_institucional == "Gobierno general")
+
+opegob_gdp <- cs_sector_publico %>% 
+  filter(indicador == 
+           "Operaciones del gobierno (clasificación económica), en porcentajes del PIB" ) %>% 
+  select(-c(3, 4, 6, 7, 8, 9, 12, 13))
+
+opegob_gdp_cen <- opegob_gdp %>% 
+  filter(cobertura_institucional_1 == "Gobierno central" )
+
+opegob_gdp_gen <- opegob_gdp %>% 
+  filter(cobertura_institucional_1 == "Gobierno general" )
+  
+opegob_gdp_spnf <- opegob_gdp %>% 
+  filter(cobertura_institucional_1 == "Sector público no financiero" )
+
+pagos_int_gcen <- opegob_gdp_cen %>% 
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Pagos de intereses" )
+
+pagos_int_ggen <- opegob_gdp_gen %>% 
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Pagos de intereses" )
+
+pagos_int_spnf <- opegob_gdp_spnf %>% 
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Pagos de intereses"  )
+
+pay_int_gcen <- make_df_diff_hp(pagos_int_gcen, type = "cs")
+pay_int_ggen <- make_df_diff_hp(pagos_int_ggen, type = "cs")
+pay_int_spnf <- make_df_diff_hp(pagos_int_spnf, type = "cs")
+
+resul_prim_gcen <- opegob_gdp_cen %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado primario" )
+
+resul_prim_ggen <- opegob_gdp_gen %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado primario" )
+
+resul_prim_spnf <- opegob_gdp_spnf %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado primario" )
+
+resul_prim_gcen <- make_df_diff_hp(resul_prim_gcen, type = "cs")
+resul_prim_ggen <- make_df_diff_hp(resul_prim_ggen, type = "cs")
+resul_prim_spnf <- make_df_diff_hp(resul_prim_spnf, type = "cs")
+
+resul_global_gcen <- opegob_gdp_cen %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado global" )
+
+resul_global_ggen <- opegob_gdp_gen %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado global" )
+
+resul_global_spnf <- opegob_gdp_spnf %>%
+  filter(clasificacion_economica_operaciones_del_gobierno ==
+           "Resultado global" )
+
+resul_global_gcen <- make_df_diff_hp(resul_global_gcen, type = "cs")
+resul_global_ggen <- make_df_diff_hp(resul_global_ggen, type = "cs")
+resul_global_spnf <- make_df_diff_hp(resul_global_spnf, type = "cs")
+#
+#
+saldo_deuda_pub <- cs_sector_publico %>%
+  filter(indicador == "Saldo de la deuda pública en porcentajes del PIB") %>%
+  select(-c(3,4,6:11))
+#
+saldo_deuda_pub_cen <- saldo_deuda_pub %>%
+  filter(cobertura_institucional_2 == "Gobierno central" ) %>%
+  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
+           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
+           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
+  select(-clasificacion_deuda )
+is_total = str_detect(saldo_deuda_pub_cen$classification, "total")
+saldo_deuda_pub_cen$classification[is_total] <- "total_deuda_publica"
+#
+saldo_deuda_pub_sp <- saldo_deuda_pub %>%
+  filter(cobertura_institucional_2 == "Sector público" ) %>%
+  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
+           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
+           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
+  select(-clasificacion_deuda )
+is_total = str_detect(saldo_deuda_pub_sp$classification, "total")
+saldo_deuda_pub_sp$classification[is_total] <- "total_deuda_publica"
+#
+saldo_deuda_pub_spnf <- saldo_deuda_pub %>%
+  filter(cobertura_institucional_2 == "Sector público no financiero" ) %>%
+  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
+           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
+           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
+  select(-clasificacion_deuda )
+is_total = str_detect(saldo_deuda_pub_spnf$classification, "total")
+saldo_deuda_pub_spnf$classification[is_total] <- "total_deuda_publica"
+#
+saldo_deuda_pub_gsub <- saldo_deuda_pub %>%
+  filter(cobertura_institucional_2 == "Gobiernos subnacionales"  ) %>%
+  mutate(classification = str_to_lower( clasificacion_deuda ) %>%
+           str_replace_all(" ", "_") %>% stri_trans_general("Latin-ASCII") %>%
+           str_replace_all("\\(", "_") %>% str_replace_all("\\)", "_")) %>%
+  select(-clasificacion_deuda )
+is_total = str_detect(saldo_deuda_pub_gsub$classification, "total")
+saldo_deuda_pub_gsub$classification[is_total] <- "total_deuda_publica"
+#
+saldo_deuda_pub_cen_tot <- saldo_deuda_pub_cen %>%
+  filter(classification == "total_deuda_publica")
+saldo_deuda_pub_cen_ext <- saldo_deuda_pub_cen %>%
+  filter(classification == "deuda_externa")
+saldo_deuda_pub_cen_dom <- saldo_deuda_pub_cen %>%
+  filter(classification == "deuda_interna")
+#
+#
+saldo_deuda_pub_sp_tot <- saldo_deuda_pub_sp %>%
+  filter(classification == "total_deuda_publica")
+saldo_deuda_pub_sp_ext <- saldo_deuda_pub_sp %>%
+  filter(classification == "deuda_externa")
+saldo_deuda_pub_sp_dom <- saldo_deuda_pub_sp %>%
+  filter(classification == "deuda_interna")
+#
+#
+saldo_deuda_pub_spnf_tot <- saldo_deuda_pub_spnf %>%
+  filter(classification == "total_deuda_publica")
+saldo_deuda_pub_spnf_ext <- saldo_deuda_pub_spnf %>%
+  filter(classification == "deuda_externa")
+saldo_deuda_pub_spnf_dom <- saldo_deuda_pub_spnf %>%
+  filter(classification == "deuda_interna")
+#
+#
+saldo_deuda_pub_gsub_tot <- saldo_deuda_pub_gsub %>%
+  filter(classification == "total_deuda_publica")
+saldo_deuda_pub_gsub_ext <- saldo_deuda_pub_gsub %>%
+  filter(classification == "deuda_externa")
+saldo_deuda_pub_gsub_dom <- saldo_deuda_pub_gsub %>%
+  filter(classification == "deuda_interna")
+
+deuda_pub_cen_tot <- make_df_diff_hp(saldo_deuda_pub_cen_tot, type = "cs")
+deuda_pub_cen_dom <- make_df_diff_hp(saldo_deuda_pub_cen_dom, type = "cs")
+deuda_pub_cen_ext <- make_df_diff_hp(saldo_deuda_pub_cen_ext, type = "cs")
+
+deuda_pub_sp_tot <- make_df_diff_hp(saldo_deuda_pub_sp_tot, type = "cs")
+deuda_pub_sp_dom <- make_df_diff_hp(saldo_deuda_pub_sp_dom, type = "cs")
+deuda_pub_sp_ext <- make_df_diff_hp(saldo_deuda_pub_sp_ext, type = "cs")
+
+deuda_pub_spnf_tot <- make_df_diff_hp(saldo_deuda_pub_spnf_tot, type = "cs")
+deuda_pub_spnf_dom <- make_df_diff_hp(saldo_deuda_pub_spnf_dom, type = "cs")
+deuda_pub_spnf_ext <- make_df_diff_hp(saldo_deuda_pub_spnf_ext, type = "cs")
+
+deuda_pub_gsub_tot <- make_df_diff_hp(saldo_deuda_pub_gsub_tot, type = "cs")
+deuda_pub_gsub_dom <- make_df_diff_hp(saldo_deuda_pub_gsub_dom, type = "cs")
+deuda_pub_gsub_ext <- make_df_diff_hp(saldo_deuda_pub_gsub_ext, type = "cs")
+
 
 
 
@@ -714,66 +990,4 @@ g_npl_cycle_pct
 g_npl_trend
 g_npl_lastval_bar
 g_npl_lastavg_bar
-
-
-
-# 
-# varsinwdi33
-# [1] "Average interest on new external debt commitments (%)"                    
-# [2] "Average interest on new external debt commitments, official (%)"          
-# [3] "Average interest on new external debt commitments, private (%)"           
-# [4] "Average maturity on new external debt commitments (years)"                
-# [5] "Average maturity on new external debt commitments, official (years)"      
-# [6] "Average maturity on new external debt commitments, private (years)"       
-# [7] "Central government debt, total (% of GDP)"                                
-# [8] "Claims on central government, etc. (% GDP)"                               
-# [9] "Claims on other sectors of the domestic economy (% of GDP)"               
-# [10] "Current account balance (% of GDP)"                                       
-# [11] "Debt service on external debt, total (TDS, current US$)"                  
-# [12] "Domestic credit provided by financial sector (% of GDP)"                  
-# [13] "Domestic credit to private sector (% of GDP)"                             
-# [14] "Domestic credit to private sector by banks (% of GDP)"                    
-# [15] "Expense (% of GDP)"                                                       
-# [16] "Exports of goods and services (% of GDP)"                                 
-# [17] "External balance on goods and services (% of GDP)"                        
-# [18] "External debt stocks (% of exports of goods, services and primary income)"
-# [19] "External debt stocks (% of GNI)"                                          
-# [20] "External debt stocks, long-term (DOD, current US$)"                       
-# [21] "External debt stocks, short-term (DOD, current US$)"                      
-# [22] "External debt stocks, total (DOD, current US$)"                           
-# [23] "External debt stocks, variable rate (DOD, current US$)"                   
-# [24] "Final consumption expenditure, etc. (% of GDP)"                           
-# [25] "Foreign direct investment, net inflows (% of GDP)"                        
-# [26] "Foreign direct investment, net outflows (% of GDP)"                       
-# [27] "GDP (constant LCU)"                                                       
-# [28] "GDP (current LCU)"                                                        
-# [29] "GDP (current US$)"                                                        
-# [30] "GDP at market prices (constant 2010 US$)"                                 
-# [31] "GDP deflator (base year varies by country)"                               
-# [32] "GDP growth (annual %)"                                                    
-# [33] "General government final consumption expenditure (% of GDP)"              
-# [34] "Gross capital formation (% of GDP)"                                       
-# [35] "Gross domestic savings (% of GDP)"                                        
-# [36] "Gross fixed capital formation (% of GDP)"                                 
-# [37] "Gross fixed capital formation, private sector (% of GDP)"                 
-# [38] "Gross national expenditure (% of GDP)"                                    
-# [39] "Gross savings (% of GDP)"                                                 
-# [40] "Household final consumption expenditure, etc. (% of GDP)"                 
-# [41] "Imports of goods and services (% of GDP)"                                 
-# [42] "Interest payments on external debt, short-term (INT, current US$)"        
-# [43] "Interest payments on external debt, total (INT, current US$)"             
-# [44] "Merchandise trade (% of GDP)"                                             
-# [45] "Mineral rents (% of GDP)"                                                 
-# [46] "Natural gas rents (% of GDP)"                                             
-# [47] "Oil rents (% of GDP)"                                                     
-# [48] "Personal remittances, received (% of GDP)"                                
-# [49] "Revenue, excluding grants (% of GDP)"                                     
-# [50] "Short-term debt (% of exports of goods, services and primary income)"     
-# [51] "Short-term debt (% of total external debt)"                               
-# [52] "Short-term debt (% of total reserves)"                                    
-# [53] "Tax revenue (% of GDP)"                                                   
-# [54] "Total natural resources rents (% of GDP)"                                 
-# [55] "Total reserves (% of total external debt)"                                
-# [56] "Trade (% of GDP)"                                                         
-# [57] "Trade in services (% of GDP)"      
 

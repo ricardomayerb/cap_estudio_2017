@@ -5,6 +5,41 @@ library(replyr)
 library(wrapr)
 library(mFilter)
 
+make_df_19_wbtype <- function(df) {
+  df %>% 
+    filter(iso2c %in% cepal_19_countries[["iso2c"]]) %>% 
+    arrange(iso2c, date) %>% 
+    mutate(iso3c = countrycode(iso2c, "iso2c", "iso3c"),
+           date = ymd(paste(date, "12", "31", sep = "-")) ) %>% 
+    mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
+                          ordered = TRUE))
+}
+
+
+make_df_19_cstype <- function(df) {
+  df %>% 
+    filter(iso3c %in% cepal_19_countries[["iso3c"]]) %>% 
+    arrange(iso3c, year) %>% 
+    mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c"),
+           date = ymd(paste(as.character(year), "12", "31", sep = "-")) ) %>% 
+    mutate(iso3c = factor(iso3c, levels = cepal_19_countries[["iso3c"]],
+                          ordered = TRUE)) %>% 
+    rename(value = valor)
+}
+
+
+make_df_diff_hp <- function(df, type = "wb") {
+  
+  if (type == "wb") {
+    new_df <- make_df_19_wbtype(df)
+  } else {
+    new_df <- make_df_19_cstype(df)
+  }
+  
+  new_df <- add_diffrank(new_df)
+  new_df <- add_ts_filters(new_df)
+}
+
 
 add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
   wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 

@@ -1,0 +1,40 @@
+---
+title: "changing resilience map"
+author: "ricardo mayer"
+date: "April 9, 2017"
+output: html_document
+---
+
+```{r setup, echo=FALSE}
+knitr::read_chunk("./../scripts/financial_script_alc.R")
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r libraries, message=FALSE}
+```
+```{r constants_and_functions, message=FALSE}
+```
+```{r load_data_sets}
+```
+```{r prestamos_bancarios_qtr_from_dde_dfs}
+```
+```{r dom_credit_dfs_anual_wb}
+```
+```{r NPL_bank_ratios_money_make_dfs}
+```
+```{r new_external_debt_maturity_interests_dfs}
+```
+```{r composition_and_relative_size_ext_debt_dfs}
+```
+```{r capital_formation_and_consumption_make_dfs}
+```
+```{r trade_share_of_gdp_make_dfs}
+```
+```{r current_account_dfs}
+```
+```{r trade_concentration_index_make_dfs}
+```
+```{r trade_shares_3_places_3_categories_dfs}
+```
+```{r government_operations_and_debt_dfs}
+```
+
