@@ -47,9 +47,9 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
                df_with_ranking <-  df %>% 
                  group_by(datecol) %>% 
                  arrange(desc(valuecol)) %>%
-                 mutate(ranking = dense_rank(desc(valuecol)),
-                        quartile = ntile(desc(valuecol), 4),
-                        half = ntile(desc(valuecol), 2)
+                 mutate(ranking = dense_rank(valuecol),
+                        quartile = ntile(valuecol, 4),
+                        half = ntile(valuecol, 2)
                  ) %>%
                  ungroup() %>% 
                  arrange(datecol, iso3c)

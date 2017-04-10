@@ -2,7 +2,10 @@
 title: "changing resilience map"
 author: "ricardo mayer"
 date: "April 9, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, echo=FALSE}
@@ -13,28 +16,351 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ```{r constants_and_functions, message=FALSE}
 ```
-```{r load_data_sets}
+```{r load_data_sets, cache=TRUE}
 ```
-```{r prestamos_bancarios_qtr_from_dde_dfs}
+```{r prestamos_bancarios_qtr_from_dde_dfs, cache=TRUE}
 ```
-```{r dom_credit_dfs_anual_wb}
+```{r dom_credit_dfs_anual_wb, cache=TRUE}
 ```
-```{r NPL_bank_ratios_money_make_dfs}
+```{r NPL_bank_ratios_money_make_dfs, cache=TRUE}
 ```
-```{r new_external_debt_maturity_interests_dfs}
+```{r risk_premium_on_lending, cache=TRUE}
 ```
-```{r composition_and_relative_size_ext_debt_dfs}
+```{r new_external_debt_maturity_interests_dfs, cache=TRUE}
 ```
-```{r capital_formation_and_consumption_make_dfs}
+```{r composition_and_relative_size_ext_debt_dfs, cache=TRUE}
 ```
-```{r trade_share_of_gdp_make_dfs}
+```{r capital_formation_and_consumption_make_dfs, cache=TRUE}
 ```
-```{r current_account_dfs}
+```{r trade_share_of_gdp_make_dfs, cache=TRUE}
 ```
-```{r trade_concentration_index_make_dfs}
+```{r current_account_dfs, cache=TRUE}
 ```
-```{r trade_shares_3_places_3_categories_dfs}
+```{r trade_concentration_index_make_dfs, cache=TRUE}
 ```
-```{r government_operations_and_debt_dfs}
+```{r trade_shares_3_places_3_categories_dfs, cache=TRUE}
+```
+```{r government_operations_and_debt_dfs, cache=TRUE}
+```
+```{r plot_quick_dirty_fns}
 ```
 
+
+
+# Choques financieros y comerciales en la última década
+
+Diez años atrás, América Latina y el Caribe se encontraba por finalizar un lustro  extremadamente favorable desde el 
+punto de vista de las condiciones externas: financiamiento externo abundante y cada vez más barato, altos 
+precios de los commodities (especialmente de los metales y energía) y un comercio mundial bullante. En adición a las 
+condiciones generales externas favorables, los países de la región habían ahorrado lo suficiente para disminuir los montos totales de deuda externa y dismiuir al mismo tiempo el peso relativo de la deuda de corto plazo y aumentar las reservas internacionales. Dicho ahorro, aportado principalmente por el sector público y el sector externo, permitió además mantener una capitalización razonable de la banca local y disminuir paulatinamente las tasas de interés de los préstamos. Finalmente el crecimiento económico, moderadamente alto y sostenido de aquel lustro contribuyó a 
+una dismiución de los porcentajes de cartera vencida en el sistema financiero. Es así como la región terminó el año 2006 y en buena parte el 2007, con una posición externa fortalecida, tanto en sus exportaciones como en sus pasivos finacieros, un sistema financiero en condiciones de expandir el crédito privado y con un framework de política que había logrado por la mayor parte condiciones económicas estables y con algún espacio para ejecutar políticas contracíclicas.
+
+Luego vinieron, en breve sucesión dos choques de gran magnitud: el comienzo de la crisis subprime en USA el año 2007 y alcanzó su clímax en Septiembre del 2008, al tiempo que en pleno peak de la crisis finaciera, un mes antes aproximadamente del meltdown de Septiembre, comienza una caída brutal del precio de los principales productos de exportanciones de ALC. Afortunadamente tanto los indicadores de riesgo soberano y especialmente el precio de los commodities se recuperaron rápidamente hacia fines del 2009. Por el lado de la política doméstica, los países de la región respondieron disminuyendo, con distinta intensidad, las tasa de política monetaria y evitando contraer el gasto público, con algunos casos de marcado gasto contracíclico, como en los casos de México y Chile, que habían logrado acumular activos netos y resultados fiscales positivos en los años precedentes.
+
+Los mercados locales lograron capear en buena medida la contracción violenta del volumen de comercio internacional de los años 2008 y 2009 gracias a la rápida recuperación del precio de sus exportaciones, bonanza que siguió hasta aproximadamente el año 2012 para los exportadores de metales y hasta el 2014 para los exportadores de hidrocarburos. Las condiciones adversas en los precios de los commodities comenzaron a revertirse durante el 2016 y para el 2017 la mayoria de las proyecciones advierten un tímido pero seguro aumento de los precios, aunque no se ve en el horizote un regreso a los precios previos del 2012 ni menos del 2007.
+
+Por otro lado la recuperación de la actividad real post 2008 fue más rápida que en crisis anteriores. Creemos que la confianza depositada en la recuperación del ingresos del comercio y la posición más sólida de los sistemas financieros mantuvieron las confianzas de consumidores y acreedores, lo que se reflejó en el crecimiento sostenido en toda esta última década del crédito privado total, hipotecario y de consumo respecto del PIB, en casi todos los países de la región pero sobre todo en los casos de Chile, Costa Rica, Brasil y Argentina, aunque en este último caso el aumento fue respecto de niveles históricamente bajos y se encuentra aún en niveles relativamente bajos comparados con el resto de la región.
+
+Ahora bien, las condiciones y desarrollos favorables han dejado, por supuesto, un legado de desafíos que es necesario reconocer y enfrentar: después de 15 años de expansión sostenida del crédito doméstico, el espacio disponible para seguir alimentado los mercados hipotecarios y de consumo se ha reducido bastante, más aún cuando hemos observado un aún leve aumento del porcentaje de préstamos con cartera vencida en el último par de años, esperable en condiciones de menor crecimiento económico, pero que unido a las nuevas regulaciones sobre las hojas de balance ajustadas por riesgo le ponen un límite macroprudencial, acertado, al sistema financiero y en particualr al bancario como motor de la demanda agregada. Por otro lado, aunque los    
+
+- falta referencia al comportamiento de la inversión
+
+## Condiciones iniciales y finales diferenciadas
+
+
+### La fotografía finaciera doméstica:
+
+Por un lado, podemos apreciar una clara tendencia a la disminución en le porcentaje de 
+non-performing loans durante el quinquenio, aunque destacan Brasil, Chile, Costa Rica por tener niveles 
+bajos y parejos de NPLs previo a la crisis. A la llegada del doble choque comercial y financiero 2007-2008,
+las mejores condiciones las exchibían méxico, chile, Costa Risca, Brasil, Guatemala y El salvador. De las economías más grandes, Argentina si biene no exhibia un índice muy elevado su reducción era muy reciente y con ua de las peores performance en esta dimensión durante el lusto previa al 2008. Al final del 2015, la distribución de NPLs se ha vuelto mucho más compacta en ALC, pero es posible advertir en los casos de Chile y México un incipiente deterioro del cumplimiento oportuno de la cartera doméstica, pasíses que además presentan una de las alzas proporcionales más altas de la razón crédito privado a PIB y en el caso de Chile, uno de los niveles absolutos más elevado de la región. Bolivia y Argentina mejoraron su posición relativa y absoluta en este indicador.
+
+En cuanto a la razón de capital sobre activos de los bancos, no ha habido cambios dramáticos, sin embargo 
+podemos apreciar que aprocimadamete la mitad de los países elevaron levemente este ratio el el período posterior a la crisis, mietras que la otra mitad lo ha dismiuido Ene ste sentido, Bolivia , Costa Rica y Brasil han mejorado su posición relativa frente a sus vecinos, reforzando el patrimoio relativo de sus bancos, mientras EL Salvador, Venezuela y México han pasado a ser países con bancos relativamente menos capitalizados dentro de la región.
+
+
+```{r dom_finacial_joindf, warning=FALSE}
+
+prepare_tm <- function(df, suffix) {
+  new_df <- df %>% 
+  select(iso3c, date, value, ranking, quartile, half, 
+         hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) 
+  
+  names(new_df)[3:10] <- paste(names(new_df), suffix, sep = "_")[3:10]
+  
+  return(new_df)
+}
+
+dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")
+npl_tm <- prepare_tm(npl, "npl")
+bk_cap_to_ass_tm <- prepare_tm(bk_cap_to_ass, "bca")
+dom_risk_premium_wdi_tm <- prepare_tm(dom_risk_premium_wdi, "drp")
+
+
+
+dom_fin_df <- left_join(dom_cred_to_spriv_tm, npl_tm, by = c("iso3c", "date")) %>%
+  left_join(bk_cap_to_ass_tm, by = c("iso3c", "date")) %>%
+  left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date"))
+
+dom_fin_df_2006 <- dom_fin_df %>%
+  filter(year(date) %in% c(2006))
+  
+dom_fin_df_2015 <- dom_fin_df %>%
+  filter(year(date) %in% c(2015))
+
+r_g_domcred <- plot_cred_lines("ranking_dcpri", "ranking_npl", "ranking_bca",
+                               main = "Ranking", main_data = "dom_fin_df",
+                               dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                               h_line_pos = 9.5,
+                               le1 = "Dom cred to priv",
+                             le2 = "NPLs",
+                             le3 = "Capital to assets")
+
+q_g_domcred <- plot_cred_lines("quartile_dcpri", "quartile_npl", "quartile_bca",
+                               main = "Quartiles", main_data = "dom_fin_df",
+                               dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                               h_line_pos = 2.5,
+                               le1 = "Dom cred to priv",
+                             le2 = "NPLs",
+                             le3 = "Capital to assets")
+
+h_g_domcred <- plot_cred_lines("half_dcpri", "half_npl", "half_bca",
+                               main = "Halves", main_data = "dom_fin_df",
+                               dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                               h_line_pos = 1.5,
+                               le1 = "Dom cred to priv",
+                             le2 = "NPLs",
+                             le3 = "Capital to assets")
+
+g_npl <- plot_1_lines("value_npl", main = "Non-performing loans (%)", main_data = "dom_fin_df",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "NPLs")
+
+g_dcpri <- plot_1_lines("value_dcpri", main = "Domestic credit to private sector", main_data = "dom_fin_df",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Dom cred to priv")
+
+g_bca <- plot_1_lines("value_bca", main = "Banks capital to asset ratio", main_data = "dom_fin_df",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Cap to assets")
+
+print(g_npl)
+print(g_dcpri)
+print(g_bca)
+
+print(r_g_domcred)
+print(q_g_domcred)
+# print(h_g_domcred)
+
+```
+### Vulnerabilidad a roll over difícil en el corto plazo: reservas versus deuda de corto plazo
+
+Un indicador frecuentemente usado en la literatura como señanal de fragilidad ante choques financieros externos es la proporción de las reservas internacionales que representan los pasivos externos de corto plazo. En este punto, el caso más dramático es Panamá, que pasó de tener niveles cercanos a cero previos a la crisis a tener un endeudamiento de corto plazo equivalente a más de la mitas de sus reservas internacionales.. Otros casos que han llegado con niveles de deuda de crtop plazo a reservas mayor que los previos a la crisis incluyen a Venezuela, México y Colombia. El caso opuesto lo representan Costa Rica y EL salvador, que presentan niveles menores en el período previo al 2015 que previo al 2008.
+
+
+
+```{r edebt_joindf, message=FALSE, warning=FALSE}
+edebt_short_to_res_tm <- prepare_tm(edebt_short_to_res, "shre")
+edebt_short_to_total_tm <- prepare_tm(edebt_short_to_total, "sht")
+
+edebt_join_dfs <- left_join(edebt_short_to_res_tm, 
+                            edebt_short_to_total_tm, by = c("iso3c", "date") )
+                            
+g_shre <- plot_1_lines("value_sht",
+                       main = "Short-term external debt (% of total reserves) ", 
+                       main_data = "edebt_join_dfs",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "short-term debt (% reserves) ",
+                      ylim = c(0,150) )
+
+g_sht <- plot_1_lines("value_shre", main = "Short term ext debt (% total external debt)",
+                      main_data = "edebt_join_dfs",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Short-term external debt to total",
+                      ylim = c(0,150) )
+
+r_g_edebtsh <- plot_2_lines("ranking_sht", "ranking_shre", 
+                            le1 = "Short-term external debt to total",
+                            le2 = "short-term debt (% reserves)" ,
+                            dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")), 
+                            main_data = "edebt_join_dfs", main = "Rankings")
+
+print(g_shre)
+print(g_sht)
+
+print(r_g_edebtsh)
+
+```
+
+
+### Exposición a choques comerciales: apertura comercial y concentración exportadora
+
+Otros indicadores cruciales de vulnerabildad externa, en este caso frente a choques comerciales,
+es el nivel de concentració de las exportaciones y el peso relativo del comercio comparado con el PIB.
+
+Respecto de la Concentración de las exportaciones, observamos que en general la región 
+en general no ha diversificado mayormente su canasta exportadora comparado con el el perídodo pre crisis. Es más, en los casos Bolivia, Colombia y El salvador (y más tímidamente Argentina y Brasil) este ha sido un período reciente mayor concentración de exportaciones que el período 2003-2008. No se han construído fortalezas suficientes en esa materia  en el perídod post crisis.
+
+Una cualificación al punto anterior es que, con la excepció de México y Bolivia, la suma de exportaciones 
+e importaciones representa una fracción menor en este último trienio que el que antecedió  a la crisis .
+
+
+```{r trade_exposure_join, warning=FALSE}
+trade_to_gdp_tm <- prepare_tm(trade_to_gdp, "trade")
+
+trade_balance_tm <- prepare_tm(trade_balance, "trbal")
+
+curr_acc_to_gdp_tm <- prepare_tm(curr_acc_to_gdp, "cacc")
+
+cs_x_m_10_herf_tm <- prepare_tm(cs_x_m_10_herf, "xherf")
+
+exp_minepet_shares_tm <- prepare_tm(exp_minepet_shares, "minsh")
+
+exp_manuf_shares_tm <- prepare_tm(exp_manuf_shares, "mansh")
+
+exp_agro_pec_shares_tm <- prepare_tm(exp_agro_pec_shares, "agrsh")
+
+trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm, by = c("iso3c", "date")) %>% 
+  left_join(curr_acc_to_gdp_tm, by = c("iso3c", "date")) %>% 
+  left_join(cs_x_m_10_herf_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_minepet_shares_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_manuf_shares_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_agro_pec_shares_tm, by = c("iso3c", "date")) 
+
+g_trade <- plot_1_lines("value_trade",
+                       main = "Trade (% of GDP)", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+
+r_g_trade <- plot_1_lines("ranking_trade",
+                       main = "Ranking, trade", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+
+q_g_trade <- plot_1_lines("quartile_trade",
+                       main = "Quartiles, trade", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+g_trade
+r_g_trade
+q_g_trade
+
+g_xhh <- plot_1_lines("value_xherf",
+                       main = "HHI of exports", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Exports, HH index")
+
+g_xhh
+
+```
+
+
+### Trayectorias del consumo, la inversión y el producto
+TO DO.
+
+### El sector fiscal
+
+Junto con la rápida disminución de tasa de política monetaria que examinaremos más adelante, el otro aspecto de la 
+política económica en la década post crisis financiera y en los años de turbulencias en los precios de los commodities fue echar mano a los ahorros y a la mejorada capacidad de endeudamiento con que contaban 
+los sectores publicos de la región el año 2007.
+
+Habiendo cumplido un papel positivo en el período post crisis, los sectores públicos llegan 
+con espaldas más débiles al 2017 de lo que estaban en genreal hace diez años, por las siguientes 
+razones: aunque los niveles totales de deuda no han aumetado significativamente, sí ha disminuído 
+la tasa de crecimiento promedio de la economía comparada con el período anterior, por lo tanto 
+el mismo ratio de deuda se vuelve en términos presentes, mayor. Por otro lado, la base impositiva se ha resentido notablemente en los países donde la recaudación depende fuertemente de los commodities de exportación. Incluso en los países donde no recauda directamente a partir de los montos exportados, 
+el menor precio de los commodities ha significado o bien efectuar largas sumas de trasferencia de capital 
+a alguna empresa que vende commodities (México y PEMEX, ver recuadro) y en otros países ha podido contar con emnores transferencias de capital desde las empresas públicas (Chile, Venezuela).
+
+
+```{r public_sector_joined, message=FALSE, warning=FALSE}
+resul_prim_gcen_tm <- prepare_tm(resul_prim_gcen, "primcen")
+resul_prim_ggen_tm <- prepare_tm(resul_prim_ggen, "primgen")
+resul_prim_spnf_tm <- prepare_tm(resul_prim_spnf, "primspnf")
+resul_global_gcen_tm <- prepare_tm(resul_global_gcen, "globcen")
+resul_global_ggen_tm <- prepare_tm(resul_global_ggen, "globgen")
+resul_global_spnf_tm <- prepare_tm(resul_global_spnf, "globspnf")
+
+deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "centot")
+deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "cendom")
+deuda_pub_cen_ext_tm <- prepare_tm(deuda_pub_cen_ext, "cenext")
+deuda_pub_sp_tot_tm <- prepare_tm(deuda_pub_sp_tot, "sptot")
+deuda_pub_sp_dom_tm <- prepare_tm(deuda_pub_sp_dom, "spdom")
+deuda_pub_sp_ext_tm <- prepare_tm(deuda_pub_sp_ext, "spext")
+deuda_pub_spnf_tot_tm <- prepare_tm(deuda_pub_spnf_tot, "spnftot")
+deuda_pub_spnf_dom_tm <- prepare_tm(deuda_pub_spnf_dom, "spnfdom")
+deuda_pub_spnf_ext_tm <- prepare_tm(deuda_pub_spnf_ext, "spnfext")
+deuda_pub_gsub_tot_tm <- prepare_tm(deuda_pub_gsub_tot, "gsubtot")
+deuda_pub_gsub_dom_tm <- prepare_tm(deuda_pub_gsub_dom, "gsubdom")
+deuda_pub_gsub_ext_tm  <- prepare_tm(deuda_pub_gsub_ext , "gsubext")
+
+tax_revenue_to_gdp_tm <- prepare_tm(tax_revenue_to_gdp, "taxrev")
+revenue_to_gdp_tm <- prepare_tm(revenue_to_gdp, "rev")
+
+public_sector_joined <- left_join(resul_prim_gcen_tm, resul_prim_ggen_tm,
+                                  by = c("iso3c", "date")) %>% 
+  left_join(resul_prim_spnf_tm, by = c("iso3c", "date")) %>%
+  left_join(resul_global_gcen_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_global_ggen_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_global_spnf_tm, by = c("iso3c", "date")) %>%
+  left_join(deuda_pub_cen_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_cen_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_cen_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(tax_revenue_to_gdp_tm, by = c("iso3c", "date")) %>% 
+  left_join(revenue_to_gdp_tm , by = c("iso3c", "date")) 
+
+g_primary_all <- plot_cred_lines("value_primcen", "value_primgen", "value_primspnf",
+                              main_data = "public_sector_joined",
+                              le1 = "central", le2 = "general", le3 = "spnf",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Primary result (% GDP)")
+
+g_global_all <- plot_cred_lines("value_globcen", "value_globgen", "value_globspnf",
+                              main_data = "public_sector_joined",
+                              le1 = "central", le2 = "general", le3 = "spnf",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Global result (% GDP)")
+
+g_primary_global_cen <-  plot_2_lines("value_primcen", "value_globcen",
+                              main_data = "public_sector_joined",
+                              le1 = "primary", le2 = "global",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Primary and global results (% GDP)")
+
+r_g_global_result <- plot_1_lines("ranking_globcen", le1 = "Global result",
+                                  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                                  main_data = "public_sector_joined",
+                                  main = "Ranking, global fiscal results")
+
+q_g_global_result <- plot_1_lines("quartile_globcen", le1 = "Global result",
+                                  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                                  main_data = "public_sector_joined",
+                                  main = "Quartiles, global fiscal results")
+
+g_primary_all
+g_global_all
+g_primary_global_cen
+r_g_global_result 
+q_g_global_result
+```
+
+#### Box: transferencias hacia y desde empresas con presencia pública.
+
+
+
+
+### Espacio disponible para la política monetaria
+ To DO

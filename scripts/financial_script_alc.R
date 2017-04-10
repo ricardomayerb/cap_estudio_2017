@@ -34,8 +34,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"s
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -236,6 +236,13 @@ b_money_growth_a <- make_df_diff_hp(broad_money_growth_annual)
 
 ### external debt indicators dfs -----------
 
+## ---- risk_premium_on_lending
+
+risk_premium_on_lending <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "FM.AST.CGOV.ZG.M3") %>% 
+  rename(date = year)
+dom_risk_premium_wdi <- make_df_diff_hp(risk_premium_on_lending)
+
 ## ---- new_external_debt_maturity_interests_dfs
 avg_int_new_extde_off    <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "DT.INR.OFFT") %>% 
@@ -414,6 +421,24 @@ trade_as_pct_of_gdp   <- WDI_33_selected_vars %>%
   filter(indicator_code ==  "NE.TRD.GNFS.ZS") %>% 
   rename(date = year)
 trade_to_gdp <- make_df_diff_hp(trade_as_pct_of_gdp)
+
+# Exports of goods and services (% of GDP) NE.EXP.GNFS.ZS
+xgs_as_pct_of_gdp   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.EXP.GNFS.ZS") %>% 
+  rename(date = year)
+exp_g_s_gdp <- make_df_diff_hp(xgs_as_pct_of_gdp )
+
+# Exports of goods and services (annual % growth) NE.EXP.GNFS.KD.ZG
+xgs_growth   <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.EXP.GNFS.KD.ZG") %>% 
+  rename(date = year)
+exp_g_s_growth <- make_df_diff_hp(xgs_growth)
+
+# External balance on goods and services (% of GDP) NE.RSB.GNFS.ZS
+external_balance_goods_service <- WDI_33_selected_vars %>% 
+  filter(indicator_code ==  "NE.RSB.GNFS.ZS") %>% 
+  rename(date = year)
+trade_balance <- make_df_diff_hp(external_balance_goods_service)
 
 ## ---- current_account_dfs
 current_account_balance_as_pct_of_gdp   <- WDI_33_selected_vars %>% 

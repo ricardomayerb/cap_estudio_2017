@@ -6,6 +6,12 @@ library(lubridate)
 
 load("./produced_data/data_with_basic_wrangling/WDI_Data_33_tidy")
 
+risk <- WDI_Data_33_tidy %>% 
+  filter(str_detect(indicator_name, "isk") ) %>% 
+  select(indicator_name, indicator_code) %>% 
+  distinct()
+risk_ic <- growth$indicator_code[c(7)]
+risk_in <- growth$indicator_name[c(7)]
 
 growth <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "rowth") ) %>% 
@@ -55,9 +61,9 @@ gdp <- WDI_Data_33_tidy %>%
   select(indicator_name, indicator_code) %>% 
   distinct()
 gdp_ic <- gdp$indicator_code[
-  c(12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
+  c(11:12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
 gdp_in <- gdp$indicator_name[
-  c(12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
+  c(11:12, 20:25, 27:32, 45, 49:54, 58, 59, 60, 65, 67, 68, 71, 72, 76, 77, 79:82)]
 
 central <- WDI_Data_33_tidy %>% 
   filter(str_detect(indicator_name, "entral") ) %>% 
@@ -65,13 +71,12 @@ central <- WDI_Data_33_tidy %>%
   distinct()
 
   
-sel_codes = c(claims_ic, debt_ic, cred_ic, gdp_ic, growth_ic)
-sel_names = c(claims_in, debt_in, cred_in, gdp_in, growth_in)
-
+selection_codes = c(claims_ic, debt_ic, cred_ic, gdp_ic, growth_ic, risk_ic)
+selection_names = c(claims_in, debt_in, cred_in, gdp_in, growth_in, risk_in)
 
 
 WDI_33_selected_vars <-  WDI_Data_33_tidy %>% 
-  filter(indicator_code %in% sel_codes)
+  filter(indicator_code %in% selection_codes)
 
 save(WDI_33_selected_vars, 
      file = "./produced_data/data_with_basic_wrangling/WDI_33_selected_all")
