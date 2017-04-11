@@ -1,10 +1,16 @@
 ---
-title: "changing resilience map"
+title: "Changing resilience maps"
 author: "ricardo mayer"
 date: "April 9, 2017"
 output:
-  pdf_document: default
-  html_document: default
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
   word_document: default
 ---
 
@@ -45,6 +51,29 @@ knitr::opts_chunk$set(echo = FALSE)
 ```{r plot_quick_dirty_fns}
 ```
 
+# Introducción: organizando la heterogenidad regional 
+
+
+## Choques y canales de transmisión
+
+- Este capítulo se centra en en escenarios frente choques financieros y comerciales. En particular: choques a los precios de los commodities de exportación, aumentos importantes del costo de financianmeinto externo o la salida masiva de divisas.
+
+- No pretende construir predicciones ni estimar contrafactuales. Se ubica en el paso intermedio 
+entre la exploración de datos y la modelación. Va más allá de la descripción de datos porque asume ciertos canales de transmisión de los choques y la política, que ayudan a organizar la selección de variables y aventura los posibles signos de los impactos. Por ejemplo, usa la evidencia presentada en Garcia Ccico, Uribe y SG, para elegir el precio de los commodities en vez de simplemente los términos de intercambio, aún cuando los precios puedan contener factores comunes en sus fluctuaciones.
+
+
+## Clusters regionales y Early Warning Systems.
+
+Este capítulo está emparentado con la literatura de EWS pero por cobertura y objetivos, es menos ambicioso.
+
+Cepal también ha trabajado con indicadores de stress fiscal (Panorama Fiscal 2015 y 2016).
+
+Comparte con la literatura de clusters regionales el objetivo de simplificar la complejidad de grupos heterogeneos, pero somos en principio un poco escépticos no de la metodología misma de clusters, si no de que la cantidad de variables homogéneamente disponible en los países nos permita definir meaningful and useful clusters.
+
+
+
+
+## Marcos y espacios de política fiscal y monetaria
 
 
 # Choques financieros y comerciales en la última década
@@ -65,10 +94,10 @@ Ahora bien, las condiciones y desarrollos favorables han dejado, por supuesto, u
 
 - falta referencia al comportamiento de la inversión
 
-## Condiciones iniciales y finales diferenciadas
+# Condiciones iniciales y finales diferenciadas
 
 
-### La fotografía finaciera doméstica:
+## La fotografía finaciera doméstica:
 
 Por un lado, podemos apreciar una clara tendencia a la disminución en le porcentaje de 
 non-performing loans durante el quinquenio, aunque destacan Brasil, Chile, Costa Rica por tener niveles 
@@ -80,16 +109,16 @@ podemos apreciar que aprocimadamete la mitad de los países elevaron levemente e
 
 
 ```{r dom_finacial_joindf, warning=FALSE}
-
-prepare_tm <- function(df, suffix) {
-  new_df <- df %>% 
-  select(iso3c, date, value, ranking, quartile, half, 
-         hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) 
-  
-  names(new_df)[3:10] <- paste(names(new_df), suffix, sep = "_")[3:10]
-  
-  return(new_df)
-}
+# 
+# prepare_tm <- function(df, suffix) {
+#   new_df <- df %>% 
+#   select(iso3c, date, value, ranking, quartile, half,  ranking_3, quartile_3, half_3,
+#          avg_recent3, avg_last3, hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) 
+#   
+#   names(new_df)[3:10] <- paste(names(new_df), suffix, sep = "_")[3:10]
+#   
+#   return(new_df)
+# }
 
 dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")
 npl_tm <- prepare_tm(npl, "npl")
@@ -103,10 +132,45 @@ dom_fin_df <- left_join(dom_cred_to_spriv_tm, npl_tm, by = c("iso3c", "date")) %
   left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date"))
 
 dom_fin_df_2006 <- dom_fin_df %>%
-  filter(year(date) %in% c(2006))
-  
+  filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_dcpri)) 
+
+dom_fin_df_2007 <- dom_fin_df %>%
+  filter(year(date) %in% c(2007)) %>%arrange(desc(avg_recent3_dcpri))
+
 dom_fin_df_2015 <- dom_fin_df %>%
-  filter(year(date) %in% c(2015))
+  filter(year(date) %in% c(2015)) %>% arrange(desc(avg_recent3_dcpri))
+
+foo <- data.frame(avg_0406 = dom_fin_df_2006$avg_recent3_dcpri,
+                  avg_1416 = dom_fin_df_2006$avg_last3_dcpri,
+                  ran_06 = dom_fin_df_2006$ranking_dcpri,
+                  qth_0406 = dom_fin_df_2006$quartile_recent3_dcpri,
+                  qth_1416 = dom_fin_df_2006$quartile_last3_dcpri,
+                  ran_0406 = dom_fin_df_2006$ranking_recent3_dcpri,
+                  ran_1416 = dom_fin_df_2006$ranking_last3_dcpri,
+                  row.names =  dom_fin_df_2006$iso3c) 
+
+wfoo <- with(dom_fin_df_2006, data.frame(avg_0406 = avg_recent3_dcpri,
+                  avg_1416 = avg_last3_dcpri,
+                  ran_06 = ranking_dcpri,
+                  qth_0406 = quartile_recent3_dcpri,
+                  qth_1406 = quartile_last3_dcpri,
+                  ran_0406 = ranking_recent3_dcpri,
+                  ran_1406 = ranking_last3_dcpri,
+                  row.names =  iso3c) )
+
+goo  <- with(dom_fin_df_2006, data.frame(country = iso3c, avg_0406 = avg_recent3_dcpri,
+                  avg_1416 = avg_last3_dcpri,
+                  qth_0406 = quartile_recent3_dcpri,
+                  qth_1406 = quartile_last3_dcpri,
+                  ran_0406 = ranking_recent3_dcpri,
+                  ran_1406 = ranking_last3_dcpri ))
+
+moo  <- with(dom_fin_df_2006, data.frame(country = iso3c, avg_0406 = avg_recent3_dcpri,
+                  avg_1416 = avg_last3_dcpri,
+                  qth_0406 = quartile_recent3_dcpri,
+                  d_qth = quartile_last3_dcpri - quartile_recent3_dcpri,
+                  ran_0406 = ranking_recent3_dcpri,
+                  d_ran = ranking_last3_dcpri - ranking_recent3_dcpri ))
 
 r_g_domcred <- plot_cred_lines("ranking_dcpri", "ranking_npl", "ranking_bca",
                                main = "Ranking", main_data = "dom_fin_df",
@@ -153,7 +217,7 @@ print(q_g_domcred)
 # print(h_g_domcred)
 
 ```
-### Vulnerabilidad a roll over difícil en el corto plazo: reservas versus deuda de corto plazo
+## Vulnerabilidad a roll over difícil en el corto plazo: reservas versus deuda de corto plazo
 
 Un indicador frecuentemente usado en la literatura como señanal de fragilidad ante choques financieros externos es la proporción de las reservas internacionales que representan los pasivos externos de corto plazo. En este punto, el caso más dramático es Panamá, que pasó de tener niveles cercanos a cero previos a la crisis a tener un endeudamiento de corto plazo equivalente a más de la mitas de sus reservas internacionales.. Otros casos que han llegado con niveles de deuda de crtop plazo a reservas mayor que los previos a la crisis incluyen a Venezuela, México y Colombia. El caso opuesto lo representan Costa Rica y EL salvador, que presentan niveles menores en el período previo al 2015 que previo al 2008.
 
@@ -193,7 +257,7 @@ print(r_g_edebtsh)
 ```
 
 
-### Exposición a choques comerciales: apertura comercial y concentración exportadora
+## Exposición a choques comerciales: apertura comercial y concentración exportadora
 
 Otros indicadores cruciales de vulnerabildad externa, en este caso frente a choques comerciales,
 es el nivel de concentració de las exportaciones y el peso relativo del comercio comparado con el PIB.
@@ -256,13 +320,43 @@ g_xhh <- plot_1_lines("value_xherf",
 
 g_xhh
 
+
+
+manoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_mansh)),
+               data.frame(country = iso3c, avg_0406 = avg_recent3_mansh,
+                  avg_1416 = avg_last3_mansh,
+                  qth_0406 = quartile_recent3_mansh,
+                  d_qth = quartile_last3_mansh - quartile_recent3_mansh,
+                  ran_0406 = ranking_recent3_mansh,
+                  d_ran = ranking_last3_mansh - ranking_recent3_mansh ))
+
+minoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_minsh)),
+                  data.frame(country = iso3c, avg_0406 = avg_recent3_minsh,
+                  avg_1416 = avg_last3_minsh,
+                  qth_0406 = quartile_recent3_minsh,
+                  d_qth = quartile_last3_minsh - quartile_recent3_minsh,
+                  ran_0406 = ranking_recent3_minsh,
+                  d_ran = ranking_last3_minsh - ranking_recent3_minsh ))
+
+agroo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_agrsh)),
+               data.frame(country = iso3c, avg_0406 = avg_recent3_agrsh,
+                  avg_1416 = avg_last3_agrsh,
+                  qth_0406 = quartile_recent3_agrsh,
+                  d_qth = quartile_last3_agrsh - quartile_recent3_agrsh,
+                  ran_0406 = ranking_recent3_agrsh,
+                  d_ran = ranking_last3_agrsh - ranking_recent3_agrsh ))
+
+manoo_06
+minoo_06
+agroo_06
+
 ```
 
 
-### Trayectorias del consumo, la inversión y el producto
+## Trayectorias pasadas del consumo, la inversión y el producto
 TO DO.
 
-### El sector fiscal
+## El sector fiscal
 
 Junto con la rápida disminución de tasa de política monetaria que examinaremos más adelante, el otro aspecto de la 
 política económica en la década post crisis financiera y en los años de turbulencias en los precios de los commodities fue echar mano a los ahorros y a la mejorada capacidad de endeudamiento con que contaban 
@@ -357,10 +451,12 @@ r_g_global_result
 q_g_global_result
 ```
 
-#### Box: transferencias hacia y desde empresas con presencia pública.
+### Box: transferencias hacia y desde empresas con presencia pública.
 
 
+# Observaciones del desempeño macroeconómico en el interim: build-ups and cycle features
 
-
-### Espacio disponible para la política monetaria
+# Espacio disponible para la política monetaria y fiscal al final del período.
  To DO
+
+# Mapas regionales para cada choque

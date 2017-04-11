@@ -1,4 +1,4 @@
-# use read_chunk to insert this in a Rmd doc
+ # use read_chunk to insert this in a Rmd doc
 
 
 
@@ -58,6 +58,15 @@ coi_ca <-  c("CRI", "DOM", "HND" ,"GTM", "PAN", "NIC", "SLV", "MEX")
 ## ---- load_data_sets
 load(paste0(pre_path, 
             "produced_data/peak_trough_dates"))
+
+load(paste0(pre_path, 
+            "produced_data/cs_tipo_cambio_nominal"))
+
+load(paste0(pre_path, 
+            "produced_data/cs_tipo_cambio_real_efectivo_mensual"))
+
+load(paste0(pre_path, 
+            "produced_data/cs_tipo_cambio_real_efectivo_promedio_anual"))
 
 load(paste0(pre_path, 
             "produced_data/data_with_basic_wrangling/monetary_fin_tidy"))
@@ -559,6 +568,27 @@ exp_mineria_y_petro_pec_shares_anual_avg <- exp_by_prod_shares_anual_avg %>%
   mutate(iso2c = countrycode(iso3c, "iso3c", "iso2c")) %>% 
   select(-year_as_date)
 exp_minepet_shares <- make_df_diff_hp(exp_mineria_y_petro_pec_shares_anual_avg)
+
+
+## ---- exchange_rates_dfs
+
+tipo_de_cambio_nominal <- cs_tipo_cambio_nominal %>% 
+  filter(iso3c %in% coi_18) %>% 
+  rename(year = `Años`) %>% 
+  select(-notas, -fuente)
+tcn_cs <- make_df_diff_hp(tipo_de_cambio_nominal, type = "cs")
+  
+tipo_de_cambio_real_efectivo_mensual <- cs_tipo_cambio_real_efectivo_mensual %>% 
+  filter(iso3c %in% coi_18) %>% 
+  rename(year = `Años`) %>% 
+  select(-notas, -fuente)
+tcre_m_cs <- make_df_diff_hp(tipo_de_cambio_real_efectivo_mensual, type = "cs")
+
+tipo_de_cambio_real_efectivo_promedio_anual <- cs_tipo_cambio_real_efectivo_promedio_anual %>% 
+  filter(iso3c %in% coi_18) %>% 
+  rename(year = `Años`) %>% 
+  select(-notas, -fuente)
+tcre_pan_cs <- make_df_diff_hp(tipo_de_cambio_real_efectivo_promedio_anual, type = "cs")
 
 
 ### government variables   ----------------

@@ -41,7 +41,7 @@ make_df_diff_hp <- function(df, type = "wb") {
 }
 
 
-add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
+add_diffrank_old <- function(df, valuecol_name = "value", datecol_name = "date") {
   wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 
              expr = {
                df_with_ranking <-  df %>% 
@@ -71,6 +71,98 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
              })
   
 } 
+
+
+add_diffrank_semi_new <- function(df, valuecol_name = "value", datecol_name = "date") {
+  wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 
+             expr = {
+               df_with_ranking <-  df %>% 
+                 group_by(datecol) %>% 
+                 arrange(valuecol) %>%
+                 mutate(ranking = dense_rank(valuecol),
+                        quartile = ntile(valuecol, 4),
+                        half = ntile(valuecol, 2)
+                 ) %>%
+                 ungroup() %>% 
+                 arrange(datecol, iso3c)
+               
+               df_rdiff <- df_with_ranking %>%
+                 group_by(iso3c) %>% 
+                 arrange(datecol) %>% 
+                 mutate(diff_lastval = dplyr::last(valuecol) - valuecol,
+                        avg_last3 = mean( c(
+                          dplyr::last(valuecol),
+                          lag(dplyr::last(valuecol)),
+                          lag(dplyr::last(valuecol), 2)
+                        ),na.rm = TRUE),
+                        avg_recent3 = mean(c(valuecol, lag(valuecol), lag(valuecol, 2)),
+                                           na.rm = TRUE),
+                        diff_avg3 = avg_last3 - avg_recent3,
+                        ranking_recent3 = dense_rank(avg_recent3),
+                        quartile_recent3 = ntile(avg_recent3, 4),
+                        half_recent3 = ntile(avg_recent3, 2),
+                        ranking_last3 = dense_rank(avg_last3),
+                        quartile_last3 = ntile(avg_last3, 4),
+                        half_last3 = ntile(avg_last3, 2)) %>% 
+                 ungroup() %>% 
+                 arrange(iso3c, datecol)
+             })
+  
+} 
+
+
+add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
+  wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 
+             expr = {
+               
+               df_rdiff <- df %>%
+                 group_by(iso3c) %>% 
+                 arrange(datecol) %>% 
+                 mutate(diff_lastval = dplyr::last(valuecol) - valuecol,
+                        avg_last3 = mean( c(
+                          dplyr::last(valuecol),
+                          lag(dplyr::last(valuecol)),
+                          lag(dplyr::last(valuecol), 2)
+                        ),na.rm = TRUE),
+                        avg_recent3 = mean(c(valuecol, lag(valuecol), lag(valuecol, 2)),
+                                           na.rm = TRUE),
+                        diff_avg3 = avg_last3 - avg_recent3) %>% 
+                 ungroup() %>% 
+                 arrange(iso3c, datecol)
+               
+               df_with_ranking_rdiff <-  df_rdiff %>% 
+                 group_by(datecol) %>% 
+                 arrange(valuecol) %>%
+                 mutate(ranking = dense_rank(valuecol),
+                        quartile = ntile(valuecol, 4),
+                        half = ntile(valuecol, 2),
+                        ranking_recent3 = dense_rank(avg_recent3),
+                        quartile_recent3 = ntile(avg_recent3, 4),
+                        half_recent3 = ntile(avg_recent3, 2),
+                        ranking_last3 = dense_rank(avg_last3),
+                        quartile_last3 = ntile(avg_last3, 4),
+                        half_last3 = ntile(avg_last3, 2)
+                 ) %>%
+                 ungroup() %>% 
+                 arrange(datecol, iso3c)
+               
+             })
+} 
+
+
+prepare_tm <- function(df, suffix) {
+  new_df <- df %>%
+    select(iso3c, date, value, ranking, quartile, half, hp_cycle_pct, hp_trend,
+           ranking_recent3, quartile_recent3, half_recent3, avg_recent3, 
+           ranking_last3, quartile_last3, half_last3, avg_last3, 
+           diff_lastval, diff_avg3)
+  
+  nc = ncol(new_df)
+  
+  names(new_df)[3:nc] <- paste(names(new_df), suffix, sep = "_")[3:nc]
+  
+  return(new_df)
+}
 
 
 make_country_lists_by_quant <- function(df) {

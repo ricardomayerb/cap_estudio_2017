@@ -171,6 +171,34 @@ cepalstat_tipo_de_cambio <-
     locale = locale("es", encoding = "windows-1252")
   )
 
+cepalstat_tipo_de_cambio_nominal <-
+  read_delim(
+    "./raw_data/cepalstat_tipo_de_cambio_nominal.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
+
+cepalstat_tipo_de_cambio_real_efectivo_mensual <-
+  read_delim(
+    "./raw_data/cepalstat_tipo_de_cambio_real_efectivo_mensual.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
+cepalstat_tipo_de_cambio_real_efectivo_promedio_anual <-
+  read_delim(
+    "./raw_data/cepalstat_tipo_de_cambio_real_efectivo_promedio_anual.csv",
+    ";",
+    escape_double = FALSE,
+    trim_ws = TRUE,
+    locale = locale("es", encoding = "windows-1252")
+  )
+
 cepalstat_ipc_ipm_mensual <-
   read_delim(
     "./raw_data/cepalstat_ipc_ipm_mensual.csv",
@@ -294,6 +322,15 @@ cepalstat_indic_vol_precios_imp_exp = select(cepalstat_indic_vol_precios_imp_exp
 new_cols = ncol(cepalstat_tipo_de_cambio) - 1
 cepalstat_tipo_de_cambio = select(cepalstat_tipo_de_cambio, 1:new_cols)
 
+new_cols = ncol(cepalstat_tipo_de_cambio_nominal) - 1
+cepalstat_tipo_de_cambio_nominal = select(cepalstat_tipo_de_cambio_nominal, 1:new_cols)
+
+new_cols = ncol(cepalstat_tipo_de_cambio_real_efectivo_mensual) - 1
+cepalstat_tipo_de_cambio_real_efectivo_mensual = select(cepalstat_tipo_de_cambio_real_efectivo_mensual, 1:new_cols)
+
+new_cols = ncol(cepalstat_tipo_de_cambio_real_efectivo_promedio_anual) - 1
+cepalstat_tipo_de_cambio_real_efectivo_promedio_anual = select(cepalstat_tipo_de_cambio_real_efectivo_promedio_anual, 1:new_cols)
+
 new_cols = ncol(cepalstat_ipc_ipm_mensual) - 1
 cepalstat_ipc_ipm_mensual = select(cepalstat_ipc_ipm_mensual, 1:new_cols)
 
@@ -352,6 +389,12 @@ save(cepalstat_exp_prim_manuf, file = "./produced_data/cepalstat_exp_prim_manuf"
 save(cepalstat_indic_vol_precios_imp_exp, file = "./produced_data/cepalstat_indic_vol_precios_imp_exp")
 
 save(cepalstat_tipo_de_cambio, file = "./produced_data/cepalstat_tipo_de_cambio")
+
+save(cepalstat_tipo_de_cambio_nominal, file = "./produced_data/cepalstat_tipo_de_cambio_nominal")
+
+save(cepalstat_tipo_de_cambio_real_efectivo_mensual, file = "./produced_data/cepalstat_tipo_de_cambio_real_efectivo_mensual")
+
+save(cepalstat_tipo_de_cambio_real_efectivo_promedio_anual, file = "./produced_data/cepalstat_tipo_de_cambio_real_efectivo_promedio_anual")
 
 save(cepalstat_ipc_ipm_mensual, file = "./produced_data/cepalstat_ipc_ipm_mensual")
 

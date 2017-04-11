@@ -27,6 +27,9 @@ load("./produced_data/cepalstat_exp_imp_totales_mensuales")
 load("./produced_data/cepalstat_exp_prim_manuf")
 load("./produced_data/cepalstat_indic_vol_precios_imp_exp")
 load("./produced_data/cepalstat_tipo_de_cambio")
+load("./produced_data/cepalstat_tipo_de_cambio_nominal")
+load("./produced_data/cepalstat_tipo_de_cambio_real_efectivo_mensual")
+load("./produced_data/cepalstat_tipo_de_cambio_real_efectivo_promedio_anual")
 load("./produced_data/cepalstat_ipc_ipm_mensual")
 load("./produced_data/cepalstat_ipc_ipm_anual")
 load("./produced_data/cepalstat_agricultura")
@@ -230,6 +233,21 @@ cs_tipo_cambio <- cepalstat_tipo_de_cambio %>%
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
   filter(!is.na(iso3c)) %>% rename(nombre_pais = País) 
 
+cs_tipo_cambio_nominal <- cepalstat_tipo_de_cambio_nominal %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País) 
+
+cs_tipo_cambio_real_efectivo_mensual <- cepalstat_tipo_de_cambio_real_efectivo_mensual %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
+cs_tipo_cambio_real_efectivo_promedio_anual <- cepalstat_tipo_de_cambio_real_efectivo_promedio_anual %>% 
+  mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
+  mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
+  filter(!is.na(iso3c)) %>% rename(nombre_pais = País)
+
 cs_x_m_vol_precios <- cepalstat_indic_vol_precios_imp_exp %>% 
   mutate(iso3c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso3c")) %>% 
   mutate(iso2c = countrycode(País, custom_dict = cepal_33_countries, origin = "country.name.es", destination = "iso2c")) %>% 
@@ -418,6 +436,9 @@ save(cs_x_m_total_mensual, file = "./produced_data/cs_x_m_total_mensual")
 save(cs_x_m_total_trimestral, file = "./produced_data/cs_x_m_total_trimestral")
 save(cs_x_prim_manuf, file = "./produced_data/cs_x_prim_manuf")
 save(cs_tipo_cambio, file = "./produced_data/cs_tipo_cambio")
+save(cs_tipo_cambio_nominal, file = "./produced_data/cs_tipo_cambio_nominal")
+save(cs_tipo_cambio_real_efectivo_mensual, file = "./produced_data/cs_tipo_cambio_real_efectivo_mensual")
+save(cs_tipo_cambio_real_efectivo_promedio_anual, file = "./produced_data/cs_tipo_cambio_real_efectivo_promedio_anual")
 save(cs_x_m_vol_precios, file = "./produced_data/cs_x_m_vol_precios")
 save(cs_ipc_mensual, file = "./produced_data/cs_ipc_mensual")
 save(cs_ipc_anual, file = "./produced_data/cs_ipc_anual")
