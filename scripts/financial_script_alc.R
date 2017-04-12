@@ -34,8 +34,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-pre_path <- "~/GitHub/cap_estudio_2017/"
-# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+# pre_path <- "~/GitHub/cap_estudio_2017/"
+pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -126,18 +126,18 @@ pb <-  prestamos_bancarios_qtr %>%
 pb_tot <- pb %>% select(iso3c, date, total_to_gdp_seas)
 pb_tot <- add_diffrank(pb_tot, valuecol_name = "total_to_gdp_seas")
 pb_tot <- add_ts_filters(pb_tot, value_colname = "total_to_gdp_seas",
-                         hp_freq = 4)
+                         data_periodicity = "quarterly")
 
 
 pb_hip <- pb %>% select(iso3c, date, hipotecario_gdp_seas) 
 pb_hip <- add_diffrank(pb_hip, valuecol_name = "hipotecario_gdp_seas")
 pb_hip <- add_ts_filters(pb_hip, value_colname = "hipotecario_gdp_seas",
-                         hp_freq = 4)
+                         data_periodicity = "quarterly")
 
 pb_con <- pb %>% select(iso3c, date, consumo_gdp_seas)
 pb_con <- add_diffrank(pb_con, valuecol_name = "consumo_gdp_seas")
 pb_con <- add_ts_filters(pb_con, value_colname = "consumo_gdp_seas",
-                         hp_freq = 4)
+                         data_periodicity = "quarterly")
 
 
 # combine credit dfs
@@ -414,6 +414,7 @@ make_tab_rank_d <- function(df, year, suffix) {
                           data.frame(country = iso3c, 
                            avg_ini = avg_recent3_suffix,
                            avg_fin = avg_last3_suffix,
+                           d_ave = avg_last3_suffix - avg_recent3_suffix,
                            qth_ini = quartile_recent3_suffix,
                            d_qth = quartile_last3_suffix - quartile_recent3_suffix,
                            ran_ini = ranking_recent3_suffix,
@@ -492,6 +493,8 @@ gross_fixed_capital_form_priv_sect   <- WDI_33_selected_vars %>%
 gfixcapf_priv <- make_df_diff_hp(gross_fixed_capital_form_priv_sect)
 
 
+
+
 # Household final consumption expenditure (annual % growth)
 # NE.CON.PRVT.KD.ZG
 # 20
@@ -505,7 +508,7 @@ gfixcapf_priv <- make_df_diff_hp(gross_fixed_capital_form_priv_sect)
 gdp_growth_annual   <- WDI_33_selected_vars %>% 
   filter(indicator_code ==  "NY.GDP.MKTP.KD.ZG") %>% 
   rename(date = year)
-gdp_growth_annual_a <- make_df_diff_hp(gdp_growth_annual)
+gdp_growth_a <- make_df_diff_hp(gdp_growth_annual)
 
 ### trade dimensions -----------
 
@@ -833,9 +836,7 @@ deuda_pub_gsub_dom <- make_df_diff_hp(saldo_deuda_pub_gsub_dom, type = "cs")
 deuda_pub_gsub_ext <- make_df_diff_hp(saldo_deuda_pub_gsub_ext, type = "cs")
 
 
-deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "dcen_tot") 
-deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "dcen_dom")
-deuda_pub_cen_ext_tm <- prepare_tm(deuda_pub_cen_ext, "dcen_ext") 
+
 
 
 
@@ -849,39 +850,63 @@ exp_minepet_shares_tm <- prepare_tm(exp_minepet_shares, "minsh")
 exp_manuf_shares_tm <- prepare_tm(exp_manuf_shares, "mansh")
 exp_agro_pec_shares_tm <- prepare_tm(exp_agro_pec_shares, "agrsh")
 
-trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm, by = c("iso3c", "date")) %>% 
+trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm,
+                             by = c("iso3c", "date")) %>% 
   left_join(curr_acc_to_gdp_tm, by = c("iso3c", "date")) %>% 
   left_join(cs_x_m_10_herf_tm, by = c("iso3c", "date")) %>% 
   left_join(exp_minepet_shares_tm, by = c("iso3c", "date")) %>% 
   left_join(exp_manuf_shares_tm, by = c("iso3c", "date")) %>% 
   left_join(exp_agro_pec_shares_tm, by = c("iso3c", "date")) 
 
-manoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_mansh)),
-                  data.frame(country = iso3c, avg_0406 = avg_recent3_mansh,
-                             avg_1416 = avg_last3_mansh,
-                             qth_0406 = quartile_recent3_mansh,
-                             d_qth = quartile_last3_mansh - quartile_recent3_mansh,
-                             ran_0406 = ranking_recent3_mansh,
-                             d_ran = ranking_last3_mansh - ranking_recent3_mansh ))
+xmanuf_06 <-   make_tab_rank(trade_cacc_join, 2006, "mansh")
+xminpet_06 <-   make_tab_rank(trade_cacc_join, 2006, "minsh")
+xagro_06 <-   make_tab_rank(trade_cacc_join, 2006, "agrsh") 
 
-minoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_minsh)),
-                  data.frame(country = iso3c, avg_0406 = avg_recent3_minsh,
-                             avg_1416 = avg_last3_minsh,
-                             qth_0406 = quartile_recent3_minsh,
-                             d_qth = quartile_last3_minsh - quartile_recent3_minsh,
-                             ran_0406 = ranking_recent3_minsh,
-                             d_ran = ranking_last3_minsh - ranking_recent3_minsh ))
+xmanuf_d_06 <-  make_tab_rank_d(trade_cacc_join, 2006, "mansh")
+xminpet_d_06 <-   make_tab_rank_d(trade_cacc_join, 2006, "minsh")
+xagro_d_06 <-   make_tab_rank_d(trade_cacc_join, 2006, "agrsh") 
 
-agroo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_agrsh)),
-                  data.frame(country = iso3c, avg_0406 = avg_recent3_agrsh,
-                             avg_1416 = avg_last3_agrsh,
-                             qth_0406 = quartile_recent3_agrsh,
-                             d_qth = quartile_last3_agrsh - quartile_recent3_agrsh,
-                             ran_0406 = ranking_recent3_agrsh,
-                             d_ran = ranking_last3_agrsh - ranking_recent3_agrsh ))
+x_hh_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
+x_hh_d_06 <- make_tab_rank_d(trade_cacc_join, 2006, "xherf")
+
+cacc_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
+cacc_d_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
 
 
+deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "dcen_tot") 
+deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "dcen_dom")
+deuda_pub_cen_ext_tm <- prepare_tm(deuda_pub_cen_ext, "dcen_ext") 
+deuda_pub_spnf_tot_tm <- prepare_tm(deuda_pub_spnf_tot, "dspnf_tot") 
+deuda_pub_spnf_dom_tm <- prepare_tm(deuda_pub_spnf_dom, "dspnf_dom")
+deuda_pub_spnf_ext_tm <- prepare_tm(deuda_pub_spnf_ext, "dspnf_ext") 
+resul_prim_gcen_tm <- prepare_tm(resul_prim_gcen, "rp_cen") 
+resul_global_gcen_tm <- prepare_tm(resul_global_gcen, "rp_cen") 
+revenue_to_gdp_tm  <- prepare_tm(revenue_to_gdp, "rev")
+tax_revenue_to_gdp_tm  <- prepare_tm(tax_revenue_to_gdp, "taxrev")
+pay_int_gcen_tm  <- prepare_tm(pay_int_gcen, "intpay")
 
+public_sect_join <- left_join(deuda_pub_cen_tot_tm, deuda_pub_cen_dom_tm,
+                             by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_cen_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_dom_tm , by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_prim_gcen_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_global_gcen_tm, by = c("iso3c", "date")) %>% 
+  left_join(revenue_to_gdp_tm , by = c("iso3c", "date")) %>% 
+  left_join(tax_revenue_to_gdp_tm , by = c("iso3c", "date")) %>% 
+  left_join(pay_int_gcen_tm , by = c("iso3c", "date")) 
+
+
+
+gdp_growth_a_tm <- prepare_tm(gdp_growth_a, "gdp_gr")
+gfixcapf_priv_tm <- prepare_tm(gfixcapf_priv, "gfcf_pri")
+gfixcapf_tm <- prepare_tm(gfixcapf, "gfcf")
+growth_gfixcapf_tm <- prepare_tm(growth_gfixcapf, "gfcf_gr")
+growth_gcapf_tm <- prepare_tm(growth_gcapf, "gcf_gr") 
+gcapf_tm <- prepare_tm(gcapf, "gcf")
+growth_consum_hh_tm <- prepare_tm(growth_consum_hh,"chh_gr") 
+consum_hh_tm <- prepare_tm(consum_hh, "chh")
 
 
 # finance related chunks plots --------------------------------------------------
