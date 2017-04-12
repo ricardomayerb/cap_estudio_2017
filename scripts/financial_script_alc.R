@@ -124,20 +124,20 @@ pb <-  prestamos_bancarios_qtr %>%
   filter( iso3c != "COL") # remove colombia until fix in ci or gdp data (ratio is off by 3 orders of magnitude)
 
 pb_tot <- pb %>% select(iso3c, date, total_to_gdp_seas)
-pb_tot <- add_diffrank(pb_tot, valuecol_name = "total_to_gdp_seas")
 pb_tot <- add_ts_filters(pb_tot, value_colname = "total_to_gdp_seas",
                          data_periodicity = "quarterly")
+pb_tot <- add_diffrank(pb_tot, valuecol_name = "total_to_gdp_seas")
 
 
 pb_hip <- pb %>% select(iso3c, date, hipotecario_gdp_seas) 
-pb_hip <- add_diffrank(pb_hip, valuecol_name = "hipotecario_gdp_seas")
 pb_hip <- add_ts_filters(pb_hip, value_colname = "hipotecario_gdp_seas",
                          data_periodicity = "quarterly")
+pb_hip <- add_diffrank(pb_hip, valuecol_name = "hipotecario_gdp_seas")
 
 pb_con <- pb %>% select(iso3c, date, consumo_gdp_seas)
-pb_con <- add_diffrank(pb_con, valuecol_name = "consumo_gdp_seas")
 pb_con <- add_ts_filters(pb_con, value_colname = "consumo_gdp_seas",
                          data_periodicity = "quarterly")
+pb_con <- add_diffrank(pb_con, valuecol_name = "consumo_gdp_seas")
 
 
 # combine credit dfs
@@ -359,69 +359,6 @@ reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
 
 ## ---- joining_financial_dfs
 
-make_tab_rank <- function(df, year, suffix) {
-  
-  avg_recent3_suffix = paste0("avg_recent3_", suffix)
-  avg_last3_suffix = paste0("avg_last3_", suffix)
-  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
-  quartile_last3_suffix = paste0("quartile_last3_", suffix)
-  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
-  ranking_last3_suffix = paste0("ranking_last3_", suffix)
-
-  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
-                          avg_last3_suffix = avg_last3_suffix,
-                          quartile_recent3_suffix = quartile_recent3_suffix,
-                          quartile_last3_suffix = quartile_last3_suffix,
-                          ranking_recent3_suffix = ranking_recent3_suffix,
-                          ranking_last3_suffix = ranking_last3_suffix),
-             expr = {
-    fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
-      arrange(desc(avg_recent3_suffix))
-    
-    new_df <- with(fil_df,
-                   data.frame(country = iso3c, 
-                              avg_ini = avg_recent3_suffix,
-                              avg_fin = avg_last3_suffix,
-                              qth_ini = quartile_recent3_suffix,
-                              qth_fin = quartile_last3_suffix,
-                              ran_ini = ranking_recent3_suffix,
-                              ran_fin = ranking_last3_suffix))
-  })
-  return(new_df)
-}
-
-
-make_tab_rank_d <- function(df, year, suffix) {
-  
-  avg_recent3_suffix = paste0("avg_recent3_", suffix)
-  avg_last3_suffix = paste0("avg_last3_", suffix)
-  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
-  quartile_last3_suffix = paste0("quartile_last3_", suffix)
-  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
-  ranking_last3_suffix = paste0("ranking_last3_", suffix)
-  
-  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
-                          avg_last3_suffix = avg_last3_suffix,
-                          quartile_recent3_suffix = quartile_recent3_suffix,
-                          quartile_last3_suffix = quartile_last3_suffix,
-                          ranking_recent3_suffix = ranking_recent3_suffix,
-                          ranking_last3_suffix = ranking_last3_suffix),
-             expr = {
-               fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
-                 arrange(desc(avg_recent3_suffix))
-               
-               new_df <- with(fil_df,
-                          data.frame(country = iso3c, 
-                           avg_ini = avg_recent3_suffix,
-                           avg_fin = avg_last3_suffix,
-                           d_ave = avg_last3_suffix - avg_recent3_suffix,
-                           qth_ini = quartile_recent3_suffix,
-                           d_qth = quartile_last3_suffix - quartile_recent3_suffix,
-                           ran_ini = ranking_recent3_suffix,
-                           d_ran_fin = ranking_last3_suffix - ranking_recent3_suffix))
-             })
-  return(new_df)
-}
 
 
 dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")

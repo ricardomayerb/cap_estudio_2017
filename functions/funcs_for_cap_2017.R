@@ -36,19 +36,22 @@ make_df_diff_hp <- function(df, type = "wb") {
     new_df <- make_df_19_cstype(df)
   }
   
-  new_df <- add_diffrank(new_df)
   new_df <- add_ts_filters(new_df)
+  new_df <- add_diffrank(new_df)
 }
 
 
-add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
-  wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name), 
+add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date",
+                         hptrend_name = "hp_trend", hpcyclepct_name = "hp_cycle_pct") {
+  wrapr::let(alias = list(valuecol = valuecol_name, datecol = datecol_name,
+                          hptrend = hptrend_name, hpcyclepct = hpcyclepct_name), 
              expr = {
                
                df_rdiff <- df %>%
                  group_by(iso3c) %>% 
                  arrange(datecol) %>% 
-                 mutate(diff_lastval = dplyr::last(valuecol) - valuecol,
+                 mutate(last_pct_chg = 100 * (valuecol - lag(valuecol))/lag(valuecol),
+                        diff_lastval = dplyr::last(valuecol) - valuecol,
                         avg_last3 = mean( c(
                           dplyr::last(valuecol),
                           lag(dplyr::last(valuecol)),
@@ -56,7 +59,9 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
                         ),na.rm = TRUE),
                         avg_recent3 = mean(c(valuecol, lag(valuecol), lag(valuecol, 2)),
                                            na.rm = TRUE),
-                        diff_avg3 = avg_last3 - avg_recent3) %>% 
+                        diff_avg3 = avg_last3 - avg_recent3,
+                        pct_diff_avg3 = 100 * diff_avg3/avg_recent3, 
+                        diff_lastpcyple = dplyr::last(hpcyclepct) - hpcyclepct) %>% 
                  ungroup() %>% 
                  arrange(iso3c, datecol)
                
@@ -75,7 +80,6 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date") {
                  ) %>%
                  ungroup() %>% 
                  arrange(datecol, iso3c)
-               
              })
 } 
 
@@ -85,7 +89,8 @@ prepare_tm <- function(df, suffix) {
     select(iso3c, date, value, ranking, quartile, half, hp_cycle_pct, hp_trend,
            ranking_recent3, quartile_recent3, half_recent3, avg_recent3, 
            ranking_last3, quartile_last3, half_last3, avg_last3, 
-           diff_lastval, diff_avg3)
+           diff_lastval, diff_avg3, sd_cycle_pct, sd_cycle_pct_2010plus,
+           sd_cycle_pct_calm, pct_diff_avg3, pct_diff_avg3, last_pct_chg)
   
   nc = ncol(new_df)
   
@@ -94,17 +99,6 @@ prepare_tm <- function(df, suffix) {
   return(new_df)
 }
 
-
-make_country_lists_by_quant <- function(df) {
-  q_all = df %>% select(iso3c, gen_group) %>% distinct(.keep_all = TRUE)
-  
-  q_4 = q_all %>% filter(gen_group == "above_pct75") %>% select(iso3c)
-  q_3 = q_all %>% filter(gen_group == "pct50_to_75") %>% select(iso3c)
-  q_2 = q_all %>% filter(gen_group == "pct25_to_50") %>% select(iso3c)
-  q_1 = q_all %>% filter(gen_group == "below_pct25") %>% select(iso3c)
-  
-  return(list(q_1 = q_1, q_2 = q_2, q_3 = q_3, q_4 = q_4, q_all = q_all))
-}
 
 
 add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
@@ -140,579 +134,91 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
     
   }
   
+  sd_cycle_pct_full_sample <- sd(df$hp_cycle_pct, na.rm = TRUE)
+  dates_after_2009 <- year(co_data[[date_colname]]) > 2009
+  dates_good_times <- year(co_data[[date_colname]]) %in% c(2003:2007, 2010:2015)
+  
+  sd_cycle_pct_2010_16 <- sd(df$hp_cycle_pct[dates_after_2009], na.rm = TRUE)
+  sd_cycle_pct_calmer <- sd(df$hp_cycle_pct[dates_good_times], na.rm = TRUE)
+  
+  df$sd_cycle_pct <- sd_cycle_pct_full_sample
+  df$sd_cycle_pct_2010plus <- sd_cycle_pct_2010_16
+  df$sd_cycle_pct_calm <- sd_cycle_pct_calmer
+  
   return(df)
 }
 
 
-add_baselines <- function(df, value_colname = "value", date_colname = "date",
-                          init_date = as.Date("2006", format = "%Y"),
-                          final_date = as.Date("2016", format = "%Y"),
-                          init_window = 3, final_window = 3) {
+make_tab_rank <- function(df, year, suffix) {
   
-  wrapr::let(alias = list(value_col = value_colname, date_col = date_colname),
+  avg_recent3_suffix = paste0("avg_recent3_", suffix)
+  avg_last3_suffix = paste0("avg_last3_", suffix)
+  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
+  quartile_last3_suffix = paste0("quartile_last3_", suffix)
+  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
+  ranking_last3_suffix = paste0("ranking_last3_", suffix)
+  
+  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
+                          avg_last3_suffix = avg_last3_suffix,
+                          quartile_recent3_suffix = quartile_recent3_suffix,
+                          quartile_last3_suffix = quartile_last3_suffix,
+                          ranking_recent3_suffix = ranking_recent3_suffix,
+                          ranking_last3_suffix = ranking_last3_suffix),
              expr = {
+               fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
+                 arrange(desc(avg_recent3_suffix))
                
-               in_win = year(init_date) - init_window + 1
-               fi_win = year(final_date) - final_window + 1
-              
-               df_init <- df %>%
-                 filter(year(date_col) >= in_win & year(date_col) <= year(init_date)) %>% 
-                 group_by(iso3c) %>% 
-                 summarise(init_avg = mean(value_col, na.rm = TRUE),
-                           init_val = dplyr::last(value_col))
-               
-               
-               df_final <- df %>%
-                 filter(year(date_col) >= fi_win & year(date_col) <= year(final_date)) %>% 
-                 group_by(iso3c) %>% 
-                 summarise(final_avg = mean(value_col, na.rm = TRUE),
-                           final_val = dplyr::last(value_col))
-               
-               df_infi <- left_join(df_init, df_final, by = "iso3c") %>% 
-                 mutate(dif_values = final_val - init_val,
-                        dif_avgs = final_avg - init_avg) %>% 
-                 arrange(iso3c)
-               
-               
-               joined_df <- full_join(df, df_infi, by = "iso3c")
-             
-               augmented_df <- joined_df %>% 
-                 mutate(value_m_val = value_col - init_val,
-                        value_m_avg = value_col - init_avg)
-               
-               return(augmented_df)
+               new_df <- with(fil_df,
+                              data.frame(country = iso3c, 
+                                         avg_ini = avg_recent3_suffix,
+                                         avg_fin = avg_last3_suffix,
+                                         qth_ini = quartile_recent3_suffix,
+                                         qth_fin = quartile_last3_suffix,
+                                         ran_ini = ranking_recent3_suffix,
+                                         ran_fin = ranking_last3_suffix))
              })
-  
+  return(new_df)
 }
 
 
-cate_dext <- function(df, time_breaks = NULL, level_breaks = NULL,
-                      is_med = TRUE, is_pct3 = FALSE, is_pct4 = FALSE) {
+make_tab_rank_d <- function(df, year, suffix) {
   
-  if (is.null(time_breaks)) {
-    if (is_med == TRUE) {
-      new_df <- df %>% arrange(iso3c, year) %>% 
-        mutate(median_of_avg = median(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-        group_by(iso3c) %>% 
-        mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-        mutate(dext_group = if_else(avg_debt > median_of_avg, "above_median",
-                                    "below_median"))
-      return(new_df)
-    } else {
-      if (is_pct3) {
-        new_df <- df  %>% arrange(iso3c, year) %>% 
-          mutate(pct33_of_avg = quantile(deuda_ext_porc_pib, probs = 0.33,
-                                         na.rm = TRUE),
-                 pct66_of_avg = quantile(deuda_ext_porc_pib, probs = 0.66,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(iso3c) %>% 
-          mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-          mutate(dext_group = if_else(avg_debt > pct66_of_avg, "above_pct66",
-                                      if_else(avg_debt > pct33_of_avg,
-                                              "pct33_to_66",
-                                              "below_pct33")
-          )
-          
-          )
-        return(new_df)
-      } else {
-        new_df <- df %>% 
-          mutate(pct25_of_avg = quantile(deuda_ext_porc_pib, probs = 0.25,
-                                         na.rm = TRUE),
-                 pct50_of_avg = quantile(deuda_ext_porc_pib, probs = 0.50,
-                                         na.rm = TRUE),
-                 pct75_of_avg = quantile(deuda_ext_porc_pib, probs = 0.75,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(iso3c) %>% 
-          mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-          mutate(dext_group = if_else(avg_debt > pct75_of_avg, "above_pct75",
-                                      if_else(avg_debt > pct50_of_avg, "pct50_to_75",
-                                              if_else(avg_debt > pct25_of_avg,
-                                                      "pct25_to_50",
-                                                      "below_pct25"))
-          )
-          
-          )
-        return(new_df)
-      }
-    }
-    
-  } else {
-    # some time break used: e.g. 2001. Creates 1990-2001 and 2002, 2015
-    if (is_med) {
-      new_df <- df %>%  arrange(iso3c, year) %>% 
-        mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
-        arrange(period) %>% 
-        group_by(period) %>% 
-        mutate(median_of_avg = median(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-        group_by(period, iso3c) %>% 
-        mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-        ungroup() %>% 
-        group_by(iso3c) %>% 
-        mutate(dext_group = if_else(avg_debt > median_of_avg, "above_median",
-                                    "below_median"))
-      
-      new_df_period_1 <- new_df %>% 
-        filter(period == "period_1")
-      
-      new_df_period_2 <- new_df %>% 
-        filter(period == "period_2")
-      
-      return( list(df_period_1 = new_df_period_1,
-                   df_period_2 = new_df_period_2, df_full =  new_df))
-    } else {
-      if (is_pct3) {
-        new_df <- df %>%  arrange(iso3c, year) %>% 
-          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
-          arrange(period) %>% 
-          group_by(period) %>% 
-          mutate(pct33_of_avg = quantile(deuda_ext_porc_pib, probs = 0.33,
-                                         na.rm = TRUE),
-                 pct66_of_avg = quantile(deuda_ext_porc_pib, probs = 0.66,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(period, iso3c) %>% 
-          mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-          ungroup() %>% 
-          group_by(iso3c) %>% 
-          mutate(dext_group = if_else(avg_debt > pct66_of_avg, "above_pct66",
-                                      if_else(avg_debt > pct33_of_avg,
-                                              "pct33_to_66",
-                                              "below_pct33")
-          )
-          
-          )
-        new_df_period_1 <- new_df %>% 
-          filter(period == "period_1")
-        
-        new_df_period_2 <- new_df %>% 
-          filter(period == "period_2")
-        
-        return( list(df_period_1 = new_df_period_1,
-                     df_period_2 = new_df_period_2, df_full =  new_df))
-      } else {
-        new_df <- df %>%  arrange(iso3c, year) %>% 
-          mutate(period = if_else(year(year) <= time_breaks, "period_1", "period_2")) %>% 
-          arrange(period) %>% 
-          group_by(period) %>% 
-          mutate(pct25_of_avg = quantile(deuda_ext_porc_pib, probs = 0.25,
-                                         na.rm = TRUE),
-                 pct50_of_avg = quantile(deuda_ext_porc_pib, probs = 0.50,
-                                         na.rm = TRUE),
-                 pct75_of_avg = quantile(deuda_ext_porc_pib, probs = 0.75,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(period, iso3c) %>% 
-          mutate(avg_debt = mean(deuda_ext_porc_pib, na.rm = TRUE)) %>% 
-          ungroup() %>% 
-          group_by(iso3c) %>% 
-          mutate(dext_group = if_else(avg_debt > pct75_of_avg, "above_pct75",
-                                      if_else(avg_debt > pct50_of_avg, "pct50_to_75",
-                                              if_else(avg_debt > pct25_of_avg,
-                                                      "pct25_to_50",
-                                                      "below_pct25"))
-          )
-          
-          )
-        new_df_period_1 <- new_df %>% 
-          filter(period == "period_1")
-        
-        new_df_period_2 <- new_df %>% 
-          filter(period == "period_2")
-        
-        return( list(df_period_1 = new_df_period_1,
-                     df_period_2 = new_df_period_2, df_full =  new_df))
-        
-      }
-    }
-  }
+  avg_recent3_suffix = paste0("avg_recent3_", suffix)
+  avg_last3_suffix = paste0("avg_last3_", suffix)
+  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
+  quartile_last3_suffix = paste0("quartile_last3_", suffix)
+  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
+  ranking_last3_suffix = paste0("ranking_last3_", suffix)
+  avg_pctcycle_last3_suffix = paste0("avg_pctcycle_last3_", suffix)
+  avg_pctcycle_recent3_suffix = paste0("avg_pctcycle_recent3_", suffix)
+  pctcycle_last_suffix = paste0("pctcycle_last_", suffix)
+  pctcycle_recent_suffix = paste0("pctcycle_recent_", suffix)
   
-}
-
-
-cate_dext_to_xts_wide <- function(cate_dext_df, is_med = TRUE,
-                                  is_pct3 = FALSE, is_pct4 = FALSE,
-                                  is_full = FALSE) {
-  
-  if(is_full){
-    df_sp <-  cate_dext_df %>% 
-      select(iso3c, year, deuda_ext_porc_pib) %>% 
-      spread(key = iso3c, value = deuda_ext_porc_pib)
-    
-    df_xts <- df_sp %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp$year)
-    
-    return(df_xts)
-  }
-  
-  
-  if(is_med){
-    df_sp_am <-  cate_dext_df %>% 
-      filter(dext_group == "above_median") %>% 
-      select(iso3c, year, deuda_ext_porc_pib) %>% 
-      spread(key = iso3c, value = deuda_ext_porc_pib)
-    
-    df_am_xts <- df_sp_am %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp_am$year)
-    
-    df_sp_bm <-  cate_dext_df %>% 
-      filter(dext_group == "below_median") %>% 
-      select(iso3c, year, deuda_ext_porc_pib) %>% 
-      spread(key = iso3c, value = deuda_ext_porc_pib)
-    
-    df_bm_xts <- df_sp_bm %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp_bm$year)
-    
-    return(list(below_median = df_bm_xts, above_median = df_am_xts))
-  } else {
-    if (is_pct3) {
-      df_sp_p33 <-  cate_dext_df %>% 
-        filter(dext_group == "below_pct33") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p33_xts <- df_sp_p33 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p33$year)
-      
-      df_sp_p33_to_66 <-  cate_dext_df %>% 
-        filter(dext_group == "pct33_to_66") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p33_to_66_xts <- df_sp_p33_to_66 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p33_to_66$year)
-      
-      df_sp_p66 <-  cate_dext_df %>% 
-        filter(dext_group == "above_pct66") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p66_xts <- df_sp_p66 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p66$year)
-      
-      
-      return(list(below_p33 = df_p33_xts, p33_to_66 = df_p33_to_66_xts,
-                  above_p66 = df_p66_xts))
-      
-    } else {
-      #pct4
-      df_sp_p25 <-  cate_dext_df %>% 
-        filter(dext_group == "below_pct25") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p25_xts <- df_sp_p25 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p25$year)
-      
-      df_sp_p25_to_50 <-  cate_dext_df %>% 
-        filter(dext_group == "pct25_to_50") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p25_to_50_xts <- df_sp_p25_to_50 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p25_to_50$year)
-
-      df_sp_p50_to_75 <-  cate_dext_df %>% 
-        filter(dext_group == "pct50_to_75") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p50_to_75_xts <- df_sp_p50_to_75 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p50_to_75$year)
-      
-      df_sp_p75 <-  cate_dext_df %>% 
-        filter(dext_group == "above_pct75") %>% 
-        select(iso3c, year, deuda_ext_porc_pib) %>% 
-        spread(key = iso3c, value = deuda_ext_porc_pib)
-      
-      df_p75_xts <- df_sp_p75 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p75$year)
-    
-      return(list(below_p25 = df_p25_xts, p25_to_50 = df_p25_to_50_xts,
-                  p50_to_75 = df_p50_to_75_xts, above_p75 = df_p75_xts))
-      
-    }
-  }
-  
-  
-}
-
-cate_gen <- function(df, value_col_name, time_breaks = NULL, level_breaks = NULL,
-                      is_med = TRUE, is_pct3 = FALSE, is_pct4 = FALSE,
-                     dating_col_name = "year") {
-  wrapr::let(alias = list(value_col = value_col_name, date_col = dating_col_name),
+  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
+                          avg_last3_suffix = avg_last3_suffix,
+                          quartile_recent3_suffix = quartile_recent3_suffix,
+                          quartile_last3_suffix = quartile_last3_suffix,
+                          ranking_recent3_suffix = ranking_recent3_suffix,
+                          ranking_last3_suffix = ranking_last3_suffix,
+                          avg_pctcycle_last3_suffix = avg_pctcycle_last3_suffix,
+                          avg_pctcycle_recent3_suffix = avg_pctcycle_recent3_suffix,
+                          pctcycle_last_suffix = pctcycle_last_suffix,
+                          pctcycle_recent_suffix = pctcycle_recent_suffix),
              expr = {
-  if (is.null(time_breaks)) {
-    if (is_med == TRUE) {
-      new_df <- df %>% arrange(iso3c, date_col) %>% 
-        mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
-        group_by(iso3c) %>% 
-        mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-        mutate(gen_group = if_else(avg_value > median_of_avg, "above_median",
-                                    "below_median"))
-      return(new_df)
-    } else {
-      if (is_pct3) {
-        new_df <- df  %>% arrange(iso3c, date_col) %>% 
-          mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
-                                         na.rm = TRUE),
-                 pct66_of_avg = quantile(value_col, probs = 0.66,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(iso3c) %>% 
-          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-          mutate(gen_group = if_else(avg_value > pct66_of_avg, "above_pct66",
-                                      if_else(avg_value > pct33_of_avg,
-                                              "pct33_to_66",
-                                              "below_pct33")
-          )
-          
-          )
-        return(new_df)
-      } else {
-        new_df <- df %>% arrange(iso3c, date_col) %>% 
-          mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
-                                         na.rm = TRUE),
-                 pct50_of_avg = quantile(value_col, probs = 0.50,
-                                         na.rm = TRUE),
-                 pct75_of_avg = quantile(value_col, probs = 0.75,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(iso3c) %>% 
-          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-          mutate(gen_group = if_else(avg_value > pct75_of_avg, "above_pct75",
-                                      if_else(avg_value > pct50_of_avg, "pct50_to_75",
-                                              if_else(avg_value > pct25_of_avg,
-                                                      "pct25_to_50",
-                                                      "below_pct25"))
-          )
-          
-          )
-        return(new_df)
-      }
-    }
-    
-  } else {
-    # some time break used: e.g. 2001. Creates 1990-2001 and 2002, 2015
-    
-    if (is_med) {
-      new_df <- df %>%  arrange(iso3c, date_col) %>% 
-        mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
-        arrange(period) %>% 
-        group_by(period) %>% 
-        mutate(median_of_avg = median(value_col, na.rm = TRUE)) %>% 
-        group_by(period, iso3c) %>% 
-        mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-        ungroup() %>% 
-        group_by(iso3c) %>% 
-        mutate(gen_group = if_else(avg_value > median_of_avg, "above_median",
-                                    "below_median"))
-      
-      new_df_period_1 <- new_df %>% 
-        filter(period == "period_1")
-      
-      new_df_period_2 <- new_df %>% 
-        filter(period == "period_2")
-      
-      return( list(df_period_1 = new_df_period_1,
-                   df_period_2 = new_df_period_2, df_full =  new_df))
-    } else {
-      if (is_pct3) {
-        new_df <- df %>%  arrange(iso3c, date_col) %>% 
-          mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
-          arrange(period) %>% 
-          group_by(period) %>% 
-          mutate(pct33_of_avg = quantile(value_col, probs = 0.33,
-                                         na.rm = TRUE),
-                 pct66_of_avg = quantile(value_col, probs = 0.66,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(period, iso3c) %>% 
-          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-          ungroup() %>% 
-          group_by(iso3c) %>% 
-          mutate(gen_group = if_else(avg_value > pct66_of_avg, "above_pct66",
-                                      if_else(avg_value > pct33_of_avg,
-                                              "pct33_to_66",
-                                              "below_pct33")
-          )
-          
-          )
-        new_df_period_1 <- new_df %>% 
-          filter(period == "period_1")
-        
-        new_df_period_2 <- new_df %>% 
-          filter(period == "period_2")
-        
-        return( list(df_period_1 = new_df_period_1,
-                     df_period_2 = new_df_period_2, df_full =  new_df))
-      } else {
-        new_df <- df %>%  arrange(iso3c, date_col) %>% 
-          mutate(period = if_else(date_col <= time_breaks, "period_1", "period_2")) %>% 
-          arrange(period) %>% 
-          group_by(period) %>% 
-          mutate(pct25_of_avg = quantile(value_col, probs = 0.25,
-                                         na.rm = TRUE),
-                 pct50_of_avg = quantile(value_col, probs = 0.50,
-                                         na.rm = TRUE),
-                 pct75_of_avg = quantile(value_col, probs = 0.75,
-                                         na.rm = TRUE)
-          ) %>% 
-          group_by(period, iso3c) %>% 
-          mutate(avg_value = mean(value_col, na.rm = TRUE)) %>% 
-          ungroup() %>% 
-          group_by(iso3c) %>% 
-          mutate(gen_group = if_else(avg_value > pct75_of_avg, "above_pct75",
-                                      if_else(avg_value > pct50_of_avg, "pct50_to_75",
-                                              if_else(avg_value > pct25_of_avg,
-                                                      "pct25_to_50",
-                                                      "below_pct25"))
-          )
-          
-          )
-        new_df_period_1 <- new_df %>% 
-          filter(period == "period_1")
-        
-        new_df_period_2 <- new_df %>% 
-          filter(period == "period_2")
-        
-        return( list(df_period_1 = new_df_period_1,
-                     df_period_2 = new_df_period_2, df_full =  new_df))
-        
-      }
-    }
-  }
-  })
-}
-
-cate_gen_to_xts_wide <- function(cate_gen_df, value_col_name, is_med = TRUE,
-                                  is_pct3 = FALSE, is_pct4 = FALSE,
-                                  is_full = FALSE, 
-                                 dating_col_name = "year") {
-  wrapr::let(alias = list(value_col = value_col_name, year = dating_col_name), expr = {
-  if(is_full){
-    df_sp <-  cate_gen_df %>% 
-      select(iso3c, year, value_col) %>% 
-      spread(key = iso3c, value = value_col)
-    
-    df_xts <- df_sp %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp$year)
-    
-    return(df_xts)
-  }
-  
-  
-  if(is_med){
-    df_sp_am <-  cate_gen_df %>% 
-      filter(gen_group == "above_median") %>% 
-      select(iso3c, year, value_col) %>% 
-      spread(key = iso3c, value = value_col)
-    
-    df_am_xts <- df_sp_am %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp_am$year)
-    
-    df_sp_bm <-  cate_gen_df %>% 
-      filter(gen_group == "below_median") %>% 
-      select(iso3c, year, value_col) %>% 
-      spread(key = iso3c, value = value_col)
-    
-    df_bm_xts <- df_sp_bm %>% 
-      select(-year) %>% 
-      xts(order.by = df_sp_bm$year)
-    
-    return(list(below_median = df_bm_xts, above_median = df_am_xts))
-  } else {
-    if (is_pct3) {
-      df_sp_p33 <-  cate_gen_df %>% 
-        filter(gen_group == "below_pct33") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p33_xts <- df_sp_p33 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p33$year)
-      
-      df_sp_p33_to_66 <-  cate_gen_df %>% 
-        filter(gen_group == "pct33_to_66") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p33_to_66_xts <- df_sp_p33_to_66 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p33_to_66$year)
-      
-      df_sp_p66 <-  cate_gen_df %>% 
-        filter(gen_group == "above_pct66") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p66_xts <- df_sp_p66 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p66$year)
-      
-      
-      return(list(below_p33 = df_p33_xts, p33_to_66 = df_p33_to_66_xts,
-                  above_p66 = df_p66_xts))
-      
-    } else {
-      #pct4
-      df_sp_p25 <-  cate_gen_df %>% 
-        filter(gen_group == "below_pct25") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p25_xts <- df_sp_p25 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p25$year)
-      
-      df_sp_p25_to_50 <-  cate_gen_df %>% 
-        filter(gen_group == "pct25_to_50") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p25_to_50_xts <- df_sp_p25_to_50 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p25_to_50$year)
-      
-      df_sp_p50_to_75 <-  cate_gen_df %>% 
-        filter(gen_group == "pct50_to_75") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p50_to_75_xts <- df_sp_p50_to_75 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p50_to_75$year)
-      
-      df_sp_p75 <-  cate_gen_df %>% 
-        filter(gen_group == "above_pct75") %>% 
-        select(iso3c, year, value_col) %>% 
-        spread(key = iso3c, value = value_col)
-      
-      df_p75_xts <- df_sp_p75 %>% 
-        select(-year) %>% 
-        xts(order.by = df_sp_p75$year)
-      
-      return(list(below_p25 = df_p25_xts, p25_to_50 = df_p25_to_50_xts,
-                  p50_to_75 = df_p50_to_75_xts, above_p75 = df_p75_xts))
-      
-    }
-  }
-  
-  })
+               fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
+                 arrange(desc(avg_recent3_suffix))
+               
+               new_df <- with(fil_df,
+                              data.frame(country = iso3c, 
+                                         avg_ini = avg_recent3_suffix,
+                                         avg_fin = avg_last3_suffix,
+                                         d_ave = avg_last3_suffix - avg_recent3_suffix,
+                                         qth_ini = quartile_recent3_suffix,
+                                         d_qth = quartile_last3_suffix - quartile_recent3_suffix,
+                                         ran_ini = ranking_recent3_suffix,
+                                         d_ran_fin = ranking_last3_suffix - ranking_recent3_suffix))
+             })
+  return(new_df)
 }
 
 
