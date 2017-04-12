@@ -34,8 +34,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"s
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -357,6 +357,92 @@ total_reserves_as_pct_total_ext_debt   <- WDI_33_selected_vars %>%
   rename(date = year)
 reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
 
+## ---- joining_financial_dfs
+
+make_tab_rank <- function(df, year, suffix) {
+  
+  avg_recent3_suffix = paste0("avg_recent3_", suffix)
+  avg_last3_suffix = paste0("avg_last3_", suffix)
+  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
+  quartile_last3_suffix = paste0("quartile_last3_", suffix)
+  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
+  ranking_last3_suffix = paste0("ranking_last3_", suffix)
+
+  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
+                          avg_last3_suffix = avg_last3_suffix,
+                          quartile_recent3_suffix = quartile_recent3_suffix,
+                          quartile_last3_suffix = quartile_last3_suffix,
+                          ranking_recent3_suffix = ranking_recent3_suffix,
+                          ranking_last3_suffix = ranking_last3_suffix),
+             expr = {
+    fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
+      arrange(desc(avg_recent3_suffix))
+    
+    new_df <- with(fil_df,
+                   data.frame(country = iso3c, 
+                              avg_ini = avg_recent3_suffix,
+                              avg_fin = avg_last3_suffix,
+                              qth_ini = quartile_recent3_suffix,
+                              qth_fin = quartile_last3_suffix,
+                              ran_ini = ranking_recent3_suffix,
+                              ran_fin = ranking_last3_suffix))
+  })
+  return(new_df)
+}
+
+
+make_tab_rank_d <- function(df, year, suffix) {
+  
+  avg_recent3_suffix = paste0("avg_recent3_", suffix)
+  avg_last3_suffix = paste0("avg_last3_", suffix)
+  quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
+  quartile_last3_suffix = paste0("quartile_last3_", suffix)
+  ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
+  ranking_last3_suffix = paste0("ranking_last3_", suffix)
+  
+  wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
+                          avg_last3_suffix = avg_last3_suffix,
+                          quartile_recent3_suffix = quartile_recent3_suffix,
+                          quartile_last3_suffix = quartile_last3_suffix,
+                          ranking_recent3_suffix = ranking_recent3_suffix,
+                          ranking_last3_suffix = ranking_last3_suffix),
+             expr = {
+               fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
+                 arrange(desc(avg_recent3_suffix))
+               
+               new_df <- with(fil_df,
+                          data.frame(country = iso3c, 
+                           avg_ini = avg_recent3_suffix,
+                           avg_fin = avg_last3_suffix,
+                           qth_ini = quartile_recent3_suffix,
+                           d_qth = quartile_last3_suffix - quartile_recent3_suffix,
+                           ran_ini = ranking_recent3_suffix,
+                           d_ran_fin = ranking_last3_suffix - ranking_recent3_suffix))
+             })
+  return(new_df)
+}
+
+
+dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")
+npl_tm <- prepare_tm(npl, "npl")
+bk_cap_to_ass_tm <- prepare_tm(bk_cap_to_ass, "bca")
+dom_risk_premium_wdi_tm <- prepare_tm(dom_risk_premium_wdi, "drp")
+
+dom_fin_df <- left_join(dom_cred_to_spriv_tm, npl_tm, by = c("iso3c", "date")) %>%
+  left_join(bk_cap_to_ass_tm, by = c("iso3c", "date")) %>%
+  left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date"))
+
+ta_credpri <- make_tab_rank(dom_fin_df, 2006, "dcpri")
+ta_credpri_d <- make_tab_rank_d(dom_fin_df, 2006, "dcpri")
+
+
+edebt_short_to_res_tm <- prepare_tm(edebt_short_to_res, "shre")
+edebt_short_to_total_tm <- prepare_tm(edebt_short_to_total, "sht")
+
+edebt_join_dfs <- left_join(edebt_short_to_res_tm, 
+                            edebt_short_to_total_tm, by = c("iso3c", "date") )
+
+
 # real sector variables dfs ----
 
 ### consumption and investment dfs ---------
@@ -610,7 +696,6 @@ tax_revenue_as_pct_gdp   <- WDI_33_selected_vars %>%
 tax_revenue_to_gdp <- make_df_diff_hp(tax_revenue_as_pct_gdp)
 
 
-
 ingtrib_gdp <- cs_sector_publico %>% 
   filter(indicador == 
            "ingresos_tributarios_por_tipo_de_impuestos_en_porcentajes_del_pib_america_latina" ) %>% 
@@ -746,6 +831,54 @@ deuda_pub_spnf_ext <- make_df_diff_hp(saldo_deuda_pub_spnf_ext, type = "cs")
 deuda_pub_gsub_tot <- make_df_diff_hp(saldo_deuda_pub_gsub_tot, type = "cs")
 deuda_pub_gsub_dom <- make_df_diff_hp(saldo_deuda_pub_gsub_dom, type = "cs")
 deuda_pub_gsub_ext <- make_df_diff_hp(saldo_deuda_pub_gsub_ext, type = "cs")
+
+
+deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "dcen_tot") 
+deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "dcen_dom")
+deuda_pub_cen_ext_tm <- prepare_tm(deuda_pub_cen_ext, "dcen_ext") 
+
+
+
+## ---- joining_real_sector_dfs
+
+trade_to_gdp_tm <- prepare_tm(trade_to_gdp, "trade")
+trade_balance_tm <- prepare_tm(trade_balance, "trbal")
+curr_acc_to_gdp_tm <- prepare_tm(curr_acc_to_gdp, "cacc")
+cs_x_m_10_herf_tm <- prepare_tm(cs_x_m_10_herf, "xherf")
+exp_minepet_shares_tm <- prepare_tm(exp_minepet_shares, "minsh")
+exp_manuf_shares_tm <- prepare_tm(exp_manuf_shares, "mansh")
+exp_agro_pec_shares_tm <- prepare_tm(exp_agro_pec_shares, "agrsh")
+
+trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm, by = c("iso3c", "date")) %>% 
+  left_join(curr_acc_to_gdp_tm, by = c("iso3c", "date")) %>% 
+  left_join(cs_x_m_10_herf_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_minepet_shares_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_manuf_shares_tm, by = c("iso3c", "date")) %>% 
+  left_join(exp_agro_pec_shares_tm, by = c("iso3c", "date")) 
+
+manoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_mansh)),
+                  data.frame(country = iso3c, avg_0406 = avg_recent3_mansh,
+                             avg_1416 = avg_last3_mansh,
+                             qth_0406 = quartile_recent3_mansh,
+                             d_qth = quartile_last3_mansh - quartile_recent3_mansh,
+                             ran_0406 = ranking_recent3_mansh,
+                             d_ran = ranking_last3_mansh - ranking_recent3_mansh ))
+
+minoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_minsh)),
+                  data.frame(country = iso3c, avg_0406 = avg_recent3_minsh,
+                             avg_1416 = avg_last3_minsh,
+                             qth_0406 = quartile_recent3_minsh,
+                             d_qth = quartile_last3_minsh - quartile_recent3_minsh,
+                             ran_0406 = ranking_recent3_minsh,
+                             d_ran = ranking_last3_minsh - ranking_recent3_minsh ))
+
+agroo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_agrsh)),
+                  data.frame(country = iso3c, avg_0406 = avg_recent3_agrsh,
+                             avg_1416 = avg_last3_agrsh,
+                             qth_0406 = quartile_recent3_agrsh,
+                             d_qth = quartile_last3_agrsh - quartile_recent3_agrsh,
+                             ran_0406 = ranking_recent3_agrsh,
+                             d_ran = ranking_last3_agrsh - ranking_recent3_agrsh ))
 
 
 

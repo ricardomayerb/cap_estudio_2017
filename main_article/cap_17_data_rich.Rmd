@@ -22,31 +22,35 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ```{r constants_and_functions, message=FALSE}
 ```
-```{r load_data_sets, cache=TRUE}
+```{r load_data_sets}
 ```
-```{r prestamos_bancarios_qtr_from_dde_dfs, cache=TRUE}
+```{r prestamos_bancarios_qtr_from_dde_dfs}
 ```
-```{r dom_credit_dfs_anual_wb, cache=TRUE}
+```{r dom_credit_dfs_anual_wb}
 ```
-```{r NPL_bank_ratios_money_make_dfs, cache=TRUE}
+```{r NPL_bank_ratios_money_make_dfs}
 ```
-```{r risk_premium_on_lending, cache=TRUE}
+```{r risk_premium_on_lending}
 ```
-```{r new_external_debt_maturity_interests_dfs, cache=TRUE}
+```{r new_external_debt_maturity_interests_dfs}
 ```
-```{r composition_and_relative_size_ext_debt_dfs, cache=TRUE}
+```{r composition_and_relative_size_ext_debt_dfs}
 ```
-```{r capital_formation_and_consumption_make_dfs, cache=TRUE}
+```{r joining_financial_dfs}
 ```
-```{r trade_share_of_gdp_make_dfs, cache=TRUE}
+```{r capital_formation_and_consumption_make_dfs}
 ```
-```{r current_account_dfs, cache=TRUE}
+```{r trade_share_of_gdp_make_dfs}
 ```
-```{r trade_concentration_index_make_dfs, cache=TRUE}
+```{r current_account_dfs}
 ```
-```{r trade_shares_3_places_3_categories_dfs, cache=TRUE}
+```{r trade_concentration_index_make_dfs}
 ```
-```{r government_operations_and_debt_dfs, cache=TRUE}
+```{r trade_shares_3_places_3_categories_dfs}
+```
+```{r government_operations_and_debt_dfs}
+```
+```{r joining_real_sector_dfs}
 ```
 ```{r plot_quick_dirty_fns}
 ```
@@ -108,69 +112,8 @@ En cuanto a la razón de capital sobre activos de los bancos, no ha habido cambi
 podemos apreciar que aprocimadamete la mitad de los países elevaron levemente este ratio el el período posterior a la crisis, mietras que la otra mitad lo ha dismiuido Ene ste sentido, Bolivia , Costa Rica y Brasil han mejorado su posición relativa frente a sus vecinos, reforzando el patrimoio relativo de sus bancos, mientras EL Salvador, Venezuela y México han pasado a ser países con bancos relativamente menos capitalizados dentro de la región.
 
 
-```{r dom_finacial_joindf, warning=FALSE}
-# 
-# prepare_tm <- function(df, suffix) {
-#   new_df <- df %>% 
-#   select(iso3c, date, value, ranking, quartile, half,  ranking_3, quartile_3, half_3,
-#          avg_recent3, avg_last3, hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) 
-#   
-#   names(new_df)[3:10] <- paste(names(new_df), suffix, sep = "_")[3:10]
-#   
-#   return(new_df)
-# }
 
-dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")
-npl_tm <- prepare_tm(npl, "npl")
-bk_cap_to_ass_tm <- prepare_tm(bk_cap_to_ass, "bca")
-dom_risk_premium_wdi_tm <- prepare_tm(dom_risk_premium_wdi, "drp")
-
-
-
-dom_fin_df <- left_join(dom_cred_to_spriv_tm, npl_tm, by = c("iso3c", "date")) %>%
-  left_join(bk_cap_to_ass_tm, by = c("iso3c", "date")) %>%
-  left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date"))
-
-dom_fin_df_2006 <- dom_fin_df %>%
-  filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_dcpri)) 
-
-dom_fin_df_2007 <- dom_fin_df %>%
-  filter(year(date) %in% c(2007)) %>%arrange(desc(avg_recent3_dcpri))
-
-dom_fin_df_2015 <- dom_fin_df %>%
-  filter(year(date) %in% c(2015)) %>% arrange(desc(avg_recent3_dcpri))
-
-foo <- data.frame(avg_0406 = dom_fin_df_2006$avg_recent3_dcpri,
-                  avg_1416 = dom_fin_df_2006$avg_last3_dcpri,
-                  ran_06 = dom_fin_df_2006$ranking_dcpri,
-                  qth_0406 = dom_fin_df_2006$quartile_recent3_dcpri,
-                  qth_1416 = dom_fin_df_2006$quartile_last3_dcpri,
-                  ran_0406 = dom_fin_df_2006$ranking_recent3_dcpri,
-                  ran_1416 = dom_fin_df_2006$ranking_last3_dcpri,
-                  row.names =  dom_fin_df_2006$iso3c) 
-
-wfoo <- with(dom_fin_df_2006, data.frame(avg_0406 = avg_recent3_dcpri,
-                  avg_1416 = avg_last3_dcpri,
-                  ran_06 = ranking_dcpri,
-                  qth_0406 = quartile_recent3_dcpri,
-                  qth_1406 = quartile_last3_dcpri,
-                  ran_0406 = ranking_recent3_dcpri,
-                  ran_1406 = ranking_last3_dcpri,
-                  row.names =  iso3c) )
-
-goo  <- with(dom_fin_df_2006, data.frame(country = iso3c, avg_0406 = avg_recent3_dcpri,
-                  avg_1416 = avg_last3_dcpri,
-                  qth_0406 = quartile_recent3_dcpri,
-                  qth_1406 = quartile_last3_dcpri,
-                  ran_0406 = ranking_recent3_dcpri,
-                  ran_1406 = ranking_last3_dcpri ))
-
-moo  <- with(dom_fin_df_2006, data.frame(country = iso3c, avg_0406 = avg_recent3_dcpri,
-                  avg_1416 = avg_last3_dcpri,
-                  qth_0406 = quartile_recent3_dcpri,
-                  d_qth = quartile_last3_dcpri - quartile_recent3_dcpri,
-                  ran_0406 = ranking_recent3_dcpri,
-                  d_ran = ranking_last3_dcpri - ranking_recent3_dcpri ))
+```{r dom_finacial_plots_and_tables, warning=FALSE}
 
 r_g_domcred <- plot_cred_lines("ranking_dcpri", "ranking_npl", "ranking_bca",
                                main = "Ranking", main_data = "dom_fin_df",
@@ -223,12 +166,7 @@ Un indicador frecuentemente usado en la literatura como señanal de fragilidad a
 
 
 
-```{r edebt_joindf, message=FALSE, warning=FALSE}
-edebt_short_to_res_tm <- prepare_tm(edebt_short_to_res, "shre")
-edebt_short_to_total_tm <- prepare_tm(edebt_short_to_total, "sht")
-
-edebt_join_dfs <- left_join(edebt_short_to_res_tm, 
-                            edebt_short_to_total_tm, by = c("iso3c", "date") )
+```{r edebt_plots_and_tables, message=FALSE, warning=FALSE}
                             
 g_shre <- plot_1_lines("value_sht",
                        main = "Short-term external debt (% of total reserves) ", 
@@ -269,28 +207,7 @@ Una cualificación al punto anterior es que, con la excepció de México y Boliv
 e importaciones representa una fracción menor en este último trienio que el que antecedió  a la crisis .
 
 
-```{r trade_exposure_join, warning=FALSE}
-trade_to_gdp_tm <- prepare_tm(trade_to_gdp, "trade")
-
-trade_balance_tm <- prepare_tm(trade_balance, "trbal")
-
-curr_acc_to_gdp_tm <- prepare_tm(curr_acc_to_gdp, "cacc")
-
-cs_x_m_10_herf_tm <- prepare_tm(cs_x_m_10_herf, "xherf")
-
-exp_minepet_shares_tm <- prepare_tm(exp_minepet_shares, "minsh")
-
-exp_manuf_shares_tm <- prepare_tm(exp_manuf_shares, "mansh")
-
-exp_agro_pec_shares_tm <- prepare_tm(exp_agro_pec_shares, "agrsh")
-
-trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm, by = c("iso3c", "date")) %>% 
-  left_join(curr_acc_to_gdp_tm, by = c("iso3c", "date")) %>% 
-  left_join(cs_x_m_10_herf_tm, by = c("iso3c", "date")) %>% 
-  left_join(exp_minepet_shares_tm, by = c("iso3c", "date")) %>% 
-  left_join(exp_manuf_shares_tm, by = c("iso3c", "date")) %>% 
-  left_join(exp_agro_pec_shares_tm, by = c("iso3c", "date")) 
-
+```{r trade_exposure_plots_and_tables, warning=FALSE}
 g_trade <- plot_1_lines("value_trade",
                        main = "Trade (% of GDP)", 
                        main_data = "trade_cacc_join",
@@ -322,29 +239,6 @@ g_xhh
 
 
 
-manoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_mansh)),
-               data.frame(country = iso3c, avg_0406 = avg_recent3_mansh,
-                  avg_1416 = avg_last3_mansh,
-                  qth_0406 = quartile_recent3_mansh,
-                  d_qth = quartile_last3_mansh - quartile_recent3_mansh,
-                  ran_0406 = ranking_recent3_mansh,
-                  d_ran = ranking_last3_mansh - ranking_recent3_mansh ))
-
-minoo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_minsh)),
-                  data.frame(country = iso3c, avg_0406 = avg_recent3_minsh,
-                  avg_1416 = avg_last3_minsh,
-                  qth_0406 = quartile_recent3_minsh,
-                  d_qth = quartile_last3_minsh - quartile_recent3_minsh,
-                  ran_0406 = ranking_recent3_minsh,
-                  d_ran = ranking_last3_minsh - ranking_recent3_minsh ))
-
-agroo_06  <- with(trade_cacc_join %>% filter(year(date) %in% c(2006)) %>% arrange(desc(avg_recent3_agrsh)),
-               data.frame(country = iso3c, avg_0406 = avg_recent3_agrsh,
-                  avg_1416 = avg_last3_agrsh,
-                  qth_0406 = quartile_recent3_agrsh,
-                  d_qth = quartile_last3_agrsh - quartile_recent3_agrsh,
-                  ran_0406 = ranking_recent3_agrsh,
-                  d_ran = ranking_last3_agrsh - ranking_recent3_agrsh ))
 
 manoo_06
 minoo_06
