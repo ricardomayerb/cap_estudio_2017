@@ -1,7 +1,6 @@
  # use read_chunk to insert this in a Rmd doc
 
 
-
 # preliminary chunks --------------------------------------------------------
 
 ## ---- libraries
@@ -25,7 +24,7 @@ options(xtable.timestamp = "")
 options(width = 60)
 options(digits = 3)
 library(dplyr)
-
+library(wbstats)
 
 ## ---- constants_and_functions
 default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d") 
@@ -34,8 +33,8 @@ default_time_break <- as.Date("2005-12-31", format = "%Y-%m-%d")
 
 # pre_path <- params$path_prefix
 
-# pre_path <- "~/GitHub/cap_estudio_2017/"
-pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/'
+pre_path <- "~/GitHub/cap_estudio_2017/"
+# pre_path <- 'V:/USR/RMAYER/cw/cap_estudio_2017/' 
 
 source(paste0(pre_path, "functions/funcs_for_cap_2017.R"))
 
@@ -178,34 +177,45 @@ dcpsbk_gdp <- make_df_diff_hp(dom_credit_to_priv_sec_by_banks_to_gdp)
 dcps_gdp <- make_df_diff_hp(dom_credit_to_priv_sec_to_gdp)
 
 # combine credit dfs
-dcfs_gdp_tm <- dcfs_gdp %>% 
-  select(iso3c, date, value, ranking, quartile, half,
-         hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
-  rename(value_fs = value, 
-         ranking_fs = ranking, quartile_fs = quartile, half_fs = half,
-         hp_cycle_pct_fs = hp_cycle_pct, hp_trend_fs = hp_trend,
-         diff_lastval_fs = diff_lastval, diff_avg3_fs = diff_avg3)
+# dcfs_gdp_tm <- dcfs_gdp %>% 
+#   select(iso3c, date, value, ranking, quartile, half,
+#          hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
+#   rename(value_fs = value, 
+#          ranking_fs = ranking, quartile_fs = quartile, half_fs = half,
+#          hp_cycle_pct_fs = hp_cycle_pct, hp_trend_fs = hp_trend,
+#          diff_lastval_fs = diff_lastval, diff_avg3_fs = diff_avg3)
 
-dcps_gdp_tm <- dcps_gdp %>% 
-  select(iso3c, date, value, ranking, quartile, half, 
-         hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
-  rename(value_ps = value, 
-         ranking_ps = ranking, quartile_ps = quartile, half_ps = half,
-         hp_cycle_pct_ps = hp_cycle_pct, hp_trend_ps = hp_trend, 
-         diff_lastval_ps = diff_lastval, diff_avg3_ps = diff_avg3)
+# dcps_gdp_tm <- dcps_gdp %>% 
+#   select(iso3c, date, value, ranking, quartile, half, 
+#          hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
+#   rename(value_ps = value, 
+#          ranking_ps = ranking, quartile_ps = quartile, half_ps = half,
+#          hp_cycle_pct_ps = hp_cycle_pct, hp_trend_ps = hp_trend, 
+#          diff_lastval_ps = diff_lastval, diff_avg3_ps = diff_avg3)
+# 
+# dcpsbk_gdp_tm <- dcpsbk_gdp %>% 
+#   select(iso3c, date, value, ranking, quartile, half,
+#          hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
+#   rename(value_psbk = value, 
+#          ranking_psbk = ranking, quartile_psbk = quartile, half_psbk = half,
+#          hp_cycle_pct_psbk = hp_cycle_pct, hp_trend_psbk = hp_trend,
+#          diff_lastval_psbk = diff_lastval, diff_avg3_psbk = diff_avg3)
 
-dcpsbk_gdp_tm <- dcpsbk_gdp %>% 
-  select(iso3c, date, value, ranking, quartile, half,
-         hp_cycle_pct, hp_trend, diff_lastval, diff_avg3) %>% 
-  rename(value_psbk = value, 
-         ranking_psbk = ranking, quartile_psbk = quartile, half_psbk = half,
-         hp_cycle_pct_psbk = hp_cycle_pct, hp_trend_psbk = hp_trend,
-         diff_lastval_psbk = diff_lastval, diff_avg3_psbk = diff_avg3)
+
+
+
+dcfs_gdp_tm <- prepare_tm(dcfs_gdp, suffix = "fs")
+dcps_gdp_tm <- prepare_tm(dcfs_gdp, suffix = "ps")
+dcpsbk_gdp_tm <- prepare_tm(dcpsbk_gdp, suffix = "psbk")
+
 
 credit_pspsbkfs <-  left_join(dcps_gdp_tm, dcpsbk_gdp_tm,
                               by = c("iso3c", "date"))
 credit_pspsbkfs <- left_join(credit_pspsbkfs, dcfs_gdp_tm,
                              by = c("iso3c", "date"))
+
+dcps_2006_tables <- make_tables_present_last(dcps_gdp_tm, 2006, suffix = "ps")
+dcps_2007_tables <- make_tables_present_last(dcps_gdp_tm, 2007, suffix = "ps")
 
 
 ## ---- claims_on_gov_and_other_sectors
@@ -307,9 +317,13 @@ edebt_variab_usd <- make_df_diff_hp(ext_debt_variable_usd)
 
 
 # External debt stocks (% of GNI)
-ext_debt_total_gni   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
-  rename(date = year)
+# ext_debt_total_gni   <- WDI_33_selected_vars %>% 
+#   filter(indicator_code ==  "DT.DOD.DECT.GN.ZS") %>% 
+#   rename(date = year)
+ext_debt_total_gni   <- wb(country = coi_18,
+                           indicator = "DT.DOD.DECT.GN.ZS")
+
+
 edebt_total_gni <- make_df_diff_hp(ext_debt_total_gni)
 
 
@@ -322,25 +336,39 @@ int_pay_short_ext_usd <- make_df_diff_hp(int_payment_on_short_ext_usd)
 
 # Short-term debt (% of total external debt)
 # DT.DOD.DSTC.ZS
-ext_debt_short_to_total   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.ZS") %>% 
-  rename(date = year)
+# ext_debt_short_to_total   <- WDI_33_selected_vars %>% 
+#   filter(indicator_code ==  "DT.DOD.DSTC.ZS") %>% 
+#   rename(date = year)
+
+ext_debt_short_to_total   <- wb(country = coi_18,
+                                indicator = "DT.DOD.DSTC.ZS")  
 edebt_short_to_total <- make_df_diff_hp(ext_debt_short_to_total)
 
 # Short-term debt (% of total reserves)
 # DT.DOD.DSTC.IR.ZS
-ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
-  rename(date = year)
+
+ext_debt_short_to_reserves <- wb(country = coi_18,
+                                     indicator = "DT.DOD.DSTC.IR.ZS")  
+  
+
+# ext_debt_short_to_reserves   <- WDI_33_selected_vars %>% 
+#   filter(indicator_code ==  "DT.DOD.DSTC.IR.ZS") %>% 
+#   rename(date = year)
+
 edebt_short_to_res <- make_df_diff_hp(ext_debt_short_to_reserves)
 
 
 # Short-term debt (% of exports of goods, services and primary income)
 # DT.DOD.DSTC.XP.ZS
-ext_debt_short_to_expo   <- WDI_33_selected_vars %>% 
-  filter(indicator_code ==  "DT.DOD.DSTC.XP.ZS") %>% 
-  rename(date = year)
-edebt_short_to_expo <- make_df_diff_hp(ext_debt_short_to_expo)
+
+# ext_debt_short_to_expo   <- WDI_33_selected_vars %>% 
+#   filter(indicator_code ==  "DT.DOD.DSTC.XP.ZS") %>% 
+#   rename(date = year)
+
+ext_debt_short_to_export <- wb(country = coi_18,
+                                 indicator = "DT.DOD.DSTC.XP.ZS")  
+
+edebt_short_to_expo <- make_df_diff_hp(ext_debt_short_to_export)
 
 
 # Debt service on external debt, total (TDS, current US$)
@@ -359,26 +387,43 @@ reserves_to_edebt <- make_df_diff_hp(total_reserves_as_pct_total_ext_debt)
 
 ## ---- joining_financial_dfs
 
-
-
 dom_cred_to_spriv_tm <- prepare_tm(dcps_gdp, "dcpri")
 npl_tm <- prepare_tm(npl, "npl")
 bk_cap_to_ass_tm <- prepare_tm(bk_cap_to_ass, "bca")
 dom_risk_premium_wdi_tm <- prepare_tm(dom_risk_premium_wdi, "drp")
+bk_liqres_to_ass_tm = prepare_tm(bk_liqres_to_ass, "bliq")
 
 dom_fin_df <- left_join(dom_cred_to_spriv_tm, npl_tm, by = c("iso3c", "date")) %>%
   left_join(bk_cap_to_ass_tm, by = c("iso3c", "date")) %>%
-  left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date"))
+  left_join(dom_risk_premium_wdi_tm, by = c("iso3c", "date")) %>% 
+  left_join(bk_liqres_to_ass_tm,  by = c("iso3c", "date"))
 
-ta_credpri <- make_tab_rank(dom_fin_df, 2006, "dcpri")
-ta_credpri_d <- make_tab_rank_d(dom_fin_df, 2006, "dcpri")
 
 
 edebt_short_to_res_tm <- prepare_tm(edebt_short_to_res, "shre")
 edebt_short_to_total_tm <- prepare_tm(edebt_short_to_total, "sht")
+edebt_short_to_expo_tm <- prepare_tm(edebt_short_to_expo, "shexp")
 
 edebt_join_dfs <- left_join(edebt_short_to_res_tm, 
-                            edebt_short_to_total_tm, by = c("iso3c", "date") )
+                            edebt_short_to_total_tm, 
+                            edebt_short_to_expo_tm ,
+                            by = c("iso3c", "date") )
+
+
+extshort_res_2007 = make_tables_present_last(edebt_join_dfs , 2007, "shre")
+extshort_tot_2007 = make_tables_present_last(edebt_join_dfs , 2007, "sht")
+# extshort_exp_2007 = make_tables_present_last(edebt_join_dfs , 2007, "shexp")
+
+extshort_res_2007$level_vars
+extshort_tot_2007$level_vars
+edebt_short_to_expo %>% filter( year(date) == 2015) %>% select(iso3c,  value)
+
+
+bkcap_2007 = make_tables_present_last(dom_fin_df, 2007, "bca")
+bkcap_2007$level_vars
+
+bkliq_2007 =  make_tables_present_last(dom_fin_df, 2007, "bliq")
+bkliq_2007$level_vars
 
 
 # real sector variables dfs ----
@@ -795,20 +840,14 @@ trade_cacc_join <- left_join(trade_to_gdp_tm, trade_balance_tm,
   left_join(exp_manuf_shares_tm, by = c("iso3c", "date")) %>% 
   left_join(exp_agro_pec_shares_tm, by = c("iso3c", "date")) 
 
-xmanuf_06 <-   make_tab_rank(trade_cacc_join, 2006, "mansh")
-xminpet_06 <-   make_tab_rank(trade_cacc_join, 2006, "minsh")
-xagro_06 <-   make_tab_rank(trade_cacc_join, 2006, "agrsh") 
+xmanuf_06 <-   make_tables_present_last(trade_cacc_join, 2006, "mansh")
+xminpet_06 <-  make_tables_present_last(trade_cacc_join, 2006, "minsh")
+xagro_06 <-   make_tables_present_last(trade_cacc_join, 2006, "agrsh") 
 
-xmanuf_d_06 <-  make_tab_rank_d(trade_cacc_join, 2006, "mansh")
-xminpet_d_06 <-   make_tab_rank_d(trade_cacc_join, 2006, "minsh")
-xagro_d_06 <-   make_tab_rank_d(trade_cacc_join, 2006, "agrsh") 
 
-x_hh_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
-x_hh_d_06 <- make_tab_rank_d(trade_cacc_join, 2006, "xherf")
+x_hh_06 <- make_tables_present_last(trade_cacc_join, 2006, "xherf")
 
-cacc_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
-cacc_d_06 <- make_tab_rank(trade_cacc_join, 2006, "xherf")
-
+cacc_06 <- make_tables_present_last(trade_cacc_join, 2006, "xherf")
 
 deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "dcen_tot") 
 deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "dcen_dom")

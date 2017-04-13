@@ -50,13 +50,13 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date",
                df_rdiff <- df %>%
                  group_by(iso3c) %>% 
                  arrange(datecol) %>% 
-                 mutate(last_pct_chg = 100 * (valuecol - lag(valuecol))/lag(valuecol),
+                 mutate(last_pct_cycle = dplyr::last(hpcyclepct),
+                        last_hp_trend = dplyr::last(hptrend),
+                        last_val = dplyr::last(valuecol),
                         diff_lastval = dplyr::last(valuecol) - valuecol,
-                        avg_last3 = mean( c(
-                          dplyr::last(valuecol),
-                          lag(dplyr::last(valuecol)),
-                          lag(dplyr::last(valuecol), 2)
-                        ),na.rm = TRUE),
+                        pct_diff_lastval = 100 * diff_lastval/last_val,
+                        avg_last3 = mean( c(last_val, lag(last_val), lag(last_val, 2)),
+                                          na.rm = TRUE),
                         avg_recent3 = mean(c(valuecol, lag(valuecol), lag(valuecol, 2)),
                                            na.rm = TRUE),
                         diff_avg3 = avg_last3 - avg_recent3,
@@ -86,11 +86,13 @@ add_diffrank <- function(df, valuecol_name = "value", datecol_name = "date",
 
 prepare_tm <- function(df, suffix) {
   new_df <- df %>%
-    select(iso3c, date, value, ranking, quartile, half, hp_cycle_pct, hp_trend,
-           ranking_recent3, quartile_recent3, half_recent3, avg_recent3, 
-           ranking_last3, quartile_last3, half_last3, avg_last3, 
-           diff_lastval, diff_avg3, sd_cycle_pct, sd_cycle_pct_2010plus,
-           sd_cycle_pct_calm, pct_diff_avg3, pct_diff_avg3, last_pct_chg)
+    select(iso3c, date, value, last_val, diff_lastval, pct_diff_lastval, 
+           avg_recent3, avg_last3, diff_avg3, pct_diff_avg3,    
+           hp_cycle_pct, hp_trend, hp_sd_cycle_pct, last_pct_cycle, last_hp_trend,
+           ranking, quartile, half,
+           ranking_recent3, quartile_recent3, half_recent3, 
+           ranking_last3, quartile_last3, half_last3
+           )
   
   nc = ncol(new_df)
   
@@ -107,6 +109,7 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
   df$hp_cycle <- NA
   df$hp_trend <- NA
   df$hp_cycle_pct <- NA
+  df$hp_sd_cycle_pct <- NA
   
   if(data_periodicity == "annual"){
     lambda_value = 6.25
@@ -132,52 +135,89 @@ add_ts_filters <- function(df, date_colname = "date", value_colname = "value",
     df$hp_trend[df$iso3c == co] <- co_hp$trend
     df$hp_cycle_pct[df$iso3c == co] <- 100 * co_hp$cycle/co_hp$trend
     
+    dates_co_post_1989 <- year(co_data[[date_colname]]) >= 1990
+    sd_post_1989 =  sd((100 * co_hp$cycle/co_hp$trend)[dates_co_post_1989], na.rm = TRUE)
+    df$hp_sd_cycle_pct[df$iso3c == co] <- sd_post_1989
+    # df$hp_sd_cycle_pct[df$iso3c == co] <- sd(100 * co_hp$cycle/co_hp$trend, na.rm = TRUE)
+    
+    
   }
-  
-  sd_cycle_pct_full_sample <- sd(df$hp_cycle_pct, na.rm = TRUE)
-  dates_after_2009 <- year(co_data[[date_colname]]) > 2009
-  dates_good_times <- year(co_data[[date_colname]]) %in% c(2003:2007, 2010:2015)
-  
-  sd_cycle_pct_2010_16 <- sd(df$hp_cycle_pct[dates_after_2009], na.rm = TRUE)
-  sd_cycle_pct_calmer <- sd(df$hp_cycle_pct[dates_good_times], na.rm = TRUE)
-  
-  df$sd_cycle_pct <- sd_cycle_pct_full_sample
-  df$sd_cycle_pct_2010plus <- sd_cycle_pct_2010_16
-  df$sd_cycle_pct_calm <- sd_cycle_pct_calmer
   
   return(df)
 }
 
 
-make_tab_rank <- function(df, year, suffix) {
+make_tables_present_last <- function(df, year, suffix) {
   
+  diff_lastval_suffix = paste0("diff_lastval_", suffix)
   avg_recent3_suffix = paste0("avg_recent3_", suffix)
   avg_last3_suffix = paste0("avg_last3_", suffix)
+  avg_pctcycle_last3_suffix = paste0("avg_pctcycle_last3_", suffix)
+  avg_pctcycle_recent3_suffix = paste0("avg_pctcycle_recent3_", suffix)
   quartile_recent3_suffix = paste0("quartile_recent3_", suffix)
   quartile_last3_suffix = paste0("quartile_last3_", suffix)
   ranking_recent3_suffix = paste0("ranking_recent3_", suffix)
   ranking_last3_suffix = paste0("ranking_last3_", suffix)
+  value_suffix = paste0("value_", suffix)
+  hp_cycle_pct_suffix = paste0("hp_cycle_pct_", suffix)
+  last_val_suffix = paste0("last_val_", suffix)
+  last_pct_cycle_suffix = paste0("last_pct_cycle_", suffix)
+  last_hp_trend_suffix = paste0("last_hp_trend_", suffix)
+  hp_trend_suffix = paste0("hp_trend_", suffix)
+  hp_sd_cycle_pct_suffix = paste0("hp_sd_cycle_pct_", suffix)
   
   wrapr::let(alias = list(avg_recent3_suffix = avg_recent3_suffix,
                           avg_last3_suffix = avg_last3_suffix,
+                          avg_pctcycle_recent3_suffix = avg_pctcycle_recent3_suffix,
+                          avg_pctcycle_last3_suffix = avg_pctcycle_last3_suffix,
+                          diff_lastval_suffix = diff_lastval_suffix,
+                          hp_trend_suffix = hp_trend_suffix,
+                          hp_cycle_pct_suffix = hp_cycle_pct_suffix,
+                          hp_sd_cycle_pct_suffix = hp_sd_cycle_pct_suffix,
+                          last_pct_cycle_suffix = last_pct_cycle_suffix,
+                          last_hp_trend_suffix = last_hp_trend_suffix,
+                          last_val_suffix = last_val_suffix,
                           quartile_recent3_suffix = quartile_recent3_suffix,
                           quartile_last3_suffix = quartile_last3_suffix,
                           ranking_recent3_suffix = ranking_recent3_suffix,
-                          ranking_last3_suffix = ranking_last3_suffix),
+                          ranking_last3_suffix = ranking_last3_suffix,
+                          value_suffix = value_suffix
+                          ),
              expr = {
                fil_df <- df %>% filter(year(date) %in% c(year)) %>% 
                  arrange(desc(avg_recent3_suffix))
                
-               new_df <- with(fil_df,
-                              data.frame(country = iso3c, 
-                                         avg_ini = avg_recent3_suffix,
-                                         avg_fin = avg_last3_suffix,
-                                         qth_ini = quartile_recent3_suffix,
-                                         qth_fin = quartile_last3_suffix,
-                                         ran_ini = ranking_recent3_suffix,
-                                         ran_fin = ranking_last3_suffix))
+               
+               lev_df <- fil_df %>% 
+                 select( iso3c,
+                         avg_recent3_suffix, value_suffix, last_val_suffix) %>% 
+                 rename(avg_previous = avg_recent3_suffix)
+               
+               ranking_df <- fil_df %>% 
+                 mutate(d_qth = quartile_last3_suffix - quartile_recent3_suffix,
+                        d_ran_fin = ranking_last3_suffix - ranking_recent3_suffix) %>% 
+                 select(iso3c, quartile_recent3_suffix, quartile_last3_suffix,
+                        d_qth, ranking_recent3_suffix, ranking_last3_suffix,
+                        d_ran_fin)
+               # hp_cycle_pct           
+               
+               diff_df <- fil_df %>% 
+                 mutate(d_ave = avg_last3_suffix - avg_recent3_suffix,
+                        pd_ave = 100*(avg_last3_suffix - avg_recent3_suffix)/avg_recent3_suffix) %>% 
+                 select(iso3c, diff_lastval_suffix, d_ave, pd_ave)
+               
+               trendcyl_df <- fil_df %>% 
+                 select(iso3c, hp_trend_suffix,  hp_cycle_pct_suffix,
+                        last_hp_trend_suffix, last_pct_cycle_suffix, hp_sd_cycle_pct_suffix) %>% 
+                 rename(tre = hp_trend_suffix, cyl = hp_cycle_pct_suffix,
+                        tre_fin = last_hp_trend_suffix, cyl_fin = last_pct_cycle_suffix,
+                        sd_cyl = hp_sd_cycle_pct_suffix)
+                 
              })
-  return(new_df)
+  
+  list_of_dfs <- list(level_vars = lev_df, ranking_vars = ranking_df, 
+                      diff_vars = diff_df, trend_vars = trendcyl_df)
+  return(list_of_dfs)
 }
 
 
@@ -262,7 +302,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
                      ncol = cols, nrow = ceiling(numPlots/cols))
   }
   
-  if (numPlots==1) {
+  if (numPlots == 1) {
     print(plots[[1]])
     
   } else {

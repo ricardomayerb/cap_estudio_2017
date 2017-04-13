@@ -1,0 +1,191 @@
+---
+title: "Changing resilience maps"
+author: "ricardo mayer"
+date: "April 9, 2017"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  word_document: default
+---
+
+```{r setup, echo=FALSE}
+knitr::read_chunk("./../scripts/financial_script_alc.R")
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r libraries, message=FALSE}
+```
+```{r constants_and_functions, message=FALSE}
+```
+```{r load_data_sets}
+```
+```{r prestamos_bancarios_qtr_from_dde_dfs}
+```
+```{r dom_credit_dfs_anual_wb}
+```
+```{r NPL_bank_ratios_money_make_dfs}
+```
+```{r risk_premium_on_lending}
+```
+```{r new_external_debt_maturity_interests_dfs}
+```
+```{r composition_and_relative_size_ext_debt_dfs}
+```
+```{r joining_financial_dfs}
+```
+```{r capital_formation_and_consumption_make_dfs}
+```
+```{r trade_share_of_gdp_make_dfs}
+```
+```{r current_account_dfs}
+```
+```{r trade_concentration_index_make_dfs}
+```
+```{r trade_shares_3_places_3_categories_dfs}
+```
+```{r government_operations_and_debt_dfs}
+```
+```{r joining_real_sector_dfs}
+```
+```{r plot_quick_dirty_fns}
+```
+
+## Vulnerabilidad ante choques financieros
+
+Indicadores clave
+
+### Credit to private sector
+
+#### Level of Credit to GDP ratio
+
+1. Credit to private sector:
+
+   + Level (100%)
+   + Departure from trend
+
+   
+
+  
+
+Cuando preocuparse?
+
+```{r trade_exposure_plots_and_tables, warning=FALSE}
+g_trade <- plot_1_lines("value_trade",
+                       main = "Trade (% of GDP)", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+
+r_g_trade <- plot_1_lines("ranking_trade",
+                       main = "Ranking, trade", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+
+q_g_trade <- plot_1_lines("quartile_trade",
+                       main = "Quartiles, trade", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Trade (% GDP)")
+g_trade
+r_g_trade
+q_g_trade
+
+g_xhh <- plot_1_lines("value_xherf",
+                       main = "HHI of exports", 
+                       main_data = "trade_cacc_join",
+                      dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                      le1 = "Exports, HH index")
+
+g_xhh
+
+
+
+
+```
+
+
+```{r public_sector_joined, message=FALSE, warning=FALSE}
+resul_prim_gcen_tm <- prepare_tm(resul_prim_gcen, "primcen")
+resul_prim_ggen_tm <- prepare_tm(resul_prim_ggen, "primgen")
+resul_prim_spnf_tm <- prepare_tm(resul_prim_spnf, "primspnf")
+resul_global_gcen_tm <- prepare_tm(resul_global_gcen, "globcen")
+resul_global_ggen_tm <- prepare_tm(resul_global_ggen, "globgen")
+resul_global_spnf_tm <- prepare_tm(resul_global_spnf, "globspnf")
+
+deuda_pub_cen_tot_tm <- prepare_tm(deuda_pub_cen_tot, "centot")
+deuda_pub_cen_dom_tm <- prepare_tm(deuda_pub_cen_dom, "cendom")
+deuda_pub_cen_ext_tm <- prepare_tm(deuda_pub_cen_ext, "cenext")
+deuda_pub_sp_tot_tm <- prepare_tm(deuda_pub_sp_tot, "sptot")
+deuda_pub_sp_dom_tm <- prepare_tm(deuda_pub_sp_dom, "spdom")
+deuda_pub_sp_ext_tm <- prepare_tm(deuda_pub_sp_ext, "spext")
+deuda_pub_spnf_tot_tm <- prepare_tm(deuda_pub_spnf_tot, "spnftot")
+deuda_pub_spnf_dom_tm <- prepare_tm(deuda_pub_spnf_dom, "spnfdom")
+deuda_pub_spnf_ext_tm <- prepare_tm(deuda_pub_spnf_ext, "spnfext")
+deuda_pub_gsub_tot_tm <- prepare_tm(deuda_pub_gsub_tot, "gsubtot")
+deuda_pub_gsub_dom_tm <- prepare_tm(deuda_pub_gsub_dom, "gsubdom")
+deuda_pub_gsub_ext_tm  <- prepare_tm(deuda_pub_gsub_ext , "gsubext")
+
+tax_revenue_to_gdp_tm <- prepare_tm(tax_revenue_to_gdp, "taxrev")
+revenue_to_gdp_tm <- prepare_tm(revenue_to_gdp, "rev")
+
+public_sector_joined <- left_join(resul_prim_gcen_tm, resul_prim_ggen_tm,
+                                  by = c("iso3c", "date")) %>% 
+  left_join(resul_prim_spnf_tm, by = c("iso3c", "date")) %>%
+  left_join(resul_global_gcen_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_global_ggen_tm, by = c("iso3c", "date")) %>% 
+  left_join(resul_global_spnf_tm, by = c("iso3c", "date")) %>%
+  left_join(deuda_pub_cen_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_cen_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_cen_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_sp_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_spnf_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_tot_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_dom_tm, by = c("iso3c", "date")) %>% 
+  left_join(deuda_pub_gsub_ext_tm, by = c("iso3c", "date")) %>% 
+  left_join(tax_revenue_to_gdp_tm, by = c("iso3c", "date")) %>% 
+  left_join(revenue_to_gdp_tm , by = c("iso3c", "date")) 
+
+g_primary_all <- plot_cred_lines("value_primcen", "value_primgen", "value_primspnf",
+                              main_data = "public_sector_joined",
+                              le1 = "central", le2 = "general", le3 = "spnf",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Primary result (% GDP)")
+
+g_global_all <- plot_cred_lines("value_globcen", "value_globgen", "value_globspnf",
+                              main_data = "public_sector_joined",
+                              le1 = "central", le2 = "general", le3 = "spnf",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Global result (% GDP)")
+
+g_primary_global_cen <-  plot_2_lines("value_primcen", "value_globcen",
+                              main_data = "public_sector_joined",
+                              le1 = "primary", le2 = "global",
+                              dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                              main = "Primary and global results (% GDP)")
+
+r_g_global_result <- plot_1_lines("ranking_globcen", le1 = "Global result",
+                                  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                                  main_data = "public_sector_joined",
+                                  main = "Ranking, global fiscal results")
+
+q_g_global_result <- plot_1_lines("quartile_globcen", le1 = "Global result",
+                                  dxlim = c(ymd("1999-12-31"), ymd("2015-12-31")),
+                                  main_data = "public_sector_joined",
+                                  main = "Quartiles, global fiscal results")
+
+g_primary_all
+g_global_all
+g_primary_global_cen
+r_g_global_result 
+q_g_global_result
+```
